@@ -3,18 +3,22 @@ import {
   createDrawerNavigator,
   createSwitchNavigator
 } from "react-navigation";
-import HomeStackNavigator from "~/Screens/Home/index";
+import HomeTabNavigator from "~/Screens/Home/index";
 import Loading from "~/Screens/Loading";
-import LoginScreen from "~/Screens/Login";
-import MyAccountScreen from "~/Screens/MyAccount/MyAccountScreen";
-import WelcomeScreen from "~/Screens/Welcome";
+import AccountStack from "./Screens/Account/AccountStack";
+import AuthStack from "./Screens/Auth/AuthStack";
+import SettingStack from "./Screens/Settings/SettingStack";
+import WelcomeStack from "./Screens/Welcome/WelcomeStack";
 
 const RootDrawer = createDrawerNavigator({
   Home: {
-    screen: HomeStackNavigator
+    screen: HomeTabNavigator
   },
-  "My Account": {
-    screen: MyAccountScreen
+  Account: {
+    screen: AccountStack
+  },
+  Setting: {
+    screen: SettingStack
   }
 });
 
@@ -24,10 +28,10 @@ const RootSwitch = createSwitchNavigator(
       screen: Loading
     },
     Login: {
-      screen: LoginScreen
+      screen: AuthStack
     },
     Welcome: {
-      screen: WelcomeScreen
+      screen: WelcomeStack
     },
     Dashboard: {
       screen: RootDrawer

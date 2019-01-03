@@ -4,7 +4,8 @@ import firebase from "react-native-firebase";
 
 const auth = (
   state = {
-    info: {},
+    info:
+      firebase.auth().currentUser !== null ? firebase.auth().currentUser : {},
     loggedIn: firebase.auth().currentUser !== null,
     error: {
       isError: false,

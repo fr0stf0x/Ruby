@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { View, Text } from "react-native";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 class QuotationsScreen extends Component {
   render() {
@@ -10,5 +11,8 @@ class QuotationsScreen extends Component {
     );
   }
 }
+QuotationsScreen.navigationOptions = {
+  tabBarIcon: <Icon name="list-ol" size={20} />
+};
 
 export default QuotationsScreen;

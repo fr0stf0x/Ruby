@@ -1,8 +1,8 @@
-import { isUserLoggedIn, authError } from "./auth.selector";
+import { isUserLoggedIn, authError, userInfo } from "./auth.selector";
 import { isLoading } from "./ui.selector";
 
 const selectors = {
-  auth: { isUserLoggedIn, authError },
+  auth: { isUserLoggedIn, authError, userInfo },
   ui: { isLoading }
 };
 

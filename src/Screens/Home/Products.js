@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { View, Text } from "react-native";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 class ProductsScreen extends Component {
   render() {
@@ -10,5 +11,8 @@ class ProductsScreen extends Component {
     );
   }
 }
+ProductsScreen.navigationOptions = {
+  tabBarIcon: <Icon name="product-hunt" size={20} />
+};
 
 export default ProductsScreen;

@@ -1,38 +1,25 @@
 import React from "react";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
-import selectors from "~/Selectors";
+import { ActivityIndicator } from "react-native";
+import { Overlay } from "react-native-elements";
 import { connect } from "react-redux";
+import selectors from "~/Selectors";
 
 class Loading extends React.Component {
-  static navigationOptions = {
-    title: "Loading"
-  };
-
   render() {
     return (
-      this.props.isLoading && (
-        <View style={styles.loadingView}>
-          <View style={styles.container}>
-            <ActivityIndicator size="large" />
-          </View>
-        </View>
-      )
+      <Overlay
+        isVisible={this.props.isLoading}
+        windowBackgroundColor="rgba(255,255,255, 0.7)"
+        overlayBackgroundColor="rgba(0,0,0, 0.7"
+        width="auto"
+        height="auto"
+      >
+        <ActivityIndicator color="#000" size="large" />
+      </Overlay>
     );
   }
 }
-const styles = StyleSheet.create({
-  loadingView: {
-    ...StyleSheet.absoluteFill,
-    backgroundColor: "#000",
-    opacity: 0.7
-  },
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center"
-  }
-});
 
-export default connect(state => ({ isLoading: selectors.ui.isLoading(state) }))(
-  Loading
-);
+export default connect(state => ({
+  isLoading: selectors.ui.isLoading(state)
+}))(Loading);

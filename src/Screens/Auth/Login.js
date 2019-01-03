@@ -25,9 +25,6 @@ class LoginScreen extends Component {
       if (email !== null && password !== null) {
         this.setState({ email, password });
       }
-    } catch (error) {
-      // Error retrieving data
-      console.warn("You have not signed");
     } finally {
       toggleLoading();
     }
@@ -35,30 +32,23 @@ class LoginScreen extends Component {
 
   componentDidMount() {
     const { isUserLoggedIn, navigation } = this.props;
-    if (isUserLoggedIn) {
-      navigation.navigate("Welcome");
-    } else {
+    (isUserLoggedIn && navigation.navigate("Welcome")) ||
       this.getAccountAsync();
-    }
   }
 
   logIn = () => {
     const { email, password } = this.state;
-    const { logIn, navigation, toggleLoading } = this.props;
-    logIn({ email, password })
-      .then(() => navigation.navigate("Welcome"))
-      .finally(() => {
-        toggleLoading();
-      });
+    const { logIn, navigation } = this.props;
+    logIn({ email, password }).then(() => navigation.navigate("Welcome"));
   };
 
   render() {
     const { email, password } = this.state;
-    const { authError } = this.props;
+    const { authError, navigation } = this.props;
 
     return (
       <View style={{ flex: 1 }}>
-        <Header centerComponent={{ text: "LOGIN", style: { color: "#fff" } }} />
+        {/* <Header centerComponent={{ text: "LOGIN", style: { color: "#fff" } }} /> */}
         <View
           style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
         >
@@ -78,10 +68,28 @@ class LoginScreen extends Component {
           />
           <Button
             title="Login"
-            style={{ margin: 10 }}
-            primary
-            block
+            buttonStyle={{
+              backgroundColor: "rgba(92, 99, 216, 1)",
+              width: 300,
+              height: 45,
+              borderColor: "transparent",
+              borderWidth: 0,
+              borderRadius: 5,
+              margin: 10
+            }}
             onPress={this.logIn}
+          />
+          <Button
+            title="Sign up"
+            buttonStyle={{
+              backgroundColor: "rgba(200, 125, 231, 1)",
+              width: 300,
+              height: 45,
+              borderColor: "transparent",
+              borderWidth: 0,
+              borderRadius: 5
+            }}
+            onPress={() => navigation.navigate("SignUp")}
           />
         </View>
       </View>

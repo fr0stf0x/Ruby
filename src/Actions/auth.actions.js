@@ -54,6 +54,9 @@ export const makeLogIn = ({ email, password }) => dispatch => {
     .catch(err => {
       const { code, message } = err;
       dispatch(authError({ code, message }));
+    })
+    .finally(() => {
+      dispatch(toggleLoading());
     });
 };
 
@@ -66,5 +69,8 @@ export const makeLogOut = () => dispatch => {
       dispatch(logOut());
       dispatch(authSuccess());
       return res;
+    })
+    .finally(() => {
+      dispatch(toggleLoading());
     });
 };

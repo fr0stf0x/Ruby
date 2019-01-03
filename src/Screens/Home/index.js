@@ -26,6 +26,12 @@ const HomeTabNavigator = createBottomTabNavigator(
       return {
         headerTitle: routeName
       };
+    },
+    tabBarOptions: {
+      activeTintColor: "#e91e63",
+      labelStyle: {
+        fontSize: 14
+      }
     }
   }
 );
