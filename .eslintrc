@@ -1,0 +1,45 @@
+{
+    "parser": "babel-eslint",
+    "parserOptions": {
+        "sourceType": "module",
+        "ecmaFeatures": {
+            "jsx": true
+        }
+    },
+    "plugins": [
+        "react",
+        "react-native",
+        "import"
+    ],
+    "extends": [
+        "eslint:recommended",
+        "plugin:import/errors",
+        "plugin:import/warnings",
+        "plugin:react/recommended",
+        "plugin:prettier/recommended"
+    ],
+    "rules": {
+        "class-methods-use-this": "off",
+        "no-use-before-define": "off",
+        "react-native/no-color-literals": "off",
+        "no-console": "off",
+        "no-unused-vars": "warn",
+        "react/prop-types": "off",
+        "react/display-name": "off"
+    },
+    "settings": {
+        "import/resolver": {
+            "babel-plugin-root-import": {
+                "rootPathPrefix": "~",
+                "rootPathSuffix": "src"
+            }
+        },
+        "react": {
+            "version": "16.6.3",
+            "flowVersion": "0.78.0"
+        }
+    },
+    "env": {
+        "jest": true
+    }
+}
