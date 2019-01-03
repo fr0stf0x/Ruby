@@ -9,8 +9,9 @@
 import React, { Component } from "react";
 import { ThemeProvider } from "react-native-elements";
 import { Provider } from "react-redux";
-import Ruby, { AppContainer } from "~/Ruby";
+import AppContainer from "~/AppContainer";
 import configureStore from "~/configureStore";
+import Loading from "~/Screens/Loading";
 import theme from "~/Theme";
 
 const store = configureStore();
@@ -20,8 +21,8 @@ class App extends Component {
     return (
       <Provider store={store}>
         <ThemeProvider theme={theme}>
-          {/* <Ruby /> */}
           <AppContainer />
+          <Loading />
         </ThemeProvider>
       </Provider>
     );

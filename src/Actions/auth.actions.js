@@ -1,6 +1,7 @@
 import types from "./ActionTypes";
 import firebase from "react-native-firebase";
 import { AsyncStorage } from "react-native";
+import { toggleLoading } from "./ui.actions";
 
 const login = ({ user: info, account }) => {
   setAsyncStorage(account);
@@ -41,12 +42,14 @@ const authSuccess = () => {
 };
 
 export const makeLogIn = ({ email, password }) => dispatch => {
-  firebase
+  dispatch(toggleLoading());
+  return firebase
     .auth()
     .signInWithEmailAndPassword(email, password)
     .then(({ user }) => {
       dispatch(login({ user, account: { email, password } }));
       dispatch(authSuccess());
+      return { user };
     })
     .catch(err => {
       const { code, message } = err;
@@ -55,11 +58,13 @@ export const makeLogIn = ({ email, password }) => dispatch => {
 };
 
 export const makeLogOut = () => dispatch => {
-  firebase
+  dispatch(toggleLoading());
+  return firebase
     .auth()
     .signOut()
-    .then(() => {
+    .then(res => {
       dispatch(logOut());
       dispatch(authSuccess());
+      return res;
     });
 };

@@ -6,11 +6,13 @@ import actions from "~/Actions";
 
 class MyAccountScreen extends Component {
   logOut = () => {
-    const { dispatch } = this.props;
-    dispatch(actions.auth.makeLogOut());
+    const { logOut, navigation, toggleLoading } = this.props;
+    logOut()
+      .then(() => {
+        navigation.navigate("Login");
+      })
+      .finally(() => toggleLoading());
   };
-
-  componentDidMount() {}
 
   render() {
     return (
@@ -21,6 +23,12 @@ class MyAccountScreen extends Component {
   }
 }
 
-export default connect(state => {
-  return {};
-})(MyAccountScreen);
+export default connect(
+  state => {
+    return {};
+  },
+  dispatch => ({
+    logOut: () => dispatch(actions.auth.makeLogOut()),
+    toggleLoading: () => dispatch(actions.ui.toggleLoading())
+  })
+)(MyAccountScreen);

@@ -11,17 +11,25 @@ class LoginScreen extends Component {
     title: "Login"
   };
 
+  state = {
+    email: "",
+    password: ""
+  };
+
   getAccountAsync = async () => {
+    const { toggleLoading } = this.props;
+    toggleLoading();
     try {
       const email = await AsyncStorage.getItem("email");
       const password = await AsyncStorage.getItem("password");
       if (email !== null && password !== null) {
         this.setState({ email, password });
-        console.warn(email, password);
       }
     } catch (error) {
       // Error retrieving data
       console.warn("You have not signed");
+    } finally {
+      toggleLoading();
     }
   };
 
@@ -34,15 +42,14 @@ class LoginScreen extends Component {
     }
   }
 
-  state = {
-    email: "",
-    password: ""
-  };
-
   logIn = () => {
     const { email, password } = this.state;
-    const { logIn } = this.props;
-    logIn({ email, password });
+    const { logIn, navigation, toggleLoading } = this.props;
+    logIn({ email, password })
+      .then(() => navigation.navigate("Welcome"))
+      .finally(() => {
+        toggleLoading();
+      });
   };
 
   render() {
@@ -89,6 +96,7 @@ export default connect(
   }),
   dispatch => ({
     logIn: ({ email, password }) =>
-      dispatch(actions.auth.makeLogIn({ email, password }))
+      dispatch(actions.auth.makeLogIn({ email, password })),
+    toggleLoading: () => dispatch(actions.ui.toggleLoading())
   })
 )(LoginScreen);
