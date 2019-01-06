@@ -15,7 +15,7 @@ const appData = (state = {}, action) => {
 const endpoint = (state = {}, action) => {
   switch (action.type) {
     case types.data.GET_DATA:
-      console.log("getting " + action.meta.endpoint);
+      console.log("receiving collection " + action.meta.endpoint);
       return mergeObj(state, action.payload.data);
     default:
       return state;

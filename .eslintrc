@@ -35,11 +35,13 @@
             }
         },
         "react": {
-            "version": "16.7.0",
+            "version": "16.6.3",
             "flowVersion": "0.78.0"
         }
     },
     "env": {
-        "jest": true
+        "jest": true,
+        "es6": true,
+        "browser": true
     }
 }

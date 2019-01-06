@@ -5,7 +5,7 @@ import {
   StyleSheet,
   View
 } from "react-native";
-import { Button, Divider, Input, Text } from "react-native-elements";
+import { Button, Input, Text } from "react-native-elements";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { connect } from "react-redux";
 import actions from "~/Actions";
@@ -97,8 +97,7 @@ class CreateAccount extends Component {
               error.email &&
               error.email.map((err, key) => (
                 <View key={key}>
-                  <Text style={Styles.error}>{err}</Text>
-                  <Divider />
+                  <Text style={Styles.Error}>{err}</Text>
                 </View>
               ))}
           </View>
@@ -122,8 +121,7 @@ class CreateAccount extends Component {
               error.password &&
               error.password.map((err, key) => (
                 <View key={key}>
-                  <Text style={Styles.error}>{err}</Text>
-                  <Divider />
+                  <Text style={Styles.Error}>{err}</Text>
                 </View>
               ))}
           </View>
@@ -138,8 +136,7 @@ class CreateAccount extends Component {
               error.name &&
               error.name.map((err, key) => (
                 <View key={key}>
-                  <Text style={Styles.error}>{err}</Text>
-                  <Divider />
+                  <Text style={Styles.Error}>{err}</Text>
                 </View>
               ))}
           </View>
@@ -161,8 +158,9 @@ const Styles = StyleSheet.create({
   FlexBasis: {
     flexBasis: 70
   },
-  error: {
-    color: "red"
+  Error: {
+    color: globalColorsAndStyles.color.error,
+    textAlign: "center"
   }
 });
 

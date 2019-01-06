@@ -1,7 +1,8 @@
 export const globalColorsAndStyles = {
   color: {
     primary: "rgba(92, 99, 216, 1)",
-    secondary: "rgba(200, 125, 231, 1)"
+    secondary: "rgba(200, 125, 231, 1)",
+    error: "red"
   },
   style: {
     boxShadow: {

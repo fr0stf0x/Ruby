@@ -21,6 +21,11 @@ const appConstants = {
     QUOTATIONS: "quotations",
     ORDERS: "orders",
     USERS: "users"
+  },
+  dataEndpoint: {
+    PARENT: "parent",
+    USER_PROFILE: "userProfile",
+    GROUP_INFO: "groupInfo"
   }
 };
 

@@ -191,7 +191,7 @@ class GroupInfoForm extends Component {
               error.agencyName &&
               error.agencyName.map((err, key) => (
                 <View key={key}>
-                  <Text style={Styles.error}>{err}</Text>
+                  <Text style={Styles.Error}>{err}</Text>
                   <Divider />
                 </View>
               ))}
@@ -208,7 +208,7 @@ class GroupInfoForm extends Component {
               error.agencyAddress &&
               error.agencyAddress.map((err, key) => (
                 <View key={key}>
-                  <Text style={Styles.error}>{err}</Text>
+                  <Text style={Styles.Error}>{err}</Text>
                   <Divider />
                 </View>
               ))}
@@ -226,7 +226,7 @@ class GroupInfoForm extends Component {
               error.agencyPhone &&
               error.agencyPhone.map((err, key) => (
                 <View key={key}>
-                  <Text style={Styles.error}>{err}</Text>
+                  <Text style={Styles.Error}>{err}</Text>
                   <Divider />
                 </View>
               ))}
@@ -252,6 +252,10 @@ class GroupInfoForm extends Component {
 const Styles = StyleSheet.create({
   FlexBasis: {
     flexBasis: 70
+  },
+  Error: {
+    color: globalColorsAndStyles.color.error,
+    textAlign: "center"
   }
 });
 

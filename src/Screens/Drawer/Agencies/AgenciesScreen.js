@@ -1,17 +1,27 @@
 import React, { Component } from "react";
-import { Text, View } from "react-native";
+import { View, ScrollView } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
-import { Button } from "react-native-elements";
-
+import { Button, Text } from "react-native-elements";
+import selectors from "~/Selectors";
+import { connect } from "react-redux";
 class AgenciesScreen extends Component {
   render() {
+    const { agencies } = this.props;
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <View style={{ flex: 1 }}>
         <Text> AgenciesScreen </Text>
-        <Button
-          title="Thêm đại lý"
-          onPress={() => this.props.navigation.navigate("CreateAgency")}
-        />
+        <ScrollView
+          contentContainerStyle={{
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center"
+          }}
+        >
+          <Button
+            title="Thêm đại lý"
+            onPress={() => this.props.navigation.navigate("CreateAgency")}
+          />
+        </ScrollView>
       </View>
     );
   }
@@ -31,4 +41,6 @@ AgenciesScreen.navigationOptions = ({ navigation }) => {
   };
 };
 
-export default AgenciesScreen;
+export default connect(state => ({
+  agencies: selectors.data.getAgencies(state)
+}))(AgenciesScreen);

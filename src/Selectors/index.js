@@ -5,7 +5,7 @@ import {
   getUserProfile,
   getGroupInfo,
   getParent,
-  getChildren
+  getAgencies
 } from "./data.selector";
 import { isLoading, getAppMode } from "./ui.selector";
 
@@ -22,7 +22,7 @@ const selectors = {
   data: {
     getGroupInfo,
     getParent,
-    getChildren,
+    getAgencies,
     getUserProfile,
     getProducts,
     getProductByIdFromNavigationParam

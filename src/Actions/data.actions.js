@@ -1,11 +1,11 @@
 // eslint-disable-next-line import/named
-import firebase, { DocumentReference } from "react-native-firebase";
+import firebase from "react-native-firebase";
+
 import appConstants from "~/appConstants";
+import selectors from "~/Selectors";
 import { promiseWrapper } from "~/Utils/utils";
 import types from "./ActionTypes";
 import { setAppMode } from "./ui.actions";
-import selectors from "~/Selectors";
-
 // how to ignore warning /^(?!Require cycle).*$/
 // TODO add product type
 
@@ -32,6 +32,32 @@ export const initAppData = ({ uid }) => async dispatch => {
   }
 };
 
+export const addProduct = ({ name, type, defaultPrice }) => (
+  dispatch,
+  getState
+) => {
+  const db = firebase.firestore();
+  const productInfo = {
+    name,
+    type,
+    createdAt: new Date()
+  };
+  const companyId = selectors.data.getGroupInfo(getState()).id;
+  const newProductRef = db.collection(appConstants.collection.PRODUCTS).doc();
+  const newProductRefInParentSub = db
+    .collection(appConstants.collection.GROUPS)
+    .doc(companyId)
+    .collection(appConstants.collection.PRODUCTS)
+    .doc(newProductRef.id);
+  return db
+    .batch()
+    .set(newProductRef, productInfo)
+    .set(newProductRefInParentSub, {
+      status: { price: { default: defaultPrice } }
+    })
+    .commit();
+};
+
 export const makeCreateAgencyAccount = ({
   account,
   accountProfile,
@@ -39,6 +65,7 @@ export const makeCreateAgencyAccount = ({
   defaultOffPercent
 }) => (dispatch, getState) => {
   const db = firebase.firestore();
+  const createdAt = new Date();
   return firebase
     .auth()
     .createUserWithEmailAndPassword(account.email, account.password)
@@ -53,8 +80,9 @@ export const makeCreateAgencyAccount = ({
       const newChildData = {
         info: {
           ...groupInfo,
-          ...{ parent_group_type: currentGroup.id }
-        }
+          ...{ parent_group_id: currentGroup.id }
+        },
+        createdAt
       };
 
       const childRefInCurrentGroup = currentGroupDocRef
@@ -63,7 +91,8 @@ export const makeCreateAgencyAccount = ({
       const childDataInCurrentGroup = {
         status: {
           off_percent: { default: defaultOffPercent }
-        }
+        },
+        createdAt
       };
 
       const newAccountProfile = {
@@ -71,7 +100,8 @@ export const makeCreateAgencyAccount = ({
         group: {
           group_type: groupInfo.type,
           group_id: newChildRef.id
-        }
+        },
+        createdAt
       };
       const newAccountDocRef = db
         .collection(appConstants.collection.USERS)
@@ -113,7 +143,7 @@ const getAppData = ({ group: { group_id, group_type } }) => dispatch => {
   }
 };
 
-const getGroupAndRelatives = (groupDocRef: DocumentReference) => dispatch => {
+const getGroupAndRelatives = groupDocRef => dispatch => {
   console.log("getting parent and children if needed");
   dispatch(getGroupAndParent(groupDocRef));
   dispatch(
@@ -125,7 +155,7 @@ const getGroupAndRelatives = (groupDocRef: DocumentReference) => dispatch => {
   );
 };
 
-const getGroupAndParent = (groupDocRef: DocumentReference) => dispatch => {
+const getGroupAndParent = groupDocRef => dispatch => {
   groupDocRef.get().then(async doc => {
     console.log("checking if group exist");
     if (doc.exists) {
@@ -153,42 +183,39 @@ const getGroupAndParent = (groupDocRef: DocumentReference) => dispatch => {
 };
 
 const getCollectionAndMergeDetails = (
-  groupRef: DocumentReference,
-  collectionName: string,
-  parentCollectionName: string = collectionName
+  groupRef,
+  collectionName,
+  parentCollectionName = collectionName
 ) => dispatch => {
   console.log("getting " + collectionName);
-  groupRef
-    .collection(collectionName)
-    // .orderBy("createdAt", "ASC")
-    .onSnapshot(query => {
-      if (!query.empty) {
-        console.log(collectionName + " not empty");
-        let allIds = [];
-        let byId = {};
-        query.docs.forEach(async docRef => {
-          allIds.push(docRef.id);
-          const { error, data: snapshot } = await promiseWrapper(
-            firebase
-              .firestore()
-              .collection(parentCollectionName)
-              .doc(docRef.id)
-              .get()
-          );
-          if (!error && snapshot.exists) {
-            byId[docRef.id] = {
-              ...docRef.data(),
-              ...{ detail: snapshot.data() }
-            };
-            return;
-          }
-          console.log(error);
-        });
-        return dispatch(
-          receiveData({ endpoint: collectionName, data: { allIds, byId } })
+  groupRef.collection(collectionName).onSnapshot(query => {
+    if (!query.empty) {
+      console.log(collectionName + " not empty");
+      let allIds = [],
+        byId = {};
+      query.docs.forEach(async docSnapshot => {
+        const { error, data: snapshot } = await promiseWrapper(
+          firebase
+            .firestore()
+            .collection(parentCollectionName)
+            .doc(docSnapshot.id)
+            .get()
         );
-      }
-    });
+        if (!error && snapshot.exists) {
+          allIds.push(docSnapshot.id);
+          byId[docSnapshot.id] = {
+            ...docSnapshot.data(),
+            ...{ detail: snapshot.data() }
+          };
+          return;
+        }
+        console.log(error);
+      });
+      return dispatch(
+        receiveData({ endpoint: collectionName, data: { allIds, byId } })
+      );
+    }
+  });
 };
 
 const receiveData = ({ endpoint, data }) => {
