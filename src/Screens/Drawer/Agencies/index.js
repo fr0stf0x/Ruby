@@ -1,18 +1,12 @@
-import { createStackNavigator, createSwitchNavigator } from "react-navigation";
+import { createStackNavigator } from "react-navigation";
 import AgenciesScreen from "./AgenciesScreen";
-import GroupInfoForm from "./CreateAgency";
 import CreateAccount from "./CreateAccount";
+import GroupInfoForm from "./CreateAgency";
 
-const AgenciesStack = createSwitchNavigator({
-  AgenciesScreen: {
-    screen: createStackNavigator({ AgenciesScreen })
-  },
-  CreateAgency: {
-    screen: createStackNavigator({
-      CreateAccount,
-      GroupInfoForm
-    })
-  }
+const AgenciesStack = createStackNavigator({
+  AgenciesScreen,
+  CreateAccount,
+  GroupInfoForm
 });
 
 export default AgenciesStack;

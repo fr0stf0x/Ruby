@@ -20,7 +20,7 @@ const DashboardDrawer = createDrawerNavigator(
     }
   },
   {
-    initialRouteName: "Home"
+    initialRouteName: "Agencies"
   }
 );
 

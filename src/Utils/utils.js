@@ -21,6 +21,21 @@ const asyncCheckIfRegistered = email => {
   });
 };
 
+export const randomImage = () => {
+  return [
+    require("~/assets/img/products/coca_01.jpg"),
+    require("~/assets/img/products/coca_02.jpg")
+  ][Math.floor(Math.random() * 2)];
+};
+
+export const randomImageAgency = () => {
+  return [
+    require("~/assets/img/agencies/ag_01.jpg"),
+    require("~/assets/img/agencies/ag_02.jpg"),
+    require("~/assets/img/agencies/ag_03.jpg")
+  ][Math.floor(Math.random() * 3)];
+};
+
 export const validateFields = (fields, constrants) =>
   ValidateJs.validate(fields, constrants);
 

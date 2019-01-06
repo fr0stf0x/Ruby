@@ -67,14 +67,16 @@ class AddProduct extends Component {
           Alert.alert("Thành công", "", [
             {
               text: "Quay lại danh sách",
-              onPress: () => {
-                navigation.navigate("Products");
-              }
+              onPress: this.goBackToList
             }
           ])
         )
         .finally(toggleLoading);
     }
+  };
+
+  goBackToList = () => {
+    this.props.navigation.navigate("Products");
   };
 
   render() {
@@ -140,7 +142,7 @@ class AddProduct extends Component {
               backgroundColor: globalColorsAndStyles.color.secondary
             }}
             title="Huỷ bỏ"
-            onPress={() => this.props.navigation.navigate("AgenciesScreen")}
+            onPress={this.goBackToList}
           />
         </ScrollView>
       </KeyboardAvoidingView>

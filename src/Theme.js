@@ -1,7 +1,11 @@
 export const globalColorsAndStyles = {
   color: {
     primary: "rgba(92, 99, 216, 1)",
+    primaryLight: "rgba(159, 199, 242, .8)",
+    primaryText: "rgb(1, 26, 68)",
     secondary: "rgba(200, 125, 231, 1)",
+    secondaryLight: "rgba(231, 196, 239, .8)",
+    secondaryText: "rgb(45, 2, 51)",
     error: "red"
   },
   style: {
@@ -21,13 +25,14 @@ const theme = {
   Button: {
     buttonStyle: {
       ...globalColorsAndStyles.style.boxShadow,
-      width: 300,
+      // width: 300,
       height: 45,
       backgroundColor: "rgba(92, 99, 216, 1)",
       borderColor: "transparent",
       borderWidth: 0,
       borderRadius: 15,
-      margin: 10
+      paddingHorizontal: 10,
+      margin: 5
     }
   },
   Input: {
