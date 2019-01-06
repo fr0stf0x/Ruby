@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Linking, View } from "react-native";
+import { Linking, View, Image } from "react-native";
 import { Text } from "react-native-elements";
 
 class SignUpScreen extends Component {
@@ -18,9 +18,14 @@ class SignUpScreen extends Component {
         style={{
           flex: 1,
           justifyContent: "center",
-          padding: 25
+          alignItems: "center",
+          padding: 10
         }}
       >
+        <Image
+          style={{ maxHeight: 250, maxWidth: 250 }}
+          source={require("~/assets/img/sad-emoji.jpg")}
+        />
         <Text h3>
           Hiện tại chúng tôi không cung cấp khả năng đăng kí tài khoản.
         </Text>
@@ -30,7 +35,7 @@ class SignUpScreen extends Component {
           style={{ marginLeft: 5, textDecorationLine: "underline" }}
           onPress={() => this.showOptions("0906561545")}
         >
-          090 656 15 45
+          090 656 1545
         </Text>
         <Text h3>để được hướng dẫn!</Text>
       </View>

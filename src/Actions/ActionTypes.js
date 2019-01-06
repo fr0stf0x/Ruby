@@ -5,6 +5,11 @@ const AUTH_SUCCESS = "auth_success";
 
 const TOGGLE_LOADING = "toggle_loading";
 
+const GET_DATA = "get_data";
+const OBSERVE_DATA = "observe_data";
+
+const SET_APP_MODE = "set_app_mode";
+
 const types = {
   auth: {
     LOG_IN,
@@ -13,7 +18,12 @@ const types = {
     AUTH_SUCCESS
   },
   ui: {
-    TOGGLE_LOADING
+    TOGGLE_LOADING,
+    SET_APP_MODE
+  },
+  data: {
+    GET_DATA,
+    OBSERVE_DATA
   }
 };
 

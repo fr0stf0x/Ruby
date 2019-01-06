@@ -3,7 +3,8 @@ import { mergeObj } from "./utils";
 
 const ui = (
   state = {
-    isLoading: false
+    isLoading: false,
+    appMode: ""
   },
   action
 ) => {

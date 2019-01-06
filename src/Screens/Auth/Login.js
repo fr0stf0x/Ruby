@@ -1,10 +1,17 @@
 import React, { Component } from "react";
-import { AsyncStorage, View } from "react-native";
-import { Button, Header, Input } from "react-native-elements";
+import {
+  AsyncStorage,
+  Text,
+  ScrollView,
+  View,
+  KeyboardAvoidingView
+} from "react-native";
+import { Button, Input } from "react-native-elements";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { connect } from "react-redux";
 import actions from "~/Actions";
 import selectors from "~/Selectors";
+import { promiseWrapper } from "~/Utils/utils";
 
 class LoginScreen extends Component {
   static navigationOptions = {
@@ -13,7 +20,8 @@ class LoginScreen extends Component {
 
   state = {
     email: "",
-    password: ""
+    password: "",
+    passwordShown: false
   };
 
   getAccountAsync = async () => {
@@ -36,62 +44,84 @@ class LoginScreen extends Component {
       this.getAccountAsync();
   }
 
-  logIn = () => {
+  toggleRevealPassword = () => {
+    this.setState({ passwordShown: !this.state.passwordShown });
+  };
+
+  logIn = async () => {
     const { email, password } = this.state;
-    const { logIn, navigation } = this.props;
-    logIn({ email, password }).then(() => navigation.navigate("Welcome"));
+    const { logIn, navigation, toggleLoading } = this.props;
+    toggleLoading();
+    const { error, data } = await promiseWrapper(logIn({ email, password }));
+    if (!error) {
+      toggleLoading();
+      navigation.navigate("Welcome");
+    }
   };
 
   render() {
-    const { email, password } = this.state;
+    const { email, passwordShown, password } = this.state;
     const { authError, navigation } = this.props;
 
     return (
       <View style={{ flex: 1 }}>
-        {/* <Header centerComponent={{ text: "LOGIN", style: { color: "#fff" } }} /> */}
-        <View
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+        <ScrollView
+          contentContainerStyle={{
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center"
+          }}
         >
-          <Input
-            placeholder="Email"
-            value={email}
-            onChangeText={email => this.setState({ email })}
-            errorMessage={authError.message}
-            leftIcon={<Icon name="account" size={24} color="black" />}
-          />
-          <Input
-            placeholder="Password"
-            secureTextEntry
-            value={password}
-            onChangeText={password => this.setState({ password })}
-            leftIcon={<Icon name="textbox-password" size={24} color="black" />}
-          />
-          <Button
-            title="Login"
-            buttonStyle={{
-              backgroundColor: "rgba(92, 99, 216, 1)",
-              width: 300,
-              height: 45,
-              borderColor: "transparent",
-              borderWidth: 0,
-              borderRadius: 5,
-              margin: 10
+          <KeyboardAvoidingView
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center"
             }}
-            onPress={this.logIn}
-          />
-          <Button
-            title="Sign up"
-            buttonStyle={{
-              backgroundColor: "rgba(200, 125, 231, 1)",
-              width: 300,
-              height: 45,
-              borderColor: "transparent",
-              borderWidth: 0,
-              borderRadius: 5
-            }}
-            onPress={() => navigation.navigate("SignUp")}
-          />
-        </View>
+            behavior="padding"
+            enabled
+          >
+            <Input
+              placeholder="Email"
+              value={email}
+              onChangeText={email => this.setState({ email })}
+              leftIcon={<Icon name="account" size={24} color="black" />}
+            />
+            <Input
+              placeholder="Password"
+              secureTextEntry={!passwordShown}
+              value={password}
+              onChangeText={password => this.setState({ password })}
+              leftIcon={
+                <Icon name="textbox-password" size={24} color="black" />
+              }
+              rightIcon={
+                password.length > 0 && (
+                  <Icon
+                    name={(passwordShown && "eye-off") || "eye"}
+                    onPress={this.toggleRevealPassword}
+                    size={24}
+                  />
+                )
+              }
+            />
+            <Text style={{ color: "red" }}>{authError.message}</Text>
+            <Button
+              title="Login"
+              buttonStyle={{
+                backgroundColor: "rgba(92, 99, 216, 1)"
+              }}
+              onPress={this.logIn}
+            />
+            <Button
+              title="Sign up"
+              buttonStyle={{
+                backgroundColor: "rgba(200, 125, 231, 1)"
+              }}
+              onPress={() => navigation.navigate("SignUp")}
+            />
+          </KeyboardAvoidingView>
+        </ScrollView>
       </View>
     );
   }
@@ -100,7 +130,7 @@ class LoginScreen extends Component {
 export default connect(
   state => ({
     isUserLoggedIn: selectors.auth.isUserLoggedIn(state),
-    authError: selectors.auth.authError(state)
+    authError: selectors.auth.getAuthError(state)
   }),
   dispatch => ({
     logIn: ({ email, password }) =>

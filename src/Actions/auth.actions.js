@@ -1,10 +1,9 @@
-import types from "./ActionTypes";
-import firebase from "react-native-firebase";
 import { AsyncStorage } from "react-native";
+import firebase from "react-native-firebase";
+import types from "./ActionTypes";
 import { toggleLoading } from "./ui.actions";
 
-const login = ({ user: info, account }) => {
-  setAsyncStorage(account);
+const login = ({ user: info }) => {
   return {
     type: types.auth.LOG_IN,
     payload: {
@@ -42,21 +41,18 @@ const authSuccess = () => {
 };
 
 export const makeLogIn = ({ email, password }) => dispatch => {
-  dispatch(toggleLoading());
   return firebase
     .auth()
     .signInWithEmailAndPassword(email, password)
     .then(({ user }) => {
-      dispatch(login({ user, account: { email, password } }));
+      dispatch(login({ user }));
       dispatch(authSuccess());
-      return { user };
+      return setAsyncStorage({ email, password });
     })
     .catch(err => {
       const { code, message } = err;
       dispatch(authError({ code, message }));
-    })
-    .finally(() => {
-      dispatch(toggleLoading());
+      return Promise.reject(err);
     });
 };
 
@@ -68,7 +64,7 @@ export const makeLogOut = () => dispatch => {
     .then(res => {
       dispatch(logOut());
       dispatch(authSuccess());
-      return res;
+      // navigate("Login");
     })
     .finally(() => {
       dispatch(toggleLoading());

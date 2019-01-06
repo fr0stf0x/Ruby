@@ -1,5 +1,5 @@
 export const isUserLoggedIn = state => state.auth.loggedIn;
 
-export const authError = state => state.auth.error;
+export const getAuthError = state => state.auth.error;
 
-export const userInfo = state => state.auth.info;
+export const getAuthInfo = state => state.auth.info;

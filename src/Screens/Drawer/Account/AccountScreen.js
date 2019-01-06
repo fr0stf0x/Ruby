@@ -18,10 +18,10 @@ class AccountScreen extends Component {
   };
 
   render() {
-    const { userInfo } = this.props;
+    const { authInfo } = this.props;
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <Text>{userInfo.email}</Text>
+        <Text>{authInfo.email}</Text>
         <Button title={"Log out"} onPress={this.logOut} />
       </View>
     );
@@ -31,7 +31,7 @@ class AccountScreen extends Component {
 export default connect(
   state => {
     return {
-      userInfo: selectors.auth.userInfo(state)
+      authInfo: selectors.auth.getAuthInfo(state)
     };
   },
   dispatch => ({

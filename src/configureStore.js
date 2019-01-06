@@ -1,13 +1,12 @@
 import { applyMiddleware, createStore } from "redux";
 import thunk from "redux-thunk";
-import { composeWithDevTools } from "redux-devtools-extension";
 import RubyReducers from "~/Reducers/";
+import { composeWithDevTools } from "redux-devtools-extension";
 
-const configureStore = preloadedState =>
-  createStore(
-    RubyReducers,
-    preloadedState,
-    composeWithDevTools(applyMiddleware(thunk))
-  );
+const store = createStore(
+  RubyReducers,
+  {},
+  composeWithDevTools(applyMiddleware(thunk))
+);
 
-export default configureStore;
+export default store;

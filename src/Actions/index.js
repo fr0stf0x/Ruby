@@ -1,5 +1,6 @@
 import { makeLogIn, makeLogOut } from "./auth.actions";
-import { toggleLoading } from "./ui.actions";
+import { toggleLoading, setAppMode } from "./ui.actions";
+import { makeCreateAgencyAccount, initAppData } from "./data.actions";
 
 const actions = {
   auth: {
@@ -7,7 +8,12 @@ const actions = {
     makeLogOut
   },
   ui: {
-    toggleLoading
+    toggleLoading,
+    setAppMode
+  },
+  data: {
+    makeCreateAgencyAccount,
+    initAppData
   }
 };
 

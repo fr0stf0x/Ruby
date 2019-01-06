@@ -1,13 +1,14 @@
 import React, { Component } from "react";
-import { ThemeProvider } from "react-native-elements";
 import { Provider } from "react-redux";
-import AppContainer from "~/AppContainer";
-import configureStore from "~/configureStore";
+import { ThemeProvider } from "react-native-elements";
+
+import AppContainer from "~/Screens/AppContainer";
 import Loading from "~/Screens/Loading";
 import theme from "~/Theme";
+import store from "~/configureStore";
+import { YellowBox } from "react-native";
 
-const store = configureStore();
-
+YellowBox.ignoreWarnings(["Require cycle:"]);
 class App extends Component {
   render() {
     return (
