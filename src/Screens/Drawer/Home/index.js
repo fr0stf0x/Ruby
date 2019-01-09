@@ -27,7 +27,7 @@ const DashboardBottomNav = createBottomTabNavigator(
   {
     defaultNavigationOptions: ({ navigation }) => {
       return {
-        tabBarIcon: ({ focused, horizontal, tintColor }) => {
+        tabBarIcon: ({ tintColor }) => {
           const { routeName } = navigation.state;
           let iconName = tabIconNames[routeName];
           return (

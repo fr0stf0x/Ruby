@@ -1,10 +1,8 @@
 import React, { Component } from "react";
 import { Text, View } from "react-native";
+import { connect } from "react-redux";
 
-export default class CreateQuotation extends Component {
-  static navigationOptions: {
-    title: "Tạo báo giá"
-  };
+class SelectAgenciesScreen extends Component {
   render() {
     return (
       <View>
@@ -13,3 +11,4 @@ export default class CreateQuotation extends Component {
     );
   }
 }
+export default connect(state => ({}))(SelectAgenciesScreen);

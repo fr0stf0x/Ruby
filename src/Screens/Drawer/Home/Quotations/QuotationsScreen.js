@@ -21,6 +21,14 @@ QuotationsScreen.navigationOptions = ({ navigation }) => ({
       size={30}
       onPress={() => navigation.openDrawer()}
     />
+  ),
+  headerRight: (
+    <Icon
+      style={{ paddingRight: 10 }}
+      name="ios-add"
+      size={30}
+      onPress={() => navigation.navigate("CreateQuotation")}
+    />
   )
 });
 

@@ -1,17 +1,9 @@
 import React, { Component } from "react";
-import { Linking, View, Image } from "react-native";
+import { Image, View } from "react-native";
 import { Text } from "react-native-elements";
+import { makeCall } from "~/Utils/utils";
 
 class SignUpScreen extends Component {
-  showOptions = tel => {
-    const url = `tel:${tel}`;
-    Linking.canOpenURL(url).then(supported => {
-      if (supported) {
-        return Linking.openURL(url).catch(() => null);
-      }
-    });
-  };
-
   render() {
     return (
       <View
@@ -33,7 +25,7 @@ class SignUpScreen extends Component {
         <Text
           h3
           style={{ marginLeft: 5, textDecorationLine: "underline" }}
-          onPress={() => this.showOptions("0906561545")}
+          onPress={() => makeCall("0906561545")}
         >
           090 656 1545
         </Text>

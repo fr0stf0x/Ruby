@@ -8,6 +8,10 @@ import {
   getAgencies
 } from "./data.selector";
 import { isLoading, getAppMode } from "./ui.selector";
+import {
+  getProductInCart,
+  getAgenciesInCreatingQuotation
+} from "./cart.selector";
 
 const selectors = {
   auth: {
@@ -26,6 +30,10 @@ const selectors = {
     getUserProfile,
     getProducts,
     getProductByIdFromNavigationParam
+  },
+  cart: {
+    getAgenciesInCreatingQuotation,
+    getProductInCart
   }
 };
 

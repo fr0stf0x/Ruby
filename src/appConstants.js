@@ -26,6 +26,12 @@ const appConstants = {
     PARENT: "parent",
     USER_PROFILE: "userProfile",
     GROUP_INFO: "groupInfo"
+  },
+  productItemContext: {
+    IN_CART: "in_cart",
+    SHOW: "show",
+    QUOTATION: "quotation",
+    ORDER: "order"
   }
 };
 

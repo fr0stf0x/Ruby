@@ -1,10 +1,15 @@
 import { makeLogIn, makeLogOut } from "./auth.actions";
-import { toggleLoading, setAppMode } from "./ui.actions";
 import {
-  makeCreateAgencyAccount,
+  addProduct,
   initAppData,
-  addProduct
+  makeCreateAgencyAccount
 } from "./data.actions";
+import { setAppMode, toggleLoading } from "./ui.actions";
+import {
+  toggleCheckProduct,
+  addAgencyToCart,
+  removeAgencyFromCart
+} from "./cart.actions";
 
 const actions = {
   auth: {
@@ -19,6 +24,11 @@ const actions = {
     addProduct,
     makeCreateAgencyAccount,
     initAppData
+  },
+  cart: {
+    toggleCheckProduct,
+    addAgencyToCart,
+    removeAgencyFromCart
   }
 };
 

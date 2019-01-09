@@ -4,8 +4,23 @@ import appConstants from "~/appConstants";
 export const getAgencies = state =>
   state.appData[appConstants.collection.CHILDREN];
 
-export const getProducts = state =>
-  state.appData[[appConstants.collection.PRODUCTS]];
+export const getProducts = (state, props) => {
+  const { type } = props || { type: "all" };
+  console.log(type);
+  const products = state.appData[appConstants.collection.PRODUCTS];
+  if (type === "all") return products;
+  const { allIds, byId } = products;
+  const newAllIds = allIds.filter(
+    id => byId[id].status.available === (type === "available")
+  );
+  return {
+    allIds: newAllIds,
+    byId: newAllIds.reduce((obj, id) => {
+      obj[id] = byId[id];
+      return obj;
+    }, {})
+  };
+};
 
 // data endpoints
 export const getUserProfile = state =>

@@ -3,14 +3,14 @@ import { View, Image } from "react-native";
 import { connect } from "react-redux";
 import selectors from "~/Selectors";
 import { Text } from "react-native-elements";
-import { randomImage } from "~/Utils/utils";
+import { randomProductImage } from "~/Utils/utils";
 
 class ProductDetail extends Component {
   render() {
     const { product } = this.props;
     return (
       <View style={{ flex: 1 }}>
-        <Image style={{ alignSelf: "center" }} source={randomImage()} />
+        <Image style={{ alignSelf: "center" }} source={randomProductImage()} />
         <View
           style={{
             alignSelf: "center",

@@ -29,6 +29,7 @@ const constrants = {
       message: "^Phải điền tên đại lý chính xác"
     }
   },
+
   agencyAddress: {
     length: {
       minimum: 8,

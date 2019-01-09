@@ -53,7 +53,13 @@ export const addProduct = ({ name, type, defaultPrice }) => (
     .batch()
     .set(newProductRef, productInfo)
     .set(newProductRefInParentSub, {
-      status: { price: { default: defaultPrice } }
+      status: {
+        available: true,
+        price: { default: defaultPrice },
+        off_percent: {
+          default: 0
+        }
+      }
     })
     .commit();
 };

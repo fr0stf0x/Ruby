@@ -1,13 +1,15 @@
 import { createStackNavigator } from "react-navigation";
-import QuotationsScreen from "./QuotationsScreen";
 import CreateQuotation from "./CreateQuotation";
+import QuotationsScreen from "./QuotationsScreen";
+import SelectAgenciesScreen from "./SelectAgenciesScreen";
 
 const QuotationsStack = createStackNavigator({
   QuotationList: {
     screen: QuotationsScreen
   },
-  CreateQuotation: {
-    screen: CreateQuotation
+  CreateQuotation,
+  SelectAgencies: {
+    screen: SelectAgenciesScreen
   }
 });
 
