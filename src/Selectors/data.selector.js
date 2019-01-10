@@ -4,9 +4,7 @@ import appConstants from "~/appConstants";
 export const getAgencies = state =>
   state.appData[appConstants.collection.CHILDREN];
 
-export const getProducts = (state, props) => {
-  const { type } = props || { type: "all" };
-  console.log(type);
+export const getProductsByType = (state, { type = "all" }) => {
   const products = state.appData[appConstants.collection.PRODUCTS];
   if (type === "all") return products;
   const { allIds, byId } = products;

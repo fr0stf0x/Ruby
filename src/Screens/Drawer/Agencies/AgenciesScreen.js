@@ -1,20 +1,18 @@
 import React, { Component } from "react";
 import { StyleSheet, View } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
-import { connect } from "react-redux";
+import appConstants from "~/appConstants";
 import AgencyList from "~/Components/AgencyList";
-import selectors from "~/Selectors";
 
 class AgenciesScreen extends Component {
-  goToDetail = agencyId => {
-    this.props.navigation.navigate("AgencyDetail", { id: agencyId });
-  };
-
   render() {
-    const { agencies, navigation } = this.props;
+    const { navigation } = this.props;
     return (
       <View style={styles.container}>
-        <AgencyList {...agencies} navigation={navigation} />
+        <AgencyList
+          type={appConstants.productItemContext.SHOW}
+          navigation={navigation}
+        />
       </View>
     );
   }
@@ -49,11 +47,4 @@ AgenciesScreen.navigationOptions = ({ navigation }) => {
   };
 };
 
-export default connect(
-  state => ({
-    agencies: selectors.data.getAgencies(state)
-  }),
-  dispatch => ({
-    addAgencyToCart: id => dispatch()
-  })
-)(AgenciesScreen);
+export default AgenciesScreen;

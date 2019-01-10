@@ -8,21 +8,13 @@ const SettingStack = createStackNavigator(
     Setting: {
       screen: SettingScreen
     }
+  },
+  {
+    navigationOptions: {
+      drawerLabel: "Cài đặt",
+      drawerIcon: <Icon name="ios-settings" size={30} />
+    }
   }
-  // {
-  //   defaultNavigationOptions: ({ navigation }) => {
-  //     return {
-  //       headerLeft: (
-  //         <Icon
-  //           style={{ paddingLeft: 10 }}
-  //           name="md-menu"
-  //           size={30}
-  //           onPress={() => navigation.openDrawer()}
-  //         />
-  //       )
-  //     };
-  //   }
-  // }
 );
 
 export default SettingStack;

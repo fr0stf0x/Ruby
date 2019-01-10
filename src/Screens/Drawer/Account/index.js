@@ -11,17 +11,9 @@ const AccountStack = createStackNavigator(
     }
   },
   {
-    defaultNavigationOptions: ({ navigation }) => {
-      return {
-        headerLeft: (
-          <Icon
-            style={{ paddingLeft: 10 }}
-            name="md-menu"
-            size={30}
-            onPress={() => navigation.openDrawer()}
-          />
-        )
-      };
+    navigationOptions: {
+      drawerLabel: "Tài khoản",
+      drawerIcon: <Icon name="ios-person" size={30} />
     }
   }
 );

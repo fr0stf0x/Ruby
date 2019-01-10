@@ -6,10 +6,14 @@ import {
 } from "./data.actions";
 import { setAppMode, toggleLoading } from "./ui.actions";
 import {
+  toggleCheckAllAgencies,
+  toggleCheckAgency,
+  toggleCheckProducts,
   toggleCheckProduct,
-  addAgencyToCart,
-  removeAgencyFromCart
+  addAgencyToCartIfNeeded
 } from "./cart.actions";
+
+import { globalToggleCheckProducts, globalToggleCheckAgencies } from "./global";
 
 const actions = {
   auth: {
@@ -26,9 +30,15 @@ const actions = {
     initAppData
   },
   cart: {
+    addAgencyToCartIfNeeded,
+    toggleCheckProducts,
     toggleCheckProduct,
-    addAgencyToCart,
-    removeAgencyFromCart
+    toggleCheckAllAgencies,
+    toggleCheckAgency
+  },
+  global: {
+    globalToggleCheckProducts,
+    globalToggleCheckAgencies
   }
 };
 

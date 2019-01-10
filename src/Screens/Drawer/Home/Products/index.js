@@ -11,7 +11,10 @@ const ProductStack = createStackNavigator(
   },
   {
     navigationOptions: {
-      title: "Products"
+      title: "Danh sách sản phẩm"
+    },
+    defaultNavigationOptions: {
+      headerBackTitle: "Danh sách"
     }
   }
 );

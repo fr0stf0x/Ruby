@@ -1,7 +1,7 @@
 import { getAuthError, isUserLoggedIn, getAuthInfo } from "./auth.selector";
 import {
   getProductByIdFromNavigationParam,
-  getProducts,
+  getProductsByType,
   getUserProfile,
   getGroupInfo,
   getParent,
@@ -10,7 +10,9 @@ import {
 import { isLoading, getAppMode } from "./ui.selector";
 import {
   getProductInCart,
-  getAgenciesInCreatingQuotation
+  getProductsInCart,
+  isCartEmpty,
+  getSelectedAgenciesInCreatingQuotation
 } from "./cart.selector";
 
 const selectors = {
@@ -28,12 +30,14 @@ const selectors = {
     getParent,
     getAgencies,
     getUserProfile,
-    getProducts,
+    getProductsByType,
     getProductByIdFromNavigationParam
   },
   cart: {
-    getAgenciesInCreatingQuotation,
-    getProductInCart
+    getProductInCart,
+    getProductsInCart,
+    isCartEmpty,
+    getSelectedAgenciesInCreatingQuotation
   }
 };
 

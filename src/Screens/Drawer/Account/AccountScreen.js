@@ -4,12 +4,9 @@ import { Button, Text } from "react-native-elements";
 import { connect } from "react-redux";
 import actions from "~/Actions";
 import selectors from "~/Selectors";
+import Icon from "react-native-vector-icons/Ionicons";
 
 class AccountScreen extends Component {
-  static navigationOptions = {
-    title: "Account"
-  };
-
   logOut = () => {
     const { logOut, navigation } = this.props;
     logOut().then(() => {
@@ -27,6 +24,18 @@ class AccountScreen extends Component {
     );
   }
 }
+
+AccountScreen.navigationOptions = ({ navigation }) => ({
+  title: "Settings",
+  headerLeft: (
+    <Icon
+      style={{ paddingLeft: 10 }}
+      name="md-menu"
+      size={30}
+      onPress={() => navigation.openDrawer()}
+    />
+  )
+});
 
 export default connect(
   state => {

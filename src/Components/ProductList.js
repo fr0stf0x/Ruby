@@ -1,6 +1,7 @@
 import React from "react";
-import { Image, FlatList, StyleSheet, View } from "react-native";
-import { CheckBox, ListItem, Text, Input } from "react-native-elements";
+import { FlatList, Image, StyleSheet, View } from "react-native";
+import { CheckBox, Input, Text } from "react-native-elements";
+import Icon from "react-native-vector-icons/Ionicons";
 import { connect } from "react-redux";
 import actions from "~/Actions";
 import appConstants from "~/appConstants";
@@ -8,7 +9,6 @@ import { mergeObj } from "~/Reducers/utils";
 import selectors from "~/Selectors";
 import { globalColorsAndStyles } from "~/Theme";
 import { randomProductImage } from "~/Utils/utils";
-import Icon from "react-native-vector-icons/Ionicons";
 
 export const ProductItemContext = React.createContext(
   appConstants.productItemContext.SHOW
@@ -52,60 +52,56 @@ const styles = (key, available) =>
     }
   });
 
-const mapStateToProps = (state, props) => {
+const ProductInfoAndActions = connect((state, props) => {
   const product = selectors.cart.getProductInCart(state, props);
   return {
     checked: product && product.checked
   };
-};
+})(({ id, detail, endpoint, status, index, checked, dispatch }) => {
+  const price = status.price.current || status.price.default;
+  const offPercent = status.off_percent.current || status.off_percent.default;
 
-const ProductInfoAndActions = connect(mapStateToProps)(
-  ({ id, detail, endpoint, status, index, checked, dispatch }) => {
-    console.log(status);
-    const price = status.price.current || status.price.default;
-    const offPercent = status.off_percent.current || status.off_percent.default;
-
-    const toggleCheck = () => {
-      dispatch(actions.cart.toggleCheckProduct({ id, endpoint }));
-    };
-    return (
-      <View style={{ flex: 1, flexDirection: "row" }}>
-        <View style={styles(index, status.available).listItem}>
-          <View style={styles().imageContainer}>
-            <Image
-              source={randomProductImage()}
-              resizeMode="cover"
-              style={{ width: 70, height: 130 }}
-            />
-          </View>
-          <View style={styles().infoAndActions}>
-            <View style={[styles().info, { flex: 1, alignContent: "center" }]}>
-              <Text style={styles().listItemTitle}>{detail.name}</Text>
-              {endpoint === appConstants.productItemContext.QUOTATION && (
-                <View style={{ flex: 1 }}>
-                  <Input
-                    value={offPercent.toString()}
-                    editable={Boolean(checked)}
-                  />
-                  <Input value={price.toString()} editable={Boolean(checked)} />
-                </View>
-              )}
-            </View>
-          </View>
-        </View>
-        <View style={{ alignSelf: "center" }}>
-          <CheckBox
-            containerStyle={{ padding: 0 }}
-            checkedIcon="dot-circle-o"
-            uncheckedIcon="circle-o"
-            checked={checked}
-            onPress={toggleCheck}
+  const toggleCheck = () => {
+    dispatch(actions.cart.toggleCheckProduct({ id, endpoint }));
+  };
+  return (
+    <View style={{ flex: 1, flexDirection: "row" }}>
+      <View style={styles(index, status.available).listItem}>
+        <View style={styles().imageContainer}>
+          <Image
+            source={randomProductImage()}
+            resizeMode="cover"
+            style={{ width: 80, height: 130 }}
           />
         </View>
+        <View style={styles().infoAndActions}>
+          <View style={[styles().info, { flex: 1, alignContent: "center" }]}>
+            <Text style={styles().listItemTitle}>{detail.name}</Text>
+            {endpoint === appConstants.productItemContext.QUOTATION && (
+              <View style={{ flex: 1 }}>
+                <Input
+                  value={offPercent.toString()}
+                  editable={Boolean(checked)}
+                />
+                <Input value={price.toString()} editable={Boolean(checked)} />
+              </View>
+            )}
+          </View>
+        </View>
       </View>
-    );
-  }
-);
+      <View style={{ alignSelf: "center" }}>
+        <CheckBox
+          containerStyle={{ padding: 0 }}
+          checkedIcon="dot-circle-o"
+          uncheckedColor={globalColorsAndStyles.color.primaryText}
+          uncheckedIcon="circle-o"
+          checked={checked}
+          onPress={toggleCheck}
+        />
+      </View>
+    </View>
+  );
+});
 
 const ReadOnlyProduct = ({ id, detail, status, navigation, index }) => {
   return (
@@ -114,7 +110,7 @@ const ReadOnlyProduct = ({ id, detail, status, navigation, index }) => {
         <Image
           source={randomProductImage()}
           resizeMode="cover"
-          style={{ width: 70, height: 130 }}
+          style={{ width: 100, height: 100 }}
         />
       </View>
       <View style={styles().infoAndActions}>
@@ -171,5 +167,5 @@ const ProductList = ({ products: { allIds, byId } }) => (
 );
 
 export default connect((state, props) => ({
-  products: selectors.data.getProducts(state, props)
+  products: selectors.data.getProductsByType(state, props)
 }))(ProductList);

@@ -13,6 +13,7 @@ const SET_APP_MODE = "set_app_mode";
 
 const ADD_AGENCY_QUOTATION = "add_agency_quotation";
 const REMOVE_AGENCY_QUOTATION = "remove_agency_quotation";
+const TOGGLE_ADD_AGENCY = "toggle_add_agency";
 const TOGGLE_ITEM_CART = "toggle_item_cart";
 const ADD_ITEM_TO_CART = "add_item_cart";
 const MODIFY_ITEM_IN_CART = "modify_item_cart";
@@ -35,6 +36,7 @@ const types = {
     OBSERVE_DATA
   },
   cart: {
+    TOGGLE_ADD_AGENCY,
     ADD_AGENCY_QUOTATION,
     REMOVE_AGENCY_QUOTATION,
     TOGGLE_ITEM_CART,

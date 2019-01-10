@@ -11,5 +11,7 @@
     },
     "exclude": [
         "node_modules/*", // Đừng bắt VSCode nó phải chọc vào
+        "android/*", // Đừng bắt VSCode nó phải chọc vào
+        "ios/*", // Đừng bắt VSCode nó phải chọc vào
     ] // cái đống trong này.
 }

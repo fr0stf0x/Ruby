@@ -5,6 +5,7 @@ import IconWithBadge from "./IconWithBadge";
 import OrdersStack from "./Orders";
 import ProductStack from "./Products";
 import QuotationsStack from "./Quotations";
+import Icon from "react-native-vector-icons/Ionicons";
 
 const tabIconNames = {
   Products: "ios-albums",
@@ -35,6 +36,10 @@ const DashboardBottomNav = createBottomTabNavigator(
           );
         }
       };
+    },
+    navigationOptions: {
+      drawerLabel: "Trang chủ",
+      drawerIcon: <Icon name="ios-home" size={30} />
     },
     tabBarOptions: {
       activeTintColor: globalColorsAndStyles.color.primary,

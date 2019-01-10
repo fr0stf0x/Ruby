@@ -10,7 +10,11 @@ class ProductDetail extends Component {
     const { product } = this.props;
     return (
       <View style={{ flex: 1 }}>
-        <Image style={{ alignSelf: "center" }} source={randomProductImage()} />
+        <Image
+          resizeMode="cover"
+          style={{ alignSelf: "center", maxWidth: 300, height: 250 }}
+          source={randomProductImage()}
+        />
         <View
           style={{
             alignSelf: "center",

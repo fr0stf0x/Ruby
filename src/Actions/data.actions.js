@@ -20,7 +20,6 @@ export const initAppData = ({ uid }) => async dispatch => {
   );
   if (!error && snapshot.exists) {
     const userProfile = snapshot.data();
-    console.log("userProfile exist");
     dispatch(
       receiveData({
         endpoint: "userProfile",
