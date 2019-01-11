@@ -2,6 +2,7 @@ import { createStackNavigator } from "react-navigation";
 import CreateQuotation from "./CreateQuotation";
 import QuotationsScreen from "./QuotationsScreen";
 import SelectAgenciesScreen from "./SelectAgenciesScreen";
+import QuotationDetail from "./QuotationDetail";
 
 const QuotationsStack = createStackNavigator(
   {
@@ -11,7 +12,8 @@ const QuotationsStack = createStackNavigator(
     CreateQuotation,
     SelectAgencies: {
       screen: SelectAgenciesScreen
-    }
+    },
+    QuotationDetail
   },
   {
     defaultNavigationOptions: {

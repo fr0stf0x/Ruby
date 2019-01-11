@@ -8,7 +8,9 @@ import {
   getAgencies,
   getAgencyByIdFromNavigationParam,
   getQuotations,
-  getOrders
+  getOrders,
+  getOrderByIdFromNavigationParam,
+  getQuotationByIdFromNavigationParam
 } from "./data.selector";
 import { isLoading, getAppMode } from "./ui.selector";
 import {
@@ -37,7 +39,9 @@ const selectors = {
     getAgencies,
     getUserProfile,
     getProductsByType,
-    getProductByIdFromNavigationParam
+    getProductByIdFromNavigationParam,
+    getOrderByIdFromNavigationParam,
+    getQuotationByIdFromNavigationParam
   },
   cart: {
     getProductInCart,

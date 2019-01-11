@@ -9,7 +9,7 @@ class OrdersScreen extends Component {
     return (
       <View style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ flex: 1 }}>
-          <OrderList />
+          <OrderList navigation={this.props.navigation} />
         </ScrollView>
       </View>
     );

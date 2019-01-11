@@ -30,6 +30,43 @@ export const formatDate = (date: Date): String => {
 
   return day + " " + monthNames[monthIndex] + " " + year;
 };
+export const formatDateTime = (date: Date): String => {
+  var monthNames = [
+    "Tháng 1",
+    "Tháng 2",
+    "Tháng 3",
+    "Tháng 4",
+    "Tháng 5",
+    "Tháng 6",
+    "Tháng 7",
+    "Tháng 8",
+    "Tháng 9",
+    "Tháng 10",
+    "Tháng 11",
+    "Tháng 12"
+  ];
+
+  var day = date.getDate();
+  var monthIndex = date.getMonth();
+  var year = date.getFullYear();
+  var hour = date.getHours();
+  var minutes = date.getMinutes();
+  var second = date.getSeconds();
+
+  return (
+    day +
+    " " +
+    monthNames[monthIndex] +
+    " " +
+    year +
+    ", " +
+    hour +
+    ":" +
+    minutes +
+    ":" +
+    second
+  );
+};
 
 const asyncCheckIfRegistered = email => {
   return new ValidateJs.Promise((resolve, reject) => {

@@ -18,8 +18,10 @@ import { formatDate } from "~/Utils/utils";
 class OrderList extends Component {
   render() {
     const {
+      agencies,
       orders,
       acceptNewOrder,
+      goToDetail,
       rejectNewOrder,
       toggleLoading
     } = this.props;
@@ -29,9 +31,13 @@ class OrderList extends Component {
       return (
         <FlatList
           keyExtractor={(item, index) => index.toString()}
-          data={allIds.map(id =>
-            mergeObj(byId[id], {
+          data={allIds.map(id => {
+            const { from, products } = byId[id];
+            return {
               id,
+              agencyName: agencies.byId[from].detail.info.name,
+              products,
+              goToDetail,
               onAccept: fromId => {
                 toggleLoading();
                 acceptNewOrder(fromId, id)
@@ -48,8 +54,8 @@ class OrderList extends Component {
                   })
                   .finally(toggleLoading);
               }
-            })
-          )}
+            };
+          })}
           renderItem={OrderItem}
         />
       );
@@ -67,10 +73,10 @@ class OrderList extends Component {
 }
 
 const OrderItem = ({
-  item: { id, status, from, detail, navigation, onAccept, onReject },
+  item: { id, status, from, detail, goToDetail, onAccept, onReject },
   index
 }) => {
-  const formatedDateTime = formatDate(detail.createdAt);
+  const formatedDateTime = formatedDateTime(detail.createdAt);
   return (
     <View style={styles(index, !status.verified).listItem}>
       <View style={styles().infoAndActions}>
@@ -112,7 +118,7 @@ const OrderItem = ({
           <Icon
             name="ios-arrow-forward"
             size={20}
-            onPress={() => navigation.navigate("OrderDetail", { id })}
+            onPress={() => goToDetail(id)}
           />
         </View>
       </View>
@@ -160,9 +166,11 @@ const styles = (key, isNew) =>
 
 export default connect(
   state => ({
-    orders: selectors.data.getOrders(state)
+    orders: selectors.data.getOrders(state),
+    agencies: selectors.data.getAgencies(state)
   }),
-  dispatch => ({
+  (dispatch, props) => ({
+    goToDetail: id => props.navigation.navigate("OrderDetail", { id }),
     toggleLoading: () => dispatch(actions.ui.toggleLoading()),
     acceptNewOrder: (fromId, orderId) =>
       dispatch(actions.data.acceptNewOrder(fromId, orderId)),

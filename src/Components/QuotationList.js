@@ -18,12 +18,12 @@ import { formatDate } from "~/Utils/utils";
 class QuotationList extends Component {
   render() {
     const {
+      goToDetail,
       quotations,
       toggleLoading,
       acceptNewQuotation,
       rejectNewQuotation
     } = this.props;
-    console.log(quotations);
     if (quotations) {
       const { allIds, byId } = quotations;
       return (
@@ -32,6 +32,7 @@ class QuotationList extends Component {
           data={allIds.map(id =>
             mergeObj(byId[id], {
               id,
+              goToDetail,
               onAccept: () => {
                 toggleLoading();
                 acceptNewQuotation(id)
@@ -67,10 +68,10 @@ class QuotationList extends Component {
 }
 
 const Quotation = ({
-  item: { id, status, detail, onAccept, onReject, navigation },
+  item: { id, status, detail, onAccept, onReject, goToDetail },
   index
 }) => {
-  const formatedDateTime = formatDate(detail.createdAt);
+  const formatedDateTime = formatedDateTime(detail.createdAt);
   return (
     <View style={styles(index, !status.verified).listItem}>
       <View style={styles().infoAndActions}>
@@ -83,7 +84,7 @@ const Quotation = ({
             style={{
               flexDirection: "row",
               alignItems: "center",
-              alignSelf: "center"
+              alignSelf: "flex-end"
             }}
           >
             <TouchableOpacity
@@ -112,7 +113,7 @@ const Quotation = ({
           <Icon
             name="ios-arrow-forward"
             size={20}
-            onPress={() => navigation.navigate("ProductDetail", { id })}
+            onPress={() => goToDetail(id)}
           />
         </View>
       </View>
@@ -162,7 +163,8 @@ export default connect(
   state => ({
     quotations: selectors.data.getQuotations(state)
   }),
-  dispatch => ({
+  (dispatch, props) => ({
+    goToDetail: id => props.navigation.navigate("QuotationDetail", { id }),
     toggleLoading: () => dispatch(actions.ui.toggleLoading()),
     acceptNewQuotation: quotationId =>
       dispatch(actions.data.acceptNewQuotation(quotationId)),

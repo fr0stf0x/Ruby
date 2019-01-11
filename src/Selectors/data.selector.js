@@ -48,3 +48,13 @@ export const getAgencyByIdFromNavigationParam = (state, props) =>
   state.appData[appConstants.collection.CHILDREN].byId[
     props.navigation.getParam("id")
   ];
+
+export const getOrderByIdFromNavigationParam = (state, props) =>
+  state.appData[appConstants.collection.ORDERS].byId[
+    props.navigation.getParam("id")
+  ];
+
+export const getQuotationByIdFromNavigationParam = (state, props) =>
+  state.appData[appConstants.collection.QUOTATIONS].byId[
+    props.navigation.getParam("id")
+  ];
