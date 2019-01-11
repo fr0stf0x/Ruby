@@ -64,6 +64,7 @@ const AgencyItem = ({ info, index, checked, action }) => {
       </View>
       <View style={{ alignSelf: "center" }}>
         <CheckBox
+          containerStyle={{ padding: 0 }}
           checkedIcon="dot-circle-o"
           uncheckedColor={globalColorsAndStyles.color.primaryText}
           uncheckedIcon="circle-o"
@@ -77,52 +78,64 @@ const AgencyItem = ({ info, index, checked, action }) => {
 
 const AgencyList = ({
   type,
-  agencies: { allIds, byId },
+  agencies,
+  goToDetail,
   selectedAgencyIds,
   toggleAddAgencyToCart,
   toggleAddAgencyToCartAndRedirect
 }) => {
-  const unSelectedAgencyIds = allIds.filter(
-    id => !selectedAgencyIds.includes(id)
-  );
+  if (agencies) {
+    const { allIds, byId } = agencies;
+    const unSelectedAgencyIds = allIds.filter(
+      id => !selectedAgencyIds.includes(id)
+    );
 
-  return (
-    <ScrollView style={{ flex: 1 }}>
-      {type === appConstants.productItemContext.SHOW ? (
-        allIds.map((id, key) => (
-          <View key={key}>
-            <AgencyCard
-              id={id}
-              info={byId[id].detail.info}
-              action={toggleAddAgencyToCartAndRedirect}
-            />
+    return (
+      <ScrollView style={{ flex: 1 }}>
+        {type === appConstants.productItemContext.SHOW ? (
+          allIds.map((id, key) => (
+            <View key={key}>
+              <AgencyCard
+                id={id}
+                goToDetail={goToDetail}
+                info={byId[id].detail.info}
+                action={toggleAddAgencyToCartAndRedirect}
+              />
+            </View>
+          ))
+        ) : (
+          <View>
+            {selectedAgencyIds.map((id, key) => (
+              <View key={key}>
+                <AgencyItem
+                  index={key}
+                  checked={true}
+                  info={byId[id].detail.info}
+                  action={() => toggleAddAgencyToCart(id)}
+                />
+              </View>
+            ))}
+            {unSelectedAgencyIds.map((id, key) => (
+              <View key={key}>
+                <AgencyItem
+                  index={selectedAgencyIds.length + key}
+                  checked={false}
+                  info={byId[id].detail.info}
+                  action={() => toggleAddAgencyToCart(id)}
+                />
+              </View>
+            ))}
           </View>
-        ))
-      ) : (
-        <View>
-          {selectedAgencyIds.map((id, key) => (
-            <View key={key}>
-              <AgencyItem
-                index={key}
-                checked={true}
-                info={byId[id].detail.info}
-                action={() => toggleAddAgencyToCart(id)}
-              />
-            </View>
-          ))}
-          {unSelectedAgencyIds.map((id, key) => (
-            <View key={key}>
-              <AgencyItem
-                index={selectedAgencyIds.length + key}
-                checked={false}
-                info={byId[id].detail.info}
-                action={() => toggleAddAgencyToCart(id)}
-              />
-            </View>
-          ))}
-        </View>
-      )}
-    </ScrollView>
+        )}
+      </ScrollView>
+    );
+  }
+  return (
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <Text style={{ fontSize: 16, color: globalColorsAndStyles.color.error }}>
+        Không có đại lý nào
+      </Text>
+    </View>
   );
 };
 
@@ -168,9 +181,7 @@ const styles = key =>
 
 const mapStateToProps = state => ({
   agencies: selectors.data.getAgencies(state),
-  selectedAgencyIds: selectors.cart.getSelectedAgenciesInCreatingQuotation(
-    state
-  )
+  selectedAgencyIds: selectors.cart.getSelectedAgenciesInCart(state)
 });
 
 const mapDispatchToProps = (dispatch, props) => ({

@@ -30,6 +30,7 @@ const appConstants = {
   productItemContext: {
     IN_CART: "in_cart",
     SHOW: "show",
+    ADD_TO_AGENCY: "addProducts",
     QUOTATION: "quotation",
     ORDER: "order"
   }

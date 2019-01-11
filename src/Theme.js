@@ -10,6 +10,7 @@ export const globalColorsAndStyles = {
   },
   style: {
     boxShadow: {
+      backgroundColor: "#fff",
       shadowOpacity: 0.6,
       shadowRadius: 10,
       shadowOffset: {
@@ -47,7 +48,7 @@ const theme = {
       borderStyle: "solid",
       borderWidth: 1,
       borderRadius: 20,
-      backgroundColor: "rgba(255,255,255,0.9)",
+      backgroundColor: "rgb(255,255,255)",
       borderColor: "#4286f4"
     },
     autoCapitalize: "none",

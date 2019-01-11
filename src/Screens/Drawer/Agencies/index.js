@@ -4,12 +4,16 @@ import { createStackNavigator } from "react-navigation";
 import AgenciesScreen from "./AgenciesScreen";
 import CreateAccount from "./CreateAccount";
 import GroupInfoForm from "./CreateAgency";
+import AgencyDetail from "./AgencyDetail";
+import SelectProducts from "./SelectProducts";
 
 const AgenciesStack = createStackNavigator(
   {
     AgenciesScreen,
     CreateAccount,
-    GroupInfoForm
+    GroupInfoForm,
+    AgencyDetail,
+    SelectProducts
   },
   {
     navigationOptions: {

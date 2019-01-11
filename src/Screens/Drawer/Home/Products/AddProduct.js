@@ -11,6 +11,7 @@ import { connect } from "react-redux";
 import actions from "~/Actions";
 import { globalColorsAndStyles } from "~/Theme";
 import { validateFields } from "~/Utils/utils";
+import NumericInput from "react-native-numeric-input";
 
 const constrants = {
   name: {
@@ -19,12 +20,12 @@ const constrants = {
       message: "^Phải điền tên sản phẩm chính xác"
     }
   },
-  defaultPrice: {
-    length: {
-      minimum: 4,
-      message: "^Phải điền giá khởi điểm chính xác"
-    }
-  },
+  // defaultPrice: {
+  //   length: {
+  //     minimum: 4,
+  //     message: "^Phải điền giá khởi điểm chính xác"
+  //   }
+  // },
   type: {
     length: {
       minimum: 1,
@@ -41,15 +42,20 @@ class AddProduct extends Component {
   state = {
     error: false,
     name: "",
-    defaultPrice: "",
+    // defaultPrice: "",
+    defaultPrice: 1000,
     type: ""
   };
 
   validateForm = () => {
-    const { name, defaultPrice, type } = this.state;
+    const {
+      name,
+      // defaultPrice,
+      type
+    } = this.state;
     const fields = {
       name,
-      defaultPrice,
+      // defaultPrice,
       type
     };
     this.setState(
@@ -107,20 +113,7 @@ class AddProduct extends Component {
                 </View>
               ))}
           </View>
-          <View style={Styles.FlexBasis}>
-            <Input
-              value={defaultPrice}
-              placeholder="Giá khởi điểm"
-              onChangeText={defaultPrice => this.setState({ defaultPrice })}
-            />
-            {error &&
-              error.defaultPrice &&
-              error.defaultPrice.map((err, key) => (
-                <View key={key}>
-                  <Text style={Styles.Error}>{err}</Text>
-                </View>
-              ))}
-          </View>
+
           <View style={Styles.FlexBasis}>
             <Input
               textContentType="name"
@@ -135,6 +128,52 @@ class AddProduct extends Component {
                   <Text style={Styles.Error}>{err}</Text>
                 </View>
               ))}
+          </View>
+          <View style={Styles.FlexBasis}>
+            {/* <Input
+              value={defaultPrice}
+              placeholder="Giá khởi điểm"
+              onChangeText={defaultPrice => this.setState({ defaultPrice })}
+            />
+            {error &&
+              error.defaultPrice &&
+              error.defaultPrice.map((err, key) => (
+                <View key={key}>
+                  <Text style={Styles.Error}>{err}</Text>
+                </View>
+              ))} */}
+            <View
+              style={{
+                ...globalColorsAndStyles.style.boxShadow,
+                padding: 5,
+                flexDirection: "row",
+                borderStyle: "solid",
+                borderWidth: 1,
+                borderRadius: 20,
+                backgroundColor: "rgb(255,255,255)",
+                borderColor: "#4286f4",
+                alignItems: "center"
+              }}
+            >
+              <Text style={{ fontSize: 17, paddingEnd: 10 }}>
+                Giá khởi điểm
+              </Text>
+              <NumericInput
+                initValue={defaultPrice}
+                value={defaultPrice}
+                onChange={defaultPrice => this.setState({ defaultPrice })}
+                type="up-down"
+                minValue={0}
+                totalHeight={40}
+                iconSize={20}
+                step={500}
+                rounded
+                textColor="#B0228C"
+                iconStyle={{ color: "white" }}
+                upDownButtonsBackgroundColor="#EA3788"
+                // leftButtonBackgroundColor="#E56B70"
+              />
+            </View>
           </View>
           <Button title="Đồng ý" onPress={this.validateForm} />
           <Button

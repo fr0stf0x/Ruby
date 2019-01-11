@@ -15,7 +15,9 @@ const products = (state = {}, action) => {
       });
     case types.cart.MODIFY_ITEM_IN_CART:
       return mergeObj(state, {
-        ...{ [action.payload.id]: !state[action.payload.id] }
+        [action.payload.id]: mergeObj(state[action.payload.id], {
+          [action.payload.change.name]: action.payload.change.value
+        })
       });
     default:
       return state;
@@ -24,9 +26,10 @@ const products = (state = {}, action) => {
 
 const agencies = (state = [], action) => {
   switch (action.type) {
-    case types.cart.ADD_AGENCY_QUOTATION:
+    case types.cart.ADD_AGENCY:
+      console.log("adding", action.payload.id, "into", action.meta.endpoint);
       return [...state, action.payload.id];
-    case types.cart.REMOVE_AGENCY_QUOTATION:
+    case types.cart.REMOVE_AGENCY:
       // eslint-disable-next-line no-case-declarations
       let index = state.indexOf(action.payload.id);
       return [...state.slice(0, index), ...state.slice(index + 1)];
@@ -42,6 +45,11 @@ const endpoint = (state = {}, action) => {
       return mergeObj(state, {
         products: products(state.products, action)
       });
+    case types.cart.ADD_AGENCY:
+    case types.cart.REMOVE_AGENCY:
+      return mergeObj(state, {
+        agencies: agencies(state.agencies, action)
+      });
     default:
       return state;
   }
@@ -55,6 +63,10 @@ const cartReducer = (
     quotation: {
       products: {},
       agencies: []
+    },
+    addProducts: {
+      products: {},
+      agencies: []
     }
   },
   action
@@ -62,15 +74,10 @@ const cartReducer = (
   switch (action.type) {
     case types.cart.TOGGLE_ITEM_CART:
     case types.cart.MODIFY_ITEM_IN_CART:
+    case types.cart.ADD_AGENCY:
+    case types.cart.REMOVE_AGENCY:
       return mergeObj(state, {
         [action.meta.endpoint]: endpoint(state[action.meta.endpoint], action)
-      });
-    case types.cart.ADD_AGENCY_QUOTATION:
-    case types.cart.REMOVE_AGENCY_QUOTATION:
-      return mergeObj(state, {
-        quotation: mergeObj(state.quotation, {
-          agencies: agencies(state.quotation.agencies, action)
-        })
       });
     default:
       return state;

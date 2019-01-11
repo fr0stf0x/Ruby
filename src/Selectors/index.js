@@ -5,14 +5,17 @@ import {
   getUserProfile,
   getGroupInfo,
   getParent,
-  getAgencies
+  getAgencies,
+  getAgencyByIdFromNavigationParam,
+  getQuotations,
+  getOrders
 } from "./data.selector";
 import { isLoading, getAppMode } from "./ui.selector";
 import {
   getProductInCart,
   getProductsInCart,
   isCartEmpty,
-  getSelectedAgenciesInCreatingQuotation
+  getSelectedAgenciesInCart
 } from "./cart.selector";
 
 const selectors = {
@@ -26,7 +29,10 @@ const selectors = {
     getAppMode
   },
   data: {
+    getOrders,
+    getAgencyByIdFromNavigationParam,
     getGroupInfo,
+    getQuotations,
     getParent,
     getAgencies,
     getUserProfile,
@@ -37,7 +43,7 @@ const selectors = {
     getProductInCart,
     getProductsInCart,
     isCartEmpty,
-    getSelectedAgenciesInCreatingQuotation
+    getSelectedAgenciesInCart
   }
 };
 

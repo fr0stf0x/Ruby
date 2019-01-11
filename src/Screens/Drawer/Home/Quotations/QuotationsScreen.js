@@ -1,12 +1,15 @@
 import React, { Component } from "react";
-import { Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
+import QuotationList from "~/Components/QuotationList";
 
 class QuotationsScreen extends Component {
   render() {
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <Text>QuotationsScreen</Text>
+      <View style={{ flex: 1 }}>
+        <ScrollView contentContainerStyle={{ flex: 1 }}>
+          <QuotationList />
+        </ScrollView>
       </View>
     );
   }

@@ -8,6 +8,29 @@ export const promiseWrapper = promise =>
     .then(data => ({ data, error: null }))
     .catch(error => ({ error, data: null }));
 
+export const formatDate = (date: Date): String => {
+  var monthNames = [
+    "Tháng 1",
+    "Tháng 2",
+    "Tháng 3",
+    "Tháng 4",
+    "Tháng 5",
+    "Tháng 6",
+    "Tháng 7",
+    "Tháng 8",
+    "Tháng 9",
+    "Tháng 10",
+    "Tháng 11",
+    "Tháng 12"
+  ];
+
+  var day = date.getDate();
+  var monthIndex = date.getMonth();
+  var year = date.getFullYear();
+
+  return day + " " + monthNames[monthIndex] + " " + year;
+};
+
 const asyncCheckIfRegistered = email => {
   return new ValidateJs.Promise((resolve, reject) => {
     firebase

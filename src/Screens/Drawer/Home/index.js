@@ -1,11 +1,11 @@
 import React from "react";
+import Icon from "react-native-vector-icons/Ionicons";
 import { createBottomTabNavigator } from "react-navigation";
+import IconWithBadge from "~/Components/IconWithBadge";
 import { globalColorsAndStyles } from "~/Theme";
-import IconWithBadge from "./IconWithBadge";
 import OrdersStack from "./Orders";
 import ProductStack from "./Products";
 import QuotationsStack from "./Quotations";
-import Icon from "react-native-vector-icons/Ionicons";
 
 const tabIconNames = {
   Products: "ios-albums",

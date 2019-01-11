@@ -21,6 +21,7 @@ import actions from "~/Actions";
 import appConstants from "~/appConstants";
 import { globalColorsAndStyles } from "~/Theme";
 import { validateFields } from "~/Utils/utils";
+import NumericInput from "react-native-numeric-input";
 
 const constrants = {
   agencyName: {
@@ -50,7 +51,8 @@ class GroupInfoForm extends Component {
     agencyName: "",
     agencyAddress: "",
     agencyPhone: "",
-    defaultOffPercent: "0",
+    // defaultOffPercent: "0",
+    defaultOffPercent: 0,
     agencyType: appConstants.groupType.AGENCY,
     error: false
   };
@@ -234,14 +236,51 @@ class GroupInfoForm extends Component {
           </View>
 
           <View style={Styles.FlexBasis}>
-            <Input
+            {/* <Input
               keyboardType="numeric"
               value={defaultOffPercent}
               placeholder="Tỉ lệ chiết khấu mặc định"
               onChangeText={defaultOffPercent =>
                 this.setState({ defaultOffPercent })
               }
-            />
+            /> */}
+            <View
+              style={{
+                ...globalColorsAndStyles.style.boxShadow,
+                padding: 5,
+                flexDirection: "row",
+                borderStyle: "solid",
+                borderWidth: 1,
+                borderRadius: 20,
+                backgroundColor: "rgb(255,255,255)",
+                borderColor: "#4286f4",
+                alignItems: "center"
+              }}
+            >
+              <Text style={{ fontSize: 17, paddingEnd: 10 }}>
+                Tỉ lệ chiêt khấu mặc định
+              </Text>
+              <NumericInput
+                initValue={defaultOffPercent}
+                value={defaultOffPercent}
+                onChange={defaultOffPercent =>
+                  this.setState({ defaultOffPercent })
+                }
+                type="up-down"
+                minValue={0}
+                maxValue={100}
+                totalWidth={100}
+                totalHeight={40}
+                iconSize={20}
+                step={0.5}
+                valueType="real"
+                rounded
+                textColor="#B0228C"
+                iconStyle={{ color: "white" }}
+                upDownButtonsBackgroundColor="#EA3788"
+                // leftButtonBackgroundColor="#E56B70"
+              />
+            </View>
           </View>
           <Button title="Đồng ý" onPress={this.validateForm} />
         </ScrollView>

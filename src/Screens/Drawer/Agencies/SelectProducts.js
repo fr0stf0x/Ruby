@@ -1,25 +1,28 @@
 import React, { Component } from "react";
-import { Alert, ScrollView, StyleSheet, View } from "react-native";
-import { Text, Button } from "react-native-elements";
-import { connect } from "react-redux";
+import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import actions from "~/Actions";
 import appConstants from "~/appConstants";
 import ProductList, { ProductItemContext } from "~/Components/ProductList";
-import selectors from "~/Selectors";
 import { globalColorsAndStyles } from "~/Theme";
+import { Button } from "react-native-elements";
+import { connect } from "react-redux";
 
-class CreateOrder extends Component {
+class SelectProducts extends Component {
   state = {
     error: false
   };
+
+  goBackToList = () => {
+    this.props.navigation.navigate("AgenciesScreen");
+  };
   render() {
     const { error } = this.state;
-    const { createOrder, toggleLoading } = this.props;
+    const { toggleLoading, addProductsToAgency } = this.props;
     return (
       <View style={styles.container}>
         <ScrollView style={styles.products}>
           <ProductItemContext.Provider
-            value={{ type: appConstants.productItemContext.ORDER }}
+            value={{ type: appConstants.productItemContext.ADD_TO_AGENCY }}
           >
             <ProductList type="available" />
           </ProductItemContext.Provider>
@@ -41,12 +44,12 @@ class CreateOrder extends Component {
             title="Đồng ý"
             onPress={() => {
               toggleLoading();
-              createOrder()
+              addProductsToAgency()
                 .then(() => {
                   this.setState({ error: false });
                   Alert.alert("Thành công", "", [
                     {
-                      text: "Đợi đối phương xác nhận",
+                      text: "Quay lại danh sách",
                       onPress: this.goBackToList
                     }
                   ]);
@@ -80,18 +83,26 @@ const styles = StyleSheet.create({
   }
 });
 
-CreateOrder.navigationOptions = {
-  title: "Tạo đơn đặt hàng"
+SelectProducts.navigationOptions = {
+  title: "Thêm sản phẩm",
+  headerRight: (
+    <Text
+      style={styles.actionText}
+      onPress={() =>
+        actions.global.globalToggleCheckProducts(
+          appConstants.productItemContext.ADD_TO_AGENCY
+        )
+      }
+    >
+      Chọn tất cả
+    </Text>
+  )
 };
 
 export default connect(
-  state => ({
-    products: selectors.cart.getProductsInCart(state, {
-      endpoint: appConstants.productItemContext.ORDER
-    })
-  }),
+  state => ({}),
   dispatch => ({
     toggleLoading: () => dispatch(actions.ui.toggleLoading()),
-    createOrder: () => dispatch(actions.data.makeCreateOrder())
+    addProductsToAgency: () => dispatch(actions.data.makeAddProductsToAgency())
   })
-)(CreateOrder);
+)(SelectProducts);

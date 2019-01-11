@@ -1,17 +1,16 @@
 import React, { Component } from "react";
-import { Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { Button } from "react-native-elements";
 import Icon from "react-native-vector-icons/Ionicons";
+import OrderList from "~/Components/OrderList";
 
 class OrdersScreen extends Component {
   render() {
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <Text>OrdersScreen</Text>
-        <Button
-          onPress={() => this.props.navigation.navigate("CreateOrder")}
-          title={"Tạo đơn đặt hàng"}
-        />
+      <View style={{ flex: 1 }}>
+        <ScrollView contentContainerStyle={{ flex: 1 }}>
+          <OrderList />
+        </ScrollView>
       </View>
     );
   }

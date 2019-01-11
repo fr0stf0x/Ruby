@@ -9,6 +9,7 @@ import { mergeObj } from "~/Reducers/utils";
 import selectors from "~/Selectors";
 import { globalColorsAndStyles } from "~/Theme";
 import { randomProductImage } from "~/Utils/utils";
+import NumericInput from "react-native-numeric-input";
 
 export const ProductItemContext = React.createContext(
   appConstants.productItemContext.SHOW
@@ -55,15 +56,38 @@ const styles = (key, available) =>
 const ProductInfoAndActions = connect((state, props) => {
   const product = selectors.cart.getProductInCart(state, props);
   return {
-    checked: product && product.checked
+    productInCart: product
   };
-})(({ id, detail, endpoint, status, index, checked, dispatch }) => {
-  const price = status.price.current || status.price.default;
-  const offPercent = status.off_percent.current || status.off_percent.default;
+})(({ id, detail, endpoint, status, index, productInCart, dispatch }) => {
+  const currentPrice = status.price.current || status.price.default;
+  const currentOffPercent =
+    status.off_percent.current || status.off_percent.default;
+  let price, offPercent, checked;
+  checked = Boolean(productInCart && productInCart.checked);
+  price = (productInCart && productInCart.price) || currentPrice;
+  offPercent = (productInCart && productInCart.offPercent) || currentOffPercent;
 
   const toggleCheck = () => {
     dispatch(actions.cart.toggleCheckProduct({ id, endpoint }));
   };
+
+  const inputChange = change => {
+    const otherChangeName =
+      change.name === "offPercent" ? "price" : "offPercent";
+    const otherChangeValue =
+      change.name === "offPercent"
+        ? ((100 - change.value) * status.price.default) / 100
+        : Math.round((1 - change.value / status.price.default) * 100 * 100) /
+          100;
+    const otherChange = {
+      name: otherChangeName,
+      value: otherChangeValue
+    };
+    console.log(otherChange);
+    dispatch(actions.cart.modifyItemInCart(id, endpoint, change));
+    dispatch(actions.cart.modifyItemInCart(id, endpoint, otherChange));
+  };
+
   return (
     <View style={{ flex: 1, flexDirection: "row" }}>
       <View style={styles(index, status.available).listItem}>
@@ -78,12 +102,64 @@ const ProductInfoAndActions = connect((state, props) => {
           <View style={[styles().info, { flex: 1, alignContent: "center" }]}>
             <Text style={styles().listItemTitle}>{detail.name}</Text>
             {endpoint === appConstants.productItemContext.QUOTATION && (
-              <View style={{ flex: 1 }}>
-                <Input
+              <View style={{ flexDirection: "row", alignSelf: "center" }}>
+                {/* <Input
+                  keyboardType="decimal-pad"
                   value={offPercent.toString()}
                   editable={Boolean(checked)}
+                  onChangeText={offPercent =>
+                    inputChange({ name: "offPercent", value: offPercent })
+                  }
                 />
-                <Input value={price.toString()} editable={Boolean(checked)} />
+                <Input
+                  keyboardType="decimal-pad"
+                  value={price.toString()}
+                  editable={Boolean(checked)}
+                  onChangeText={price =>
+                    inputChange({ name: "price", value: price })
+                  }
+                /> */}
+                {checked && (
+                  <NumericInput
+                    type="up-down"
+                    initValue={offPercent}
+                    value={offPercent}
+                    onChange={offPercent =>
+                      inputChange({ name: "offPercent", value: offPercent })
+                    }
+                    minValue={0}
+                    maxValue={100}
+                    totalWidth={90}
+                    totalHeight={40}
+                    iconSize={20}
+                    valueType="real"
+                    step={0.5}
+                    rounded
+                    textColor="#B0228C"
+                    iconStyle={{ color: "white" }}
+                    upDownButtonsBackgroundColor="#EA3788"
+                  />
+                )}
+                {checked && (
+                  <NumericInput
+                    type="up-down"
+                    initValue={price}
+                    value={price}
+                    onChange={price =>
+                      inputChange({ name: "price", value: price })
+                    }
+                    maxValue={status.price.default}
+                    minValue={0}
+                    totalWidth={90}
+                    totalHeight={40}
+                    iconSize={20}
+                    step={500}
+                    rounded
+                    textColor="#B0228C"
+                    iconStyle={{ color: "white" }}
+                    upDownButtonsBackgroundColor="#EA3788"
+                  />
+                )}
               </View>
             )}
           </View>
@@ -158,13 +234,27 @@ const ProductItem = ({ item: { id, detail, status }, index }) => {
   );
 };
 
-const ProductList = ({ products: { allIds, byId } }) => (
-  <FlatList
-    keyExtractor={(item, index) => index.toString()}
-    data={allIds.map(id => mergeObj(byId[id], { id }))}
-    renderItem={ProductItem}
-  />
-);
+const ProductList = ({ products, type }) => {
+  if (products) {
+    const { allIds, byId } = products;
+    return (
+      <FlatList
+        keyExtractor={(item, index) => index.toString()}
+        data={allIds.map(id => mergeObj(byId[id], { id }))}
+        renderItem={ProductItem}
+      />
+    );
+  }
+  return (
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <Text style={{ fontSize: 16, color: globalColorsAndStyles.color.error }}>
+        Không có sản phẩm
+        <Text>{type === "available" ? " có sẵn " : " không có sẵn "}</Text>
+        nào
+      </Text>
+    </View>
+  );
+};
 
 export default connect((state, props) => ({
   products: selectors.data.getProductsByType(state, props)

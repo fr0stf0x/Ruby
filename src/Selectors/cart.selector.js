@@ -1,13 +1,15 @@
+import appConstants from "~/appConstants";
+
 export const getProductInCart = (state, { endpoint, id }) =>
   state.cart[endpoint].products[id];
 
-export const getSelectedAgenciesInCreatingQuotation = (state): Array =>
-  state.cart.quotation.agencies;
+export const getSelectedAgenciesInCart = (
+  state,
+  endpoint = appConstants.productItemContext.QUOTATION
+): Array => state.cart[endpoint].agencies;
 
-export const getProductsInCart = (state, { endpoint }) => {
-  console.log(state.cart[endpoint].products);
-  return state.cart[endpoint].products;
-};
+export const getProductsInCart = (state, { endpoint }) =>
+  state.cart[endpoint].products;
 
 export const isCartEmpty = (state, { endpoint }) =>
-  getProductsInCart(state, endpoint).allIds.length > 0;
+  Object.keys(getProductsInCart(state, { endpoint })).length === 0;

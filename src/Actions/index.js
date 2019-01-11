@@ -2,7 +2,14 @@ import { makeLogIn, makeLogOut } from "./auth.actions";
 import {
   addProduct,
   initAppData,
-  makeCreateAgencyAccount
+  makeCreateOrder,
+  makeCreateQuotation,
+  makeAddProductsToAgency,
+  makeCreateAgencyAccount,
+  acceptNewQuotation,
+  rejectNewQuotation,
+  acceptNewOrder,
+  rejectNewOrder
 } from "./data.actions";
 import { setAppMode, toggleLoading } from "./ui.actions";
 import {
@@ -10,10 +17,15 @@ import {
   toggleCheckAgency,
   toggleCheckProducts,
   toggleCheckProduct,
-  addAgencyToCartIfNeeded
+  addAgencyToCartIfNeeded,
+  modifyItemInCart
 } from "./cart.actions";
 
-import { globalToggleCheckProducts, globalToggleCheckAgencies } from "./global";
+import {
+  globalToggleCheckProducts,
+  globalToggleCheckAgencies,
+  createQuotation
+} from "./global";
 
 const actions = {
   auth: {
@@ -25,20 +37,29 @@ const actions = {
     setAppMode
   },
   data: {
+    acceptNewOrder,
+    rejectNewOrder,
+    acceptNewQuotation,
+    rejectNewQuotation,
     addProduct,
+    makeCreateOrder,
+    makeCreateQuotation,
+    makeAddProductsToAgency,
     makeCreateAgencyAccount,
     initAppData
   },
   cart: {
     addAgencyToCartIfNeeded,
     toggleCheckProducts,
+    modifyItemInCart,
     toggleCheckProduct,
     toggleCheckAllAgencies,
     toggleCheckAgency
   },
   global: {
     globalToggleCheckProducts,
-    globalToggleCheckAgencies
+    globalToggleCheckAgencies,
+    createQuotation
   }
 };
 
