@@ -1,6 +1,8 @@
 // eslint-disable-next-line import/named
 import firebase from "react-native-firebase";
 
+import type { RemoteMessage } from "react-native-firebase";
+
 import appConstants from "~/appConstants";
 import selectors from "~/Selectors";
 import { promiseWrapper } from "~/Utils/utils";
@@ -52,7 +54,7 @@ export const makeCreateQuotation = () => (dispatch, getState) => {
     endpoint: appConstants.productItemContext.QUOTATION
   });
   console.log("products", selectedProducts);
-  return dispatch(createQuotation(selectedAgencyIds, selectedProducts));
+  return createQuotation(selectedAgencyIds, selectedProducts);
 };
 
 export const makeCreateOrder = () => (dispatch, getState) => {
@@ -143,7 +145,6 @@ export const rejectNewQuotation = quotationId => (dispatch, getState) => {
 
 export const acceptNewOrder = (fromId, orderId) => (dispatch, getState) => {
   const db = firebase.firestore();
-  console.log(fromId);
   const batch = db.batch();
   const currentGroup = selectors.data.getGroupInfo(getState());
   const currentGroupDocRef = db
@@ -241,7 +242,7 @@ export const makeCreateAgencyAccount = ({
         .commit();
     })
     .catch(err => {
-      // console.log(err);
+      console.log(err);
       return Promise.reject(err);
     });
 };
@@ -270,7 +271,7 @@ const getAppData = ({ group: { group_id, group_type } }) => dispatch => {
   }
 };
 
-const getGroupAndRelatives = groupDocRef => dispatch => {
+const getGroupAndRelatives = (groupDocRef: RemoteMessage) => dispatch => {
   // // console.log("getting parent and children if needed");
   dispatch(getGroupAndParent(groupDocRef));
   dispatch(
@@ -303,7 +304,7 @@ const getGroupAndParent = groupDocRef => dispatch => {
             receiveData({ endpoint: "parent", data: parentGroupDoc.data() })
           );
         }
-        // // console.log(error);
+        console.log(error);
       }
     }
   });
@@ -336,7 +337,7 @@ const getCollectionAndMergeDetails = (
           };
           return;
         }
-        // console.log(error);
+        console.log(error);
       });
       return dispatch(
         receiveData({ endpoint: collectionName, data: { allIds, byId } })

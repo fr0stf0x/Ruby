@@ -8,6 +8,7 @@ import AgenciesBox from "~/Components/AgenciesBox";
 import ProductList, { ProductItemContext } from "~/Components/ProductList";
 import selectors from "~/Selectors";
 import { globalColorsAndStyles } from "~/Theme";
+import { promiseWithLoadingAnimation } from "~/Actions/global";
 
 class CreateQuotation extends Component {
   state = {
@@ -20,7 +21,7 @@ class CreateQuotation extends Component {
 
   render() {
     const { error } = this.state;
-    const { createQuotation, toggleLoading } = this.props;
+    const { createQuotation } = this.props;
     return (
       <View style={styles.container}>
         <AgenciesBox navigation={this.props.navigation} />
@@ -46,23 +47,23 @@ class CreateQuotation extends Component {
           <Button
             style={{ alignSelf: "center", width: 150 }}
             title="Đồng ý"
-            onPress={() => {
-              toggleLoading();
-              createQuotation()
-                .then(() => {
-                  this.setState({ error: false });
-                  Alert.alert("Thành công", "", [
-                    {
-                      text: "Đợi đối phương xác nhận",
-                      onPress: this.goBackToList
-                    }
-                  ]);
-                })
-                .catch(err => {
-                  this.setState({ error: err });
-                })
-                .finally(toggleLoading);
-            }}
+            onPress={() =>
+              promiseWithLoadingAnimation(() =>
+                createQuotation()
+                  .then(() => {
+                    this.setState({ error: false });
+                    Alert.alert("Thành công", "", [
+                      {
+                        text: "Đợi đối phương xác nhận",
+                        onPress: this.goBackToList
+                      }
+                    ]);
+                  })
+                  .catch(err => {
+                    this.setState({ error: err });
+                  })
+              )
+            }
           />
         </View>
       </View>

@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 import {
   AsyncStorage,
-  Text,
+  KeyboardAvoidingView,
   ScrollView,
-  View,
-  KeyboardAvoidingView
+  Text,
+  View
 } from "react-native";
 import { Button, Input } from "react-native-elements";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -30,7 +30,7 @@ class LoginScreen extends Component {
     try {
       const email = await AsyncStorage.getItem("email");
       const password = await AsyncStorage.getItem("password");
-      if (email !== null && password !== null) {
+      if (email && password) {
         this.setState({ email, password });
       }
     } finally {
@@ -54,9 +54,9 @@ class LoginScreen extends Component {
     toggleLoading();
     const { error, data } = await promiseWrapper(logIn({ email, password }));
     if (!error) {
-      toggleLoading();
       navigation.navigate("Welcome");
     }
+    toggleLoading();
   };
 
   render() {

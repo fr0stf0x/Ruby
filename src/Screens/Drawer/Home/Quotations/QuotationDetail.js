@@ -1,26 +1,32 @@
 import React, { Component } from "react";
-import { StyleSheet, Image, FlatList, Text, View } from "react-native";
+import { FlatList, Image, StyleSheet, View } from "react-native";
+import { Text } from "react-native-elements";
 import { connect } from "react-redux";
-import selectors from "~/Selectors";
-import { formatDate, randomProductImage, formatDateTime } from "~/Utils/utils";
 import { mergeObj } from "~/Reducers/utils";
+import selectors from "~/Selectors";
 import { globalColorsAndStyles } from "~/Theme";
+import { formatDate, formatTime, randomProductImage } from "~/Utils/utils";
 
 class QuotationDetail extends Component {
   render() {
     const { quotation, allProducts } = this.props;
     const { createdAt, products: productsOfQuotation } = quotation.detail;
-    const formatedDate = formatDateTime(createdAt);
     const { byId } = allProducts;
+    const formatedDate = formatDate(createdAt);
+    const formatedTime = formatTime(createdAt);
 
     return (
-      <FlatList
-        keyExtractor={(item, index) => index.toString()}
-        data={Object.keys(productsOfQuotation).map(id =>
-          mergeObj(byId[id], { id, inQuotation: productsOfQuotation[id] })
-        )}
-        renderItem={ReadOnlyProduct}
-      />
+      <View>
+        <Text h3>Báo giá ngày {formatedDate}</Text>
+        <Text>Đã nhận lúc {formatedTime} cùng ngày</Text>
+        <FlatList
+          keyExtractor={(item, index) => index.toString()}
+          data={Object.keys(productsOfQuotation).map(id =>
+            mergeObj(byId[id], { id, inQuotation: productsOfQuotation[id] })
+          )}
+          renderItem={ReadOnlyProduct}
+        />
+      </View>
     );
   }
 }

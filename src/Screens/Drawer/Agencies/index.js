@@ -5,7 +5,7 @@ import AgenciesScreen from "./AgenciesScreen";
 import CreateAccount from "./CreateAccount";
 import GroupInfoForm from "./CreateAgency";
 import AgencyDetail from "./AgencyDetail";
-import SelectProducts from "./SelectProducts";
+import AddProductsForAgency from "./AddProductsForAgency";
 
 const AgenciesStack = createStackNavigator(
   {
@@ -13,7 +13,7 @@ const AgenciesStack = createStackNavigator(
     CreateAccount,
     GroupInfoForm,
     AgencyDetail,
-    SelectProducts
+    AddProductsForAgency
   },
   {
     navigationOptions: {

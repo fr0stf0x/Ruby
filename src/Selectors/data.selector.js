@@ -13,11 +13,12 @@ export const getProductsByType = (state, { type = "all" }) => {
   const products = state.appData[appConstants.collection.PRODUCTS];
   if (products) {
     if (type === "all") return products;
-    const { allIds, byId } = products;
+    const { allIds, byId, loading } = products;
     const newAllIds = allIds.filter(
       id => byId[id].status.available === (type === "available")
     );
     return {
+      loading,
       allIds: newAllIds,
       byId: newAllIds.reduce((obj, id) => {
         obj[id] = byId[id];
@@ -43,6 +44,9 @@ export const getProductByIdFromNavigationParam = (state, props) =>
   state.appData[appConstants.collection.PRODUCTS].byId[
     props.navigation.getParam("id")
   ];
+
+export const getProductById = (state, { id }) =>
+  state.appData[appConstants.collection.PRODUCTS].byId[id];
 
 export const getAgencyByIdFromNavigationParam = (state, props) =>
   state.appData[appConstants.collection.CHILDREN].byId[

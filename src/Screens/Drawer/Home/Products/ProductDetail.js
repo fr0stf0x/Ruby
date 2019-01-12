@@ -1,18 +1,18 @@
 import React, { Component } from "react";
-import { View, Image } from "react-native";
+import { Image, View } from "react-native";
+import { Text, ThemeProvider } from "react-native-elements";
 import { connect } from "react-redux";
 import selectors from "~/Selectors";
-import { Text } from "react-native-elements";
-import { randomProductImage } from "~/Utils/utils";
+import { formatDate, randomProductImage } from "~/Utils/utils";
 
 class ProductDetail extends Component {
   render() {
     const { product } = this.props;
     return (
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, padding: 20 }}>
         <Image
           resizeMode="cover"
-          style={{ alignSelf: "center", maxWidth: 300, height: 250 }}
+          style={{ alignSelf: "center", maxWidth: 300, maxHeight: 300 }}
           source={randomProductImage()}
         />
         <View
@@ -25,23 +25,33 @@ class ProductDetail extends Component {
             justifyContent: "center"
           }}
         >
-          <View style={{ flex: 2 }}>
-            <Text>Tên sản phẩm:</Text>
-            <Text>Loại sản phẩm:</Text>
-            {product.detail.createdAt && <Text>Ngày ra mắt</Text>}
-          </View>
-          <View style={{ flex: 3 }}>
-            <Text>{product.detail.name}</Text>
-            <Text>{product.detail.type}</Text>
-            {product.detail.createdAt && (
-              <Text>{product.detail.createdAt.toString()}</Text>
-            )}
-          </View>
+          <ThemeProvider theme={theme}>
+            <View style={{ flex: 1 }}>
+              <Text>Tên sản phẩm:</Text>
+              <Text>Loại sản phẩm:</Text>
+              {product.detail.createdAt && <Text>Ngày ra mắt</Text>}
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text>{product.detail.name}</Text>
+              <Text>{product.detail.type}</Text>
+              {product.detail.createdAt && (
+                <Text>{formatDate(product.detail.createdAt)}</Text>
+              )}
+            </View>
+          </ThemeProvider>
         </View>
       </View>
     );
   }
 }
+
+const theme = {
+  Text: {
+    style: {
+      fontSize: 20
+    }
+  }
+};
 
 export default connect((state, props) => ({
   product: selectors.data.getProductByIdFromNavigationParam(state, props)

@@ -71,7 +71,6 @@ export const modifyItemInCart = (id, endpoint, change) => ({
 });
 
 const addAgencyToCart = (id, endpoint) => {
-  console.log(endpoint);
   return {
     type: types.cart.ADD_AGENCY,
     meta: { endpoint },

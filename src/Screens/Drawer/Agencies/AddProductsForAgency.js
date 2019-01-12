@@ -6,8 +6,9 @@ import ProductList, { ProductItemContext } from "~/Components/ProductList";
 import { globalColorsAndStyles } from "~/Theme";
 import { Button } from "react-native-elements";
 import { connect } from "react-redux";
+import { promiseWithLoadingAnimation } from "~/Actions/global";
 
-class SelectProducts extends Component {
+class AddProductsForAgency extends Component {
   state = {
     error: false
   };
@@ -17,7 +18,7 @@ class SelectProducts extends Component {
   };
   render() {
     const { error } = this.state;
-    const { toggleLoading, addProductsToAgency } = this.props;
+    const { addProductsToAgency } = this.props;
     return (
       <View style={styles.container}>
         <ScrollView style={styles.products}>
@@ -42,23 +43,23 @@ class SelectProducts extends Component {
           <Button
             style={{ alignSelf: "center", width: 150 }}
             title="Đồng ý"
-            onPress={() => {
-              toggleLoading();
-              addProductsToAgency()
-                .then(() => {
-                  this.setState({ error: false });
-                  Alert.alert("Thành công", "", [
-                    {
-                      text: "Quay lại danh sách",
-                      onPress: this.goBackToList
-                    }
-                  ]);
-                })
-                .catch(err => {
-                  this.setState({ error: err });
-                })
-                .finally(toggleLoading);
-            }}
+            onPress={() =>
+              promiseWithLoadingAnimation(() =>
+                addProductsToAgency()
+                  .then(() => {
+                    this.setState({ error: false });
+                    Alert.alert("Thành công", "", [
+                      {
+                        text: "Quay lại danh sách",
+                        onPress: this.goBackToList
+                      }
+                    ]);
+                  })
+                  .catch(err => {
+                    this.setState({ error: err });
+                  })
+              )
+            }
           />
         </View>
       </View>
@@ -83,7 +84,7 @@ const styles = StyleSheet.create({
   }
 });
 
-SelectProducts.navigationOptions = {
+AddProductsForAgency.navigationOptions = {
   title: "Thêm sản phẩm",
   headerRight: (
     <Text
@@ -102,7 +103,6 @@ SelectProducts.navigationOptions = {
 export default connect(
   state => ({}),
   dispatch => ({
-    toggleLoading: () => dispatch(actions.ui.toggleLoading()),
     addProductsToAgency: () => dispatch(actions.data.makeAddProductsToAgency())
   })
-)(SelectProducts);
+)(AddProductsForAgency);

@@ -12,6 +12,11 @@ class CreateOrder extends Component {
   state = {
     error: false
   };
+
+  goBackToList = () => {
+    this.props.navigation.navigate("OrderList");
+  };
+
   render() {
     const { error } = this.state;
     const { createOrder, toggleLoading } = this.props;

@@ -4,15 +4,15 @@ import { Button, Text } from "react-native-elements";
 import { connect } from "react-redux";
 import selectors from "~/Selectors";
 import actions from "~/Actions";
+import { promiseWithLoadingAnimation } from "~/Actions/global";
 
 class WelcomeScreen extends Component {
   componentDidMount() {
     const { dispatch, authInfo } = this.props;
-    dispatch(actions.ui.toggleLoading());
     authInfo &&
-      dispatch(actions.data.initAppData(authInfo)).finally(() => {
-        dispatch(actions.ui.toggleLoading());
-      });
+      promiseWithLoadingAnimation(() =>
+        dispatch(actions.data.initAppData(authInfo))
+      );
   }
 
   render() {

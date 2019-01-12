@@ -11,7 +11,11 @@ import appConstants from "~/appConstants";
 
 class AgencyDetail extends Component {
   render() {
-    const { agency, toggleAddAgencyToCartAndRedirect } = this.props;
+    const {
+      agency,
+      toggleAddAgencyToCartAndRedirect,
+      redirectToAddProductsForAgency
+    } = this.props;
     const { info } = agency.detail;
     return (
       <View>
@@ -63,7 +67,7 @@ class AgencyDetail extends Component {
                   ...styles.actionButton,
                   backgroundColor: globalColorsAndStyles.color.secondary
                 }}
-                onPress={toggleAddAgencyToCartAndRedirect}
+                onPress={redirectToAddProductsForAgency}
               />
               <Button
                 title="Xoá đại lý"
@@ -111,14 +115,23 @@ export default connect(
   (dispatch, props) => ({
     toggleAddAgencyToCartAndRedirect: () => {
       const id = props.navigation.getParam("id");
-      console.log("id", id);
+      dispatch(
+        actions.cart.addAgencyToCartIfNeeded(
+          id,
+          appConstants.productItemContext.QUOTATION
+        )
+      );
+      props.navigation.navigate("CreateQuotation", { id });
+    },
+    redirectToAddProductsForAgency: () => {
+      const id = props.navigation.getParam("id");
       dispatch(
         actions.cart.addAgencyToCartIfNeeded(
           id,
           appConstants.productItemContext.ADD_TO_AGENCY
         )
       );
-      props.navigation.navigate("SelectProducts", { id });
+      props.navigation.navigate("AddProductsForAgency", { id });
     }
   })
 )(AgencyDetail);

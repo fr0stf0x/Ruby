@@ -1,6 +1,6 @@
-import { AsyncStorage } from "react-native";
 import firebase from "react-native-firebase";
 import types from "./ActionTypes";
+import { setAccountToAsyncStorage } from "./global";
 import { toggleLoading } from "./ui.actions";
 
 const login = ({ user: info }) => {
@@ -10,15 +10,6 @@ const login = ({ user: info }) => {
       info
     }
   };
-};
-
-const setAsyncStorage = async ({ email, password }) => {
-  try {
-    await AsyncStorage.setItem("email", email);
-    await AsyncStorage.setItem("password", password);
-  } catch (error) {
-    // Error saving data
-  }
 };
 
 const logOut = () => {
@@ -47,7 +38,7 @@ export const makeLogIn = ({ email, password }) => dispatch => {
     .then(({ user }) => {
       dispatch(login({ user }));
       dispatch(authSuccess());
-      return setAsyncStorage({ email, password });
+      return setAccountToAsyncStorage({ email, password });
     })
     .catch(err => {
       const { code, message } = err;

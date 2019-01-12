@@ -10,6 +10,8 @@ export const globalColorsAndStyles = {
   },
   style: {
     boxShadow: {
+      padding: 5,
+      borderRadius: 15,
       backgroundColor: "#fff",
       shadowOpacity: 0.6,
       shadowRadius: 10,
