@@ -27,7 +27,6 @@ const products = (state = {}, action) => {
 const agencies = (state = [], action) => {
   switch (action.type) {
     case types.cart.ADD_AGENCY:
-      console.log("adding", action.payload.id, "into", action.meta.endpoint);
       return [...state, action.payload.id];
     case types.cart.REMOVE_AGENCY:
       // eslint-disable-next-line no-case-declarations

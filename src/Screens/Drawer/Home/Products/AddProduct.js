@@ -137,9 +137,7 @@ class AddProduct extends Component {
                 />
                 <TouchableOpacity onPress={this.selectPhotos}>
                   <Image
-                    source={{
-                      uri: image.uri
-                    }}
+                    source={{ uri: image.uri }}
                     style={{
                       width: width / 1.5,
                       height: width / 1.5,

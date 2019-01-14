@@ -21,7 +21,7 @@ const AgencyCard = ({ id, info, goToDetail, action }) => {
       <Card
         containerStyle={globalColorsAndStyles.style.boxShadow}
         title={info.name}
-        image={info.imageUrl}
+        image={{ uri: info.imageUrl }}
       >
         <View style={{ flexDirection: "row", justifyContent: "center" }}>
           <Button
@@ -53,7 +53,7 @@ const AgencyItem = ({ info, index, checked, action }) => {
       <View style={styles(index).listItem}>
         <View style={styles().imageContainer}>
           <Image
-            source={info.imageUrl}
+            source={{ uri: info.imageUrl }}
             resizeMode="cover"
             style={{ width: 100, height: 100 }}
           />

@@ -248,9 +248,7 @@ class GroupInfoForm extends Component {
                 />
                 <TouchableOpacity onPress={this.selectPhotos}>
                   <Image
-                    source={{
-                      uri: image.uri
-                    }}
+                    source={{ uri: image.uri }}
                     style={{
                       width: 200,
                       height: 200,
