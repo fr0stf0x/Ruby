@@ -1,16 +1,15 @@
 import React from "react";
-import styles from "./productStyles";
-import { View, Image } from "react-native";
+import { Image, View } from "react-native";
 import { Text } from "react-native-elements";
-import { randomProductImage } from "~/Utils/utils";
 import Icon from "react-native-vector-icons/Ionicons";
+import styles from "./productStyles";
 
 const ReadOnlyProductListItem = ({ detail, status, index }) => {
   return (
     <View style={styles(index, status.available).listItem}>
       <View style={styles().imageContainer}>
         <Image
-          source={randomProductImage()}
+          source={{ uri: detail.imageUrl }}
           resizeMode="cover"
           style={{ width: 100, height: 100 }}
         />

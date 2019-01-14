@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import {
+  Platform,
   KeyboardAvoidingView,
   ScrollView,
   StyleSheet,
@@ -72,7 +73,10 @@ class CreateAccount extends Component {
   render() {
     const { email, password, name, passwordShown, error } = this.state;
     return (
-      <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
+      <KeyboardAvoidingView
+        behavior={Platform.select({ ios: "padding", android: "none" })}
+        style={{ flex: 1 }}
+      >
         <ScrollView
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode={"on-drag"}

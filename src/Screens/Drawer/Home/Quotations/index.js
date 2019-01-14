@@ -16,6 +16,16 @@ const QuotationsStack = createStackNavigator(
     QuotationDetail
   },
   {
+    navigationOptions: ({ navigation }) => {
+      let tabBarVisible = true;
+      if (navigation.state.index > 0) {
+        tabBarVisible = false;
+      }
+      return {
+        title: "Báo giá",
+        tabBarVisible
+      };
+    },
     defaultNavigationOptions: {
       headerBackTitle: "Danh sách"
     }

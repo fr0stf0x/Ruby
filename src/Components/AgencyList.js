@@ -13,7 +13,7 @@ import actions from "~/Actions";
 import appConstants from "~/appConstants";
 import selectors from "~/Selectors";
 import { globalColorsAndStyles } from "~/Theme";
-import { makeCall, randomAgencyImage } from "~/Utils/utils";
+import { makeCall } from "~/Utils/utils";
 
 const AgencyCard = ({ id, info, goToDetail, action }) => {
   return (
@@ -21,7 +21,7 @@ const AgencyCard = ({ id, info, goToDetail, action }) => {
       <Card
         containerStyle={globalColorsAndStyles.style.boxShadow}
         title={info.name}
-        image={randomAgencyImage()}
+        image={info.imageUrl}
       >
         <View style={{ flexDirection: "row", justifyContent: "center" }}>
           <Button
@@ -53,7 +53,7 @@ const AgencyItem = ({ info, index, checked, action }) => {
       <View style={styles(index).listItem}>
         <View style={styles().imageContainer}>
           <Image
-            source={randomAgencyImage()}
+            source={info.imageUrl}
             resizeMode="cover"
             style={{ width: 100, height: 100 }}
           />
@@ -84,7 +84,7 @@ const AgencyList = ({
   toggleAddAgencyToCart,
   toggleAddAgencyToCartAndRedirect
 }) => {
-  if (agencies) {
+  if (agencies && agencies.allIds && agencies.byId) {
     const { allIds, byId } = agencies;
     const unSelectedAgencyIds = allIds.filter(
       id => !selectedAgencyIds.includes(id)

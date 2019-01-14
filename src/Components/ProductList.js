@@ -46,11 +46,13 @@ const ProductItem = ({ item: { id, detail, status }, index }) => {
 };
 
 const ProductList = ({ products, type }) => {
-  if (products) {
+  if (products && !products.empty) {
     const { allIds, byId, loading } = products;
     return (
       (loading && <Text h1>Đang tải</Text>) || (
         <FlatList
+          contentContainerStyle={{ paddingVertical: 10 }}
+          refreshing={true}
           keyExtractor={(item, index) => index.toString()}
           data={allIds.map(id => mergeObj(byId[id], { id }))}
           renderItem={ProductItem}
@@ -62,9 +64,7 @@ const ProductList = ({ products, type }) => {
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
       <Text style={{ fontSize: 16, color: globalColorsAndStyles.color.error }}>
-        Không có sản phẩm
-        <Text>{type === "available" ? " có sẵn " : " không có sẵn "}</Text>
-        nào
+        <Text>{type === "available" && "Không có sản phẩm nào"}</Text>
       </Text>
     </View>
   );

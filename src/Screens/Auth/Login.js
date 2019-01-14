@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import {
+  Platform,
   AsyncStorage,
   KeyboardAvoidingView,
   ScrollView,
@@ -78,7 +79,7 @@ class LoginScreen extends Component {
               justifyContent: "center",
               alignItems: "center"
             }}
-            behavior="padding"
+            behavior={Platform.select({ ios: "padding", android: "none" })}
             enabled
           >
             <Input
@@ -91,6 +92,8 @@ class LoginScreen extends Component {
               placeholder="Password"
               secureTextEntry={!passwordShown}
               value={password}
+              returnKeyType="go"
+              onSubmitEditing={this.logIn}
               onChangeText={password => this.setState({ password })}
               leftIcon={
                 <Icon name="textbox-password" size={24} color="black" />

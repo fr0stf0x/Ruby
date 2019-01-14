@@ -9,6 +9,7 @@ import {
   getAgencyByIdFromNavigationParam,
   getQuotations,
   getOrders,
+  getProductById,
   getOrderByIdFromNavigationParam,
   getQuotationByIdFromNavigationParam
 } from "./data.selector";
@@ -31,6 +32,7 @@ const selectors = {
     getAppMode
   },
   data: {
+    getProductById,
     getOrders,
     getAgencyByIdFromNavigationParam,
     getGroupInfo,

@@ -1,14 +1,21 @@
+// @flow
+
 // eslint-disable-next-line import/named
+import { Platform } from "react-native";
 import firebase from "react-native-firebase";
-
-import type { RemoteMessage } from "react-native-firebase";
-
 import appConstants from "~/appConstants";
 import selectors from "~/Selectors";
 import { promiseWrapper } from "~/Utils/utils";
 import types from "./ActionTypes";
+import { addProductsToAgency, createOrder, createQuotation } from "./global";
 import { setAppMode } from "./ui.actions";
-import { createQuotation, addProductsToAgency, createOrder } from "./global";
+
+import type {
+  DocumentSnapshot,
+  QuerySnapshot,
+  DocumentReference
+} from "react-native-firebase/firestore";
+
 // how to ignore warning /^(?!Require cycle).*$/
 // TODO add product type
 
@@ -31,6 +38,26 @@ export const initAppData = ({ uid }) => async dispatch => {
     );
     dispatch(setAppMode(userProfile));
     dispatch(getAppData(userProfile));
+  }
+};
+
+const subscribeToTopic = async groupInfo => {
+  const fcmToken = await firebase.messaging().getToken();
+  if (fcmToken) {
+    // user has a device token
+    console.log(fcmToken);
+  } else {
+    // user doesn't have a device token yet
+  }
+  const enabled = await firebase.messaging().hasPermission();
+  if (enabled) {
+    // user has permissions
+    console.log("Got permission");
+    console.log(`subscribing to /topics/${groupInfo.id}`);
+    firebase.messaging().subscribeToTopic(`topics`);
+    firebase.messaging().onMessage(message => {
+      console.log(message);
+    });
   }
 };
 
@@ -67,7 +94,7 @@ export const makeCreateOrder = () => (dispatch, getState) => {
   return dispatch(createOrder(parentId, selectedProducts));
 };
 
-export const addProduct = ({ name, type, defaultPrice }) => (
+export const addProduct = ({ name, type, defaultPrice, imageUrl }) => (
   dispatch,
   getState
 ) => {
@@ -75,6 +102,7 @@ export const addProduct = ({ name, type, defaultPrice }) => (
   const productInfo = {
     name,
     type,
+    imageUrl,
     createdAt: new Date()
   };
   const companyId = selectors.data.getGroupInfo(getState()).id;
@@ -239,7 +267,8 @@ export const makeCreateAgencyAccount = ({
         .set(newAccountDocRef, newAccountProfile)
         .set(newChildRef, newChildData)
         .set(childRefInCurrentGroup, childDataInCurrentGroup)
-        .commit();
+        .commit()
+        .then(() => newChildRef.id);
     })
     .catch(err => {
       console.log(err);
@@ -271,8 +300,8 @@ const getAppData = ({ group: { group_id, group_type } }) => dispatch => {
   }
 };
 
-const getGroupAndRelatives = (groupDocRef: RemoteMessage) => dispatch => {
-  // // console.log("getting parent and children if needed");
+const getGroupAndRelatives = groupDocRef => dispatch => {
+  // console.log("getting parent and children if needed");
   dispatch(getGroupAndParent(groupDocRef));
   dispatch(
     getCollectionAndMergeDetails(
@@ -284,66 +313,118 @@ const getGroupAndRelatives = (groupDocRef: RemoteMessage) => dispatch => {
 };
 
 const getGroupAndParent = groupDocRef => dispatch => {
-  groupDocRef.get().then(async doc => {
-    // // console.log("checking if group exist");
-    if (doc.exists) {
-      const { info: groupInfo } = doc.data();
-      dispatch(receiveData({ endpoint: "groupInfo", data: groupInfo }));
-      // // console.log("checking if parent group exists");
-      const { parent_group_id } = groupInfo;
-      if (parent_group_id) {
-        const { error, data: parentGroupDoc } = await promiseWrapper(
-          firebase
-            .firestore()
-            .collection(appConstants.collection.GROUPS)
-            .doc(parent_group_id)
-            .get()
+  dispatch(loadData({ endpoint: appConstants.dataEndpoint.GROUP_INFO }));
+  groupDocRef
+    .get()
+    .then(async doc => {
+      // // console.log("checking if group exist");
+      if (doc.exists) {
+        const { info: groupInfo } = doc.data();
+        dispatch(
+          receiveData({
+            endpoint: appConstants.dataEndpoint.GROUP_INFO,
+            data: groupInfo
+          })
         );
-        if (!error && parentGroupDoc.exists) {
-          return dispatch(
-            receiveData({ endpoint: "parent", data: parentGroupDoc.data() })
-          );
+        if (Platform.OS === "android") {
+          subscribeToTopic(groupInfo);
         }
-        console.log(error);
+
+        // // console.log("checking if parent group exists");
+        const { parent_group_id } = groupInfo;
+        if (parent_group_id) {
+          dispatch(loadData({ endpoint: appConstants.dataEndpoint.PARENT }));
+          const { error, data: parentGroupDoc } = await promiseWrapper(
+            firebase
+              .firestore()
+              .collection(appConstants.collection.GROUPS)
+              .doc(parent_group_id)
+              .get()
+          );
+          if (!error && parentGroupDoc.exists) {
+            return dispatch(
+              receiveData({
+                endpoint: appConstants.dataEndpoint.PARENT,
+                data: parentGroupDoc.data()
+              })
+            );
+          }
+          console.log(error);
+        }
+        dispatch(
+          invalidateData({
+            endpoint: appConstants.dataEndpoint.PARENT,
+            message: "Không có dữ liệu"
+          })
+        );
       }
-    }
-  });
+    })
+    .catch(err =>
+      dispatch(
+        invalidateData({
+          endpoint: appConstants.dataEndpoint.GROUP_INFO,
+          message: err.message
+        })
+      )
+    );
 };
 
 const getCollectionAndMergeDetails = (
-  groupRef,
+  groupRef: DocumentReference,
   collectionName,
   parentCollectionName = collectionName
 ) => dispatch => {
   // // console.log("getting " + collectionName);
-  groupRef.collection(collectionName).onSnapshot(query => {
-    if (!query.empty) {
-      // console.log(collectionName + " not empty");
-      let allIds = [],
-        byId = {};
-      query.docs.forEach(async docSnapshot => {
-        const { error, data: snapshot } = await promiseWrapper(
-          firebase
-            .firestore()
-            .collection(parentCollectionName)
-            .doc(docSnapshot.id)
-            .get()
+  return groupRef
+    .collection(collectionName)
+    .onSnapshot((query: QuerySnapshot) => {
+      if (!query.empty) {
+        dispatch(loadData({ endpoint: collectionName }));
+        // console.log(collectionName + " not empty");
+        let allIds = [],
+          byId = {};
+        dispatch(
+          receiveData({ endpoint: collectionName, data: { allIds, byId } })
         );
-        if (!error && snapshot.exists) {
-          allIds.push(docSnapshot.id);
-          byId[docSnapshot.id] = {
-            ...docSnapshot.data(),
-            ...{ detail: snapshot.data() }
-          };
-          return;
-        }
-        console.log(error);
-      });
-      return dispatch(
-        receiveData({ endpoint: collectionName, data: { allIds, byId } })
-      );
-    }
-  });
+        query.docs.forEach(async docSnapshot => {
+          const { error, data: snapshot } = await promiseWrapper(
+            firebase
+              .firestore()
+              .collection(parentCollectionName)
+              .doc(docSnapshot.id)
+              .get()
+          );
+          if (!error && snapshot.exists) {
+            return dispatch(
+              observeData({
+                endpoint: collectionName,
+                id: docSnapshot.id,
+                data: {
+                  ...docSnapshot.data(),
+                  ...{ detail: snapshot.data() }
+                }
+              })
+            );
+          }
+          // console.log(error);
+        });
+      }
+    });
+};
+
+const loadData = ({ endpoint }) => {
+  return {
+    type: types.data.LOAD_DATA,
+    meta: { endpoint }
+  };
+};
+
+const invalidateData = ({ endpoint, message }) => {
+  return {
+    type: types.data.INVALIDATE_DATA,
+    meta: { endpoint },
+    payload: { message }
+  };
 };
 
 const receiveData = ({ endpoint, data }) => {
@@ -351,5 +432,13 @@ const receiveData = ({ endpoint, data }) => {
     type: types.data.GET_DATA,
     meta: { endpoint },
     payload: { data }
+  };
+};
+
+const observeData = ({ endpoint, id, data }) => {
+  return {
+    type: types.data.OBSERVE_DATA,
+    meta: { endpoint },
+    payload: { id, data }
   };
 };

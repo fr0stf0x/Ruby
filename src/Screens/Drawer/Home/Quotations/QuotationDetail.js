@@ -17,7 +17,7 @@ class QuotationDetail extends Component {
 
     return (
       <View>
-        <Text h3>Báo giá ngày {formatedDate}</Text>
+        <Text h4>Báo giá ngày {formatedDate}</Text>
         <Text>Đã nhận lúc {formatedTime} cùng ngày</Text>
         <FlatList
           keyExtractor={(item, index) => index.toString()}

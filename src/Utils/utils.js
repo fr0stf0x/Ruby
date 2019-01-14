@@ -31,11 +31,54 @@ export const formatDate = (date: Date): String => {
   return day + " " + monthNames[monthIndex] + " " + year;
 };
 
+export const formatDateTimeForFileName = (date: Date): String => {
+  var monthNames = [
+    "01",
+    "02",
+    "03",
+    "04",
+    "05",
+    "06",
+    "07",
+    "08",
+    "09",
+    "10",
+    "11",
+    "12"
+  ];
+
+  var day = date.getDate();
+  var monthIndex = date.getMonth();
+  var year = date.getFullYear();
+  var hour = date.getHours();
+  var minutes = date.getMinutes();
+  var second = date.getSeconds();
+  return (
+    year +
+    "_" +
+    monthNames[monthIndex] +
+    "_" +
+    day +
+    "__" +
+    (hour < 10 ? "0" + hour : hour) +
+    "_" +
+    (minutes < 10 ? "0" + minutes : minutes) +
+    "_" +
+    (second < 10 ? "0" + second : second)
+  );
+};
+
 export const formatTime = (date: Date): String => {
   var hour = date.getHours();
   var minutes = date.getMinutes();
   var second = date.getSeconds();
-  return hour + ":" + minutes + ":" + second;
+  return (
+    (hour < 10 ? "0" + hour : hour) +
+    " : " +
+    (minutes < 10 ? "0" + minutes : minutes) +
+    " : " +
+    (second < 10 ? "0" + second : second)
+  );
 };
 
 const asyncCheckIfRegistered = email => {

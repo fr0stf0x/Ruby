@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import { ScrollView, Text, View } from "react-native";
-import { Button } from "react-native-elements";
+import { View } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import OrderList from "~/Components/OrderList";
 
@@ -8,9 +7,7 @@ class OrdersScreen extends Component {
   render() {
     return (
       <View style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={{ flex: 1 }}>
-          <OrderList navigation={this.props.navigation} />
-        </ScrollView>
+        <OrderList navigation={this.props.navigation} />
       </View>
     );
   }

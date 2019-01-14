@@ -2,9 +2,9 @@ import React, { Component } from "react";
 import { View } from "react-native";
 import { Button, Text } from "react-native-elements";
 import { connect } from "react-redux";
-import selectors from "~/Selectors";
 import actions from "~/Actions";
 import { promiseWithLoadingAnimation } from "~/Actions/global";
+import selectors from "~/Selectors";
 
 class WelcomeScreen extends Component {
   componentDidMount() {

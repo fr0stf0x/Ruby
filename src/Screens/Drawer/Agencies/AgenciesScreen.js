@@ -21,6 +21,7 @@ class AgenciesScreen extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingVertical: 15,
     backgroundColor: "rgb(232, 241, 249)"
   }
 });

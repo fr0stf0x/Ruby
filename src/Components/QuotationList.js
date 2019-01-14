@@ -1,5 +1,12 @@
 import React, { Component } from "react";
-import { Alert, FlatList, StyleSheet, Text, View } from "react-native";
+import {
+  TouchableOpacity,
+  Alert,
+  FlatList,
+  StyleSheet,
+  Text,
+  View
+} from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { connect } from "react-redux";
 import actions from "~/Actions";
@@ -19,11 +26,13 @@ class QuotationList extends Component {
       acceptNewQuotation,
       rejectNewQuotation
     } = this.props;
-    if (quotations) {
+    if (quotations && !quotations.empty) {
       const { allIds, byId, loading } = quotations;
       return (
         (loading && <Text h1>Đang tải</Text>) || (
           <FlatList
+            contentContainerStyle={{ paddingVertical: 10 }}
+            refreshing={true}
             keyExtractor={item => item.id}
             data={allIds
               .sort(
@@ -72,34 +81,38 @@ const QuotationListItem = ({
   const formatedDate = formatDate(detail.createdAt);
   const formatedTime = formatTime(detail.createdAt);
   return (
-    <View style={styles(index, !status.verified).listItem}>
-      <View style={styles().infoAndActions}>
-        <View style={styles().info}>
-          <Text style={styles().listItemTitle}>
-            {!status.verified && <NewItemBadge />}
-            Báo giá ngày {formatedDate}
-          </Text>
-          {!status.verified && (
-            <View style={{ alignItems: "center" }}>
-              <AcceptAndRejectButtons
-                onAccept={() => onAccept(id)}
-                onReject={() => onReject(id)}
+    <TouchableOpacity onPress={() => goToDetail(id)}>
+      <View style={styles(index, !status.verified).listItem}>
+        <View style={styles().infoAndActions}>
+          <View style={{ flex: 1, flexDirection: "row" }}>
+            <View style={styles().info}>
+              <Text style={styles().listItemTitle}>
+                {!status.verified && <NewItemBadge />}
+                Báo giá ngày {formatedDate}
+              </Text>
+              {!status.verified && (
+                <View style={{ alignItems: "center" }}>
+                  <AcceptAndRejectButtons
+                    onAccept={() => onAccept(id)}
+                    onReject={() => onReject(id)}
+                  />
+                </View>
+              )}
+              <View style={styles().timeContainer}>
+                <Text style={styles().listItemSubtitle}>{formatedTime}</Text>
+              </View>
+            </View>
+            <View style={styles().actions}>
+              <Icon
+                name="ios-arrow-forward"
+                size={24}
+                onPress={() => goToDetail(id)}
               />
             </View>
-          )}
-          <View style={styles().timeContainer}>
-            <Text style={styles().listItemSubtitle}>{formatedTime}</Text>
           </View>
         </View>
-        <View style={styles().actions}>
-          <Icon
-            name="ios-arrow-forward"
-            size={24}
-            onPress={() => goToDetail(id)}
-          />
-        </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -137,12 +150,13 @@ const styles = (key, isNew) =>
       flexDirection: "row"
     },
     info: {
+      flex: 1,
       paddingLeft: 20,
       flexDirection: "column",
       alignSelf: "center"
     },
     actions: {
-      flex: 1,
+      width: 50,
       justifyContent: "center",
       alignItems: "flex-end",
       paddingRight: 20

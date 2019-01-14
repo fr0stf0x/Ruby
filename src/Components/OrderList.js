@@ -1,5 +1,12 @@
 import React, { Component } from "react";
-import { Alert, FlatList, StyleSheet, Text, View } from "react-native";
+import {
+  TouchableOpacity,
+  Alert,
+  FlatList,
+  StyleSheet,
+  Text,
+  View
+} from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { connect } from "react-redux";
 import actions from "~/Actions";
@@ -19,11 +26,13 @@ class OrderList extends Component {
       rejectNewOrder,
       goToDetail
     } = this.props;
-    if (orders) {
+    if (orders && !orders.empty) {
       const { allIds, byId, loading } = orders;
       return (
         (loading && <Text h1>Đang tải</Text>) || (
           <FlatList
+            contentContainerStyle={{ paddingVertical: 10 }}
+            refreshing={true}
             keyExtractor={item => item.id}
             data={allIds
               .sort(
@@ -87,38 +96,36 @@ const OrderItem = ({
   const formatedDate = formatDate(detail.createdAt);
   const formatedTime = formatTime(detail.createdAt);
   return (
-    <View style={styles(index, !status.verified).listItem}>
-      <View style={styles().infoAndActions}>
-        <View style={{ flex: 1, flexDirection: "row" }}>
-          <View style={styles().info}>
-            <Text style={styles().listItemTitle}>
-              {!status.verified && <NewItemBadge />}
-              Đơn đặt hàng từ {agencyName}
-            </Text>
-            {!status.verified && (
-              <View style={{ alignItems: "center" }}>
-                <AcceptAndRejectButtons
-                  onAccept={() => onAccept(agencyId)}
-                  onReject={() => onReject(agencyId)}
-                />
-              </View>
-            )}
-            <View style={{ alignItems: "flex-end" }}>
-              <Text>
-                {formatedTime}, {formatedDate}
+    <TouchableOpacity onPress={() => goToDetail(id)}>
+      <View style={styles(index, !status.verified).listItem}>
+        <View style={styles().infoAndActions}>
+          <View style={{ flex: 1, flexDirection: "row" }}>
+            <View style={styles().info}>
+              <Text style={styles().listItemTitle}>
+                {!status.verified && <NewItemBadge />}
+                Đơn đặt hàng từ {agencyName}
               </Text>
+              {!status.verified && (
+                <View style={{ alignItems: "center" }}>
+                  <AcceptAndRejectButtons
+                    onAccept={() => onAccept(agencyId)}
+                    onReject={() => onReject(agencyId)}
+                  />
+                </View>
+              )}
+              <View style={{ alignItems: "flex-end" }}>
+                <Text>
+                  {formatedTime}, {formatedDate}
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
-        <View style={styles().actions}>
-          <Icon
-            name="ios-arrow-forward"
-            size={24}
-            onPress={() => goToDetail(id)}
-          />
+          <View style={styles().actions}>
+            <Icon name="ios-arrow-forward" size={24} />
+          </View>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -153,7 +160,7 @@ const styles = (key, isNew, isRejected) =>
       flexDirection: "column"
     },
     actions: {
-      width: 40,
+      width: 50,
       alignItems: "flex-end",
       justifyContent: "center",
       paddingRight: 20

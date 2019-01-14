@@ -3,17 +3,23 @@ import { Image, View } from "react-native";
 import { Text, ThemeProvider } from "react-native-elements";
 import { connect } from "react-redux";
 import selectors from "~/Selectors";
-import { formatDate, randomProductImage } from "~/Utils/utils";
+import { formatDate } from "~/Utils/utils";
 
 class ProductDetail extends Component {
+  static navigationOptions = {
+    title: "Chi tiết"
+  };
+
   render() {
     const { product } = this.props;
+    console.log(product);
     return (
       <View style={{ flex: 1, padding: 20 }}>
         <Image
-          resizeMode="cover"
-          style={{ alignSelf: "center", maxWidth: 300, maxHeight: 300 }}
-          source={randomProductImage()}
+          style={{ width: 300, height: 300, alignSelf: "center" }}
+          source={{
+            uri: product.detail.imageUrl
+          }}
         />
         <View
           style={{

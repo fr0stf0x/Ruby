@@ -50,7 +50,7 @@ class ProductListItemWithInputs extends Component {
         <View style={styles(index, status.available).listItem}>
           <View style={styles().imageContainer}>
             <Image
-              source={randomProductImage()}
+              source={{ uri: detail.imageUrl }}
               resizeMode="cover"
               style={{ width: 80, height: 130 }}
             />

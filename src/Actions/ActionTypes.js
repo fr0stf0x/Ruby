@@ -6,6 +6,7 @@ const AUTH_SUCCESS = "auth_success";
 const SET_PRODUCT_ITEM_CONTEXT = "set_product_context";
 const TOGGLE_LOADING = "toggle_loading";
 
+const CLEAR_DATA = "clear_data";
 const INVALIDATE_DATA = "invalidate_data";
 const LOAD_DATA = "load_data";
 const GET_DATA = "get_data";
@@ -34,6 +35,7 @@ const types = {
     SET_PRODUCT_ITEM_CONTEXT
   },
   data: {
+    CLEAR_DATA,
     INVALIDATE_DATA,
     LOAD_DATA,
     GET_DATA,

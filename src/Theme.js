@@ -10,7 +10,6 @@ export const globalColorsAndStyles = {
   },
   style: {
     boxShadow: {
-      padding: 5,
       borderRadius: 15,
       backgroundColor: "#fff",
       shadowOpacity: 0.6,
@@ -40,11 +39,13 @@ const theme = {
   },
   Input: {
     containerStyle: {
-      width: "85%"
+      width: "85%",
+      height: 50
     },
     placeholderTextColor: "#5b7296",
     inputContainerStyle: {
       ...globalColorsAndStyles.style.boxShadow,
+      height: 50,
       width: "100%",
       paddingHorizontal: 5,
       borderStyle: "solid",

@@ -1,17 +1,24 @@
 import React, { Component } from "react";
 import {
   Alert,
+  Dimensions,
+  Image,
   KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
+  TouchableOpacity,
   View
 } from "react-native";
 import { Button, Input, Text } from "react-native-elements";
+import firebase from "react-native-firebase";
+import NumericInput from "react-native-numeric-input";
+import Icon from "react-native-vector-icons/FontAwesome";
 import { connect } from "react-redux";
 import actions from "~/Actions";
+import { promiseWithLoadingAnimation } from "~/Actions/global";
 import { globalColorsAndStyles } from "~/Theme";
 import { validateFields } from "~/Utils/utils";
-import NumericInput from "react-native-numeric-input";
 
 const constrants = {
   name: {
@@ -20,19 +27,20 @@ const constrants = {
       message: "^Phải điền tên sản phẩm chính xác"
     }
   },
-  // defaultPrice: {
-  //   length: {
-  //     minimum: 4,
-  //     message: "^Phải điền giá khởi điểm chính xác"
-  //   }
-  // },
   type: {
     length: {
       minimum: 1,
       message: "^Phải điền loại sản phẩm"
     }
+  },
+  image: {
+    presence: {
+      message: "^Chưa chọn hình ảnh"
+    }
   }
 };
+
+let { height, width } = Dimensions.get("window");
 
 class AddProduct extends Component {
   static navigationOptions = {
@@ -42,21 +50,26 @@ class AddProduct extends Component {
   state = {
     error: false,
     name: "",
-    // defaultPrice: "",
     defaultPrice: 1000,
-    type: ""
+    type: "",
+    image: null
+  };
+
+  selectPhotos = () => {
+    const { navigation } = this.props;
+    navigation.navigate("ImageBrowser", {
+      selectPicture: image => {
+        this.setState({ image });
+      }
+    });
   };
 
   validateForm = () => {
-    const {
-      name,
-      // defaultPrice,
-      type
-    } = this.state;
+    const { name, type, image } = this.state;
     const fields = {
       name,
-      // defaultPrice,
-      type
+      type,
+      image
     };
     this.setState(
       { error: validateFields(fields, constrants) },
@@ -66,18 +79,30 @@ class AddProduct extends Component {
 
   submitForm = () => {
     if (!this.state.error) {
-      const { addProduct, toggleLoading, navigation } = this.props;
-      toggleLoading();
-      addProduct(this.state)
-        .then(
-          Alert.alert("Thành công", "", [
-            {
-              text: "Quay lại danh sách",
-              onPress: this.goBackToList
-            }
-          ])
-        )
-        .finally(toggleLoading);
+      const { addProduct } = this.props;
+      console.log("Reading file");
+      const image = this.state.image;
+      console.log(image);
+      promiseWithLoadingAnimation(() => {
+        const storageRef = firebase.storage().ref();
+        return storageRef
+          .child(`images/products/${image.filename}`)
+          .putFile("file://" + image.uri)
+          .then(file => {
+            console.log(file);
+            this.setState({
+              imageUrl: file.downloadURL
+            });
+            return addProduct(this.state).then(
+              Alert.alert("Thành công", "", [
+                {
+                  text: "Quay lại danh sách",
+                  onPress: this.goBackToList
+                }
+              ])
+            );
+          });
+      });
     }
   };
 
@@ -86,9 +111,12 @@ class AddProduct extends Component {
   };
 
   render() {
-    const { error, name, defaultPrice, type } = this.state;
+    const { error, name, defaultPrice, type, image } = this.state;
     return (
-      <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
+      <KeyboardAvoidingView
+        behavior={Platform.select({ ios: "padding", android: "" })}
+        style={{ flex: 1, padding: 10 }}
+      >
         <ScrollView
           keyboardDismissMode="on-drag"
           keyboardShouldPersistTaps="handled"
@@ -98,7 +126,46 @@ class AddProduct extends Component {
             justifyContent: "center"
           }}
         >
-          <View style={Styles.FlexBasis}>
+          <View style={styles.imageInputContainer}>
+            {(image && (
+              <View>
+                <Icon
+                  style={styles.removeImageIcon}
+                  name="remove"
+                  size={24}
+                  onPress={() => this.setState({ image: null })}
+                />
+                <TouchableOpacity onPress={this.selectPhotos}>
+                  <Image
+                    source={{
+                      uri: image.uri
+                    }}
+                    style={{
+                      width: width / 1.5,
+                      height: width / 1.5,
+                      marginBottom: 10
+                    }}
+                  />
+                </TouchableOpacity>
+                <Text style={{ textAlign: "center", fontSize: 16 }}>
+                  {image.filename}
+                </Text>
+              </View>
+            )) || (
+              <Button
+                title="Chọn ảnh"
+                buttonStyle={{
+                  backgroundColor:
+                    (error &&
+                      error.image &&
+                      globalColorsAndStyles.color.error) ||
+                    globalColorsAndStyles.color.secondary
+                }}
+                onPress={this.selectPhotos}
+              />
+            )}
+          </View>
+          <View style={styles.flexBasis}>
             <Input
               textContentType="name"
               value={name}
@@ -109,12 +176,11 @@ class AddProduct extends Component {
               error.name &&
               error.name.map((err, key) => (
                 <View key={key}>
-                  <Text style={Styles.Error}>{err}</Text>
+                  <Text style={styles.error}>{err}</Text>
                 </View>
               ))}
           </View>
-
-          <View style={Styles.FlexBasis}>
+          <View style={styles.flexBasis}>
             <Input
               textContentType="name"
               value={type}
@@ -125,37 +191,13 @@ class AddProduct extends Component {
               error.type &&
               error.type.map((err, key) => (
                 <View key={key}>
-                  <Text style={Styles.Error}>{err}</Text>
+                  <Text style={styles.error}>{err}</Text>
                 </View>
               ))}
           </View>
-          <View style={Styles.FlexBasis}>
-            {/* <Input
-              value={defaultPrice}
-              placeholder="Giá khởi điểm"
-              onChangeText={defaultPrice => this.setState({ defaultPrice })}
-            />
-            {error &&
-              error.defaultPrice &&
-              error.defaultPrice.map((err, key) => (
-                <View key={key}>
-                  <Text style={Styles.Error}>{err}</Text>
-                </View>
-              ))} */}
-            <View
-              style={{
-                ...globalColorsAndStyles.style.boxShadow,
-                padding: 5,
-                flexDirection: "row",
-                borderStyle: "solid",
-                borderWidth: 1,
-                borderRadius: 20,
-                backgroundColor: "rgb(255,255,255)",
-                borderColor: "#4286f4",
-                alignItems: "center"
-              }}
-            >
-              <Text style={{ fontSize: 17, paddingEnd: 10 }}>
+          <View style={styles.flexBasis}>
+            <View style={styles.priceInputContainer}>
+              <Text style={{ fontSize: 17, color: "#5b7296", paddingEnd: 10 }}>
                 Giá khởi điểm
               </Text>
               <NumericInput
@@ -171,30 +213,63 @@ class AddProduct extends Component {
                 textColor="#B0228C"
                 iconStyle={{ color: "white" }}
                 upDownButtonsBackgroundColor="#EA3788"
-                // leftButtonBackgroundColor="#E56B70"
               />
             </View>
           </View>
-          <Button title="Đồng ý" onPress={this.validateForm} />
-          <Button
-            buttonStyle={{
-              backgroundColor: globalColorsAndStyles.color.secondary
-            }}
-            title="Huỷ bỏ"
-            onPress={this.goBackToList}
-          />
+          <View style={styles.buttonGroup}>
+            <Button title="Đồng ý" onPress={this.validateForm} />
+            <Button
+              buttonStyle={{
+                backgroundColor: globalColorsAndStyles.color.secondary
+              }}
+              title="Huỷ bỏ"
+              onPress={this.goBackToList}
+            />
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     );
   }
 }
-const Styles = StyleSheet.create({
-  FlexBasis: {
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  priceInputContainer: {
+    ...globalColorsAndStyles.style.boxShadow,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    flexDirection: "row",
+    borderStyle: "solid",
+    borderWidth: 1,
+    borderRadius: 20,
+    backgroundColor: "rgb(255,255,255)",
+    borderColor: "#4286f4",
+    alignItems: "center"
+  },
+  imageInputContainer: {
+    padding: 10,
+    alignItems: "center",
+    width: 200
+  },
+  buttonGroup: {
+    flexDirection: "row"
+  },
+  flexBasis: {
     flexBasis: 70
   },
-  Error: {
+  error: {
     color: globalColorsAndStyles.color.error,
     textAlign: "center"
+  },
+  removeImageIcon: {
+    zIndex: 10,
+    position: "absolute",
+    top: -10,
+    right: -10
   }
 });
 

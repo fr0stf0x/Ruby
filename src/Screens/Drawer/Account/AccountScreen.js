@@ -5,13 +5,16 @@ import { connect } from "react-redux";
 import actions from "~/Actions";
 import selectors from "~/Selectors";
 import Icon from "react-native-vector-icons/Ionicons";
+import { promiseWithLoadingAnimation } from "~/Actions/global";
 
 class AccountScreen extends Component {
   logOut = () => {
     const { logOut, navigation } = this.props;
-    logOut().then(() => {
-      navigation.navigate("Login");
-    });
+    promiseWithLoadingAnimation(() =>
+      logOut().then(() => {
+        navigation.navigate("Login");
+      })
+    );
   };
 
   render() {
