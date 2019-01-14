@@ -78,22 +78,19 @@ class AddProduct extends Component {
   };
 
   submitForm = () => {
-    if (!this.state.error) {
+    const { name, defaultPrice, type, image, error } = this.state;
+    if (!error) {
       const { addProduct } = this.props;
-      console.log("Reading file");
       const image = this.state.image;
-      console.log(image);
       promiseWithLoadingAnimation(() => {
         const storageRef = firebase.storage().ref();
+        const productData = { name, defaultPrice, type };
         return storageRef
           .child(`images/products/${image.filename}`)
           .putFile("file://" + image.uri)
           .then(file => {
-            console.log(file);
-            this.setState({
-              imageUrl: file.downloadURL
-            });
-            return addProduct(this.state).then(
+            productData.imageUrl = file.downloadURL;
+            return addProduct(productData).then(
               Alert.alert("Thành công", "", [
                 {
                   text: "Quay lại danh sách",

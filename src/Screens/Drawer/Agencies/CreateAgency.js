@@ -178,10 +178,8 @@ class GroupInfoForm extends Component {
           .child(`images/agencies/${image.filename}`)
           .putFile("file://" + image.uri)
           .then(file => {
-            console.log(file);
             data.groupInfo.imageUrl = file.downloadURL;
             return createAgency(data).then(async groupId => {
-              console.log("dang nhap lai");
               const email = await AsyncStorage.getItem("email");
               const password = await AsyncStorage.getItem("password");
               logOut().then(() =>

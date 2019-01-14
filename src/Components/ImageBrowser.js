@@ -147,7 +147,7 @@ export default class ImageBrowser extends Component {
           animationType={"slide"}
           transparent={false}
           visible={this.state.cameraOpen}
-          onRequestClose={() => console.log("closed")}
+          onRequestClose={this.toggleCamera}
         >
           <View style={styles.cameraContainer}>
             <RNCamera
@@ -228,7 +228,7 @@ export default class ImageBrowser extends Component {
           animationType={"slide"}
           transparent={false}
           visible={this.state.selectPhotos}
-          onRequestClose={() => console.log("closed")}
+          onRequestClose={this.toggleSelectPhotos}
         >
           <SafeAreaView style={{ flex: 1 }}>
             <View style={styles.modalContainer}>

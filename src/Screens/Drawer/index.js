@@ -3,13 +3,15 @@ import AccountStack from "./Account";
 import DashboardBottomNav from "./Home";
 import SettingStack from "./Settings";
 import AgenciesStack from "./Agencies";
+import NotificationStack from "./Notification";
 
 const DashboardDrawer = createDrawerNavigator(
   {
     Home: DashboardBottomNav,
     Agencies: AgenciesStack,
     Account: AccountStack,
-    Setting: SettingStack
+    Setting: SettingStack,
+    Notifications: NotificationStack
   },
   {
     initialRouteName: "Home"

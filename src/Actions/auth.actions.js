@@ -1,6 +1,7 @@
 import firebase from "react-native-firebase";
 import types from "./ActionTypes";
 import { setAccountToAsyncStorage } from "./global";
+import selectors from "~/Selectors";
 
 const login = ({ user: info }) => {
   return {
@@ -35,6 +36,7 @@ export const makeLogIn = ({ email, password }) => dispatch =>
     .auth()
     .signInWithEmailAndPassword(email, password)
     .then(({ user }) => {
+      // firebase.messaging().subscribeToTopic("/topics/ruby");
       dispatch(login({ user }));
       dispatch(authSuccess());
       return setAccountToAsyncStorage({ email, password });
@@ -46,11 +48,17 @@ export const makeLogIn = ({ email, password }) => dispatch =>
       return Promise.reject(err);
     });
 
-export const makeLogOut = () => dispatch =>
+export const makeLogOut = () => (dispatch, getState) =>
   firebase
     .auth()
     .signOut()
     .then(() => {
+      // firebase.messaging().unsubscribeFromTopic("/topics/ruby");
+      firebase
+        .messaging()
+        .unsubscribeFromTopic(
+          `/topics/${selectors.data.getGroupInfo(getState()).id}`
+        );
       dispatch(logOut());
       dispatch(authSuccess());
     });

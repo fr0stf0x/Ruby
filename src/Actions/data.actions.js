@@ -10,11 +10,7 @@ import types from "./ActionTypes";
 import { addProductsToAgency, createOrder, createQuotation } from "./global";
 import { setAppMode } from "./ui.actions";
 
-import type {
-  DocumentSnapshot,
-  QuerySnapshot,
-  DocumentReference
-} from "react-native-firebase/firestore";
+import type { QuerySnapshot, DocumentReference } from "react-native-firebase";
 
 // how to ignore warning /^(?!Require cycle).*$/
 // TODO add product type
@@ -45,19 +41,15 @@ const subscribeToTopic = async groupInfo => {
   const fcmToken = await firebase.messaging().getToken();
   if (fcmToken) {
     // user has a device token
-    console.log(fcmToken);
+    console.log("have token");
   } else {
     // user doesn't have a device token yet
   }
   const enabled = await firebase.messaging().hasPermission();
   if (enabled) {
     // user has permissions
-    console.log("Got permission");
     console.log(`subscribing to /topics/${groupInfo.id}`);
-    firebase.messaging().subscribeToTopic(`topics`);
-    firebase.messaging().onMessage(message => {
-      console.log(message);
-    });
+    firebase.messaging().subscribeToTopic(`/topics/${groupInfo.id}`);
   }
 };
 
