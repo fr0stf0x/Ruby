@@ -12,6 +12,8 @@ import { setAppMode } from "./ui.actions";
 
 import type { QuerySnapshot, DocumentReference } from "react-native-firebase";
 
+import store from "~/configureStore";
+
 // how to ignore warning /^(?!Require cycle).*$/
 // TODO add product type
 
@@ -24,17 +26,21 @@ export const initAppData = ({ uid }) => async dispatch => {
       .doc(uid)
       .get()
   );
-  if (!error && snapshot.exists) {
-    const userProfile = snapshot.data();
-    dispatch(
-      receiveData({
-        endpoint: "userProfile",
-        data: { [uid]: userProfile }
-      })
-    );
-    dispatch(setAppMode(userProfile));
-    dispatch(getAppData(userProfile));
-  }
+  return new Promise((resolve, reject) => {
+    if (!error && snapshot.exists) {
+      const userProfile = snapshot.data();
+      dispatch(
+        receiveData({
+          endpoint: appConstants.dataEndpoint.USER_PROFILE,
+          data: { [uid]: userProfile }
+        })
+      );
+      dispatch(setAppMode(userProfile));
+      getAppData(userProfile).then(resolve);
+    } else {
+      reject("Không có dữ liệu");
+    }
+  });
 };
 
 const subscribeToTopic = async groupInfo => {
@@ -268,17 +274,18 @@ export const makeCreateAgencyAccount = ({
     });
 };
 
-const getAppData = ({ group: { group_id, group_type } }) => dispatch => {
+const getAppData = ({ group: { group_id, group_type } }): Promise => {
   // // console.log("getting app data");
+  const appDataPromises = [];
   const groupDocRef = firebase
     .firestore()
     .collection(appConstants.collection.GROUPS)
     .doc(group_id);
-  dispatch(getGroupAndRelatives(groupDocRef));
-  dispatch(
+  appDataPromises.push(getGroupAndRelatives(groupDocRef));
+  appDataPromises.push(
     getCollectionAndMergeDetails(groupDocRef, appConstants.collection.PRODUCTS)
   );
-  dispatch(
+  appDataPromises.push(
     getCollectionAndMergeDetails(
       groupDocRef,
       appConstants.collection.QUOTATIONS,
@@ -286,27 +293,30 @@ const getAppData = ({ group: { group_id, group_type } }) => dispatch => {
     )
   );
   if (group_type !== appConstants.groupType.RETAIL) {
-    dispatch(
+    appDataPromises.push(
       getCollectionAndMergeDetails(groupDocRef, appConstants.collection.ORDERS)
     );
   }
+  console.log(appDataPromises);
+  return Promise.all(appDataPromises);
 };
 
-const getGroupAndRelatives = groupDocRef => dispatch => {
+const getGroupAndRelatives = (groupDocRef): Promise => {
   // console.log("getting parent and children if needed");
-  dispatch(getGroupAndParent(groupDocRef));
-  dispatch(
+  return Promise.all([
+    getGroupAndParent(groupDocRef),
     getCollectionAndMergeDetails(
       groupDocRef,
       appConstants.collection.CHILDREN,
       appConstants.collection.GROUPS
     )
-  );
+  ]);
 };
 
-const getGroupAndParent = groupDocRef => dispatch => {
+const getGroupAndParent = (groupDocRef): Promise => {
+  const { dispatch } = store;
   dispatch(loadData({ endpoint: appConstants.dataEndpoint.GROUP_INFO }));
-  groupDocRef
+  return groupDocRef
     .get()
     .then(async doc => {
       // // console.log("checking if group exist");
@@ -365,19 +375,14 @@ const getCollectionAndMergeDetails = (
   groupRef: DocumentReference,
   collectionName,
   parentCollectionName = collectionName
-) => dispatch => {
+) => {
+  const { dispatch } = store;
   // // console.log("getting " + collectionName);
-  return groupRef
-    .collection(collectionName)
-    .onSnapshot((query: QuerySnapshot) => {
+  return new Promise((resolve, reject) => {
+    groupRef.collection(collectionName).onSnapshot((query: QuerySnapshot) => {
       if (!query.empty) {
-        dispatch(loadData({ endpoint: collectionName }));
+        // dispatch(loadData({ endpoint: collectionName }));
         // console.log(collectionName + " not empty");
-        let allIds = [],
-          byId = {};
-        dispatch(
-          receiveData({ endpoint: collectionName, data: { allIds, byId } })
-        );
         query.docs.forEach(async docSnapshot => {
           const { error, data: snapshot } = await promiseWrapper(
             firebase
@@ -387,21 +392,26 @@ const getCollectionAndMergeDetails = (
               .get()
           );
           if (!error && snapshot.exists) {
-            return dispatch(
-              observeData({
-                endpoint: collectionName,
-                id: docSnapshot.id,
-                data: {
-                  ...docSnapshot.data(),
-                  ...{ detail: snapshot.data() }
-                }
-              })
+            resolve(
+              dispatch(
+                observeData({
+                  endpoint: collectionName,
+                  id: docSnapshot.id,
+                  data: {
+                    ...docSnapshot.data(),
+                    ...{ detail: snapshot.data() }
+                  }
+                })
+              )
             );
           }
+          reject("Bị lỗi dữ liệu");
           // console.log(error);
         });
       }
+      resolve("Khong co du lieu");
     });
+  });
 };
 
 const loadData = ({ endpoint }) => {
