@@ -26,7 +26,7 @@ import actions from "~/Actions";
 import { promiseWithLoadingAnimation } from "~/Actions/global";
 import appConstants from "~/appConstants";
 import { globalColorsAndStyles } from "~/Theme";
-import { validateFields } from "~/Utils/utils";
+import { validateFields, formatDateTimeForFileName } from "~/Utils/utils";
 
 const constrants = {
   agencyName: {
@@ -175,7 +175,13 @@ class GroupInfoForm extends Component {
       promiseWithLoadingAnimation(() => {
         const storageRef = firebase.storage().ref();
         return storageRef
-          .child(`images/agencies/${image.filename}`)
+          .child(
+            `images/agencies/${
+              image.filename
+                ? image.filename
+                : formatDateTimeForFileName(new Date()) + ".jpg"
+            }`
+          )
           .putFile("file://" + image.uri)
           .then(file => {
             data.groupInfo.imageUrl = file.downloadURL;

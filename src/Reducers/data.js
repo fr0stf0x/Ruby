@@ -20,6 +20,7 @@ const appData = (state = {}, action) => {
   }
 };
 
+// TODO classificate docChanges to 3 types: "added", "modified", "removed"
 const collection = (state = {}, action) => {
   switch (action.type) {
     case types.data.OBSERVE_DATA:

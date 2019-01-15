@@ -18,7 +18,7 @@ import { connect } from "react-redux";
 import actions from "~/Actions";
 import { promiseWithLoadingAnimation } from "~/Actions/global";
 import { globalColorsAndStyles } from "~/Theme";
-import { validateFields } from "~/Utils/utils";
+import { validateFields, formatDateTimeForFileName } from "~/Utils/utils";
 
 const constrants = {
   name: {
@@ -86,7 +86,13 @@ class AddProduct extends Component {
         const storageRef = firebase.storage().ref();
         const productData = { name, defaultPrice, type };
         return storageRef
-          .child(`images/products/${image.filename}`)
+          .child(
+            `images/products/${
+              image.filename
+                ? image.filename
+                : formatDateTimeForFileName(new Date()) + ".jpg"
+            }`
+          )
           .putFile("file://" + image.uri)
           .then(file => {
             productData.imageUrl = file.downloadURL;

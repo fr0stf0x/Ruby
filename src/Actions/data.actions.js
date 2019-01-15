@@ -4,6 +4,7 @@
 import { Platform } from "react-native";
 import firebase from "react-native-firebase";
 import appConstants from "~/appConstants";
+import store from "~/configureStore";
 import selectors from "~/Selectors";
 import { promiseWrapper } from "~/Utils/utils";
 import types from "./ActionTypes";
@@ -12,10 +13,7 @@ import { setAppMode } from "./ui.actions";
 
 import type { QuerySnapshot, DocumentReference } from "react-native-firebase";
 
-import store from "~/configureStore";
-
 // how to ignore warning /^(?!Require cycle).*$/
-// TODO add product type
 
 export const initAppData = ({ uid }) => async dispatch => {
   // // console.log("init app data");
@@ -36,26 +34,26 @@ export const initAppData = ({ uid }) => async dispatch => {
         })
       );
       dispatch(setAppMode(userProfile));
-      getAppData(userProfile).then(resolve);
+      getAppData(userProfile).then(() => {
+        resolve(subscribeToTopicIfNeeded(userProfile.group.group_id));
+      });
     } else {
       reject("Không có dữ liệu");
     }
   });
 };
 
-const subscribeToTopic = async groupInfo => {
-  const fcmToken = await firebase.messaging().getToken();
-  if (fcmToken) {
-    // user has a device token
-    console.log("have token");
-  } else {
-    // user doesn't have a device token yet
-  }
-  const enabled = await firebase.messaging().hasPermission();
-  if (enabled) {
-    // user has permissions
-    console.log(`subscribing to /topics/${groupInfo.id}`);
-    firebase.messaging().subscribeToTopic(`/topics/${groupInfo.id}`);
+export const subscribeToTopicIfNeeded = async groupId => {
+  if (Platform.OS === "android") {
+    const fcmToken = await firebase.messaging().getToken();
+    if (fcmToken) {
+      console.log("have token");
+    }
+    const enabled = await firebase.messaging().hasPermission();
+    if (enabled) {
+      console.log(`subscribing to /topics/${groupId}`);
+      firebase.messaging().subscribeToTopic(`/topics/${groupId}`);
+    }
   }
 };
 
@@ -319,7 +317,6 @@ const getGroupAndParent = (groupDocRef): Promise => {
   return groupDocRef
     .get()
     .then(async doc => {
-      // // console.log("checking if group exist");
       if (doc.exists) {
         const { info: groupInfo } = doc.data();
         dispatch(
@@ -328,11 +325,6 @@ const getGroupAndParent = (groupDocRef): Promise => {
             data: groupInfo
           })
         );
-        if (Platform.OS === "android") {
-          subscribeToTopic(groupInfo);
-        }
-
-        // // console.log("checking if parent group exists");
         const { parent_group_id } = groupInfo;
         if (parent_group_id) {
           dispatch(loadData({ endpoint: appConstants.dataEndpoint.PARENT }));
@@ -351,7 +343,6 @@ const getGroupAndParent = (groupDocRef): Promise => {
               })
             );
           }
-          console.log(error);
         }
         dispatch(
           invalidateData({
@@ -377,12 +368,10 @@ const getCollectionAndMergeDetails = (
   parentCollectionName = collectionName
 ) => {
   const { dispatch } = store;
-  // // console.log("getting " + collectionName);
-  return new Promise((resolve, reject) => {
-    groupRef.collection(collectionName).onSnapshot((query: QuerySnapshot) => {
+  return groupRef
+    .collection(collectionName)
+    .onSnapshot((query: QuerySnapshot) => {
       if (!query.empty) {
-        // dispatch(loadData({ endpoint: collectionName }));
-        // console.log(collectionName + " not empty");
         query.docs.forEach(async docSnapshot => {
           const { error, data: snapshot } = await promiseWrapper(
             firebase
@@ -392,26 +381,20 @@ const getCollectionAndMergeDetails = (
               .get()
           );
           if (!error && snapshot.exists) {
-            resolve(
-              dispatch(
-                observeData({
-                  endpoint: collectionName,
-                  id: docSnapshot.id,
-                  data: {
-                    ...docSnapshot.data(),
-                    ...{ detail: snapshot.data() }
-                  }
-                })
-              )
+            dispatch(
+              observeData({
+                endpoint: collectionName,
+                id: docSnapshot.id,
+                data: {
+                  ...docSnapshot.data(),
+                  ...{ detail: snapshot.data() }
+                }
+              })
             );
           }
-          reject("Bị lỗi dữ liệu");
-          // console.log(error);
         });
       }
-      resolve("Khong co du lieu");
     });
-  });
 };
 
 const loadData = ({ endpoint }) => {
