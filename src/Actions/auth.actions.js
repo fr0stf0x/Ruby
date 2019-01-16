@@ -2,6 +2,7 @@ import firebase from "react-native-firebase";
 import types from "./ActionTypes";
 import { setAccountToAsyncStorage } from "./global";
 import selectors from "~/Selectors";
+import { Platform } from "react-native";
 
 const login = ({ user: info }) => {
   return {
@@ -49,16 +50,18 @@ export const makeLogIn = ({ email, password }) => dispatch =>
     });
 
 export const makeLogOut = () => (dispatch, getState) =>
-  firebase
-    .auth()
-    .signOut()
-    .then(() => {
-      // firebase.messaging().unsubscribeFromTopic("/topics/ruby");
-      firebase
-        .messaging()
-        .unsubscribeFromTopic(
-          `/topics/${selectors.data.getGroupInfo(getState()).id}`
-        );
-      dispatch(logOut());
-      dispatch(authSuccess());
-    });
+  new Promise((resolve, reject) => {
+    firebase
+      .auth()
+      .signOut()
+      .then(() => {
+        if (Platform.OS === "android")
+          firebase
+            .messaging()
+            .unsubscribeFromTopic(
+              `/topics/${selectors.data.getGroupInfo(getState()).id}`
+            );
+        dispatch(logOut());
+        resolve(dispatch(authSuccess()));
+      });
+  });

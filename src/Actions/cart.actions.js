@@ -1,19 +1,17 @@
-import types from "./ActionTypes";
-import { getSelectedAgenciesInCart } from "~/Selectors/cart.selector";
-import { getAgencies } from "~/Selectors/data.selector";
-import selectors from "~/Selectors";
 import appConstants from "~/appConstants";
+import selectors from "~/Selectors";
+import { getSelectedAgenciesInCart } from "~/Selectors/cart.selector";
+import types from "./ActionTypes";
 
 export const toggleCheckAllAgencies = (
   endpoint = appConstants.productItemContext.QUOTATION
 ) => (dispatch, getState) => {
-  const state = getState();
-  const allAgencies = getAgencies(state);
-  const selectedIds = getSelectedAgenciesInCart(state, endpoint);
+  const allAgencies = selectors.data.getAgencies(getState());
+  const selectedIds = getSelectedAgenciesInCart(getState(), endpoint);
   if (selectedIds.length > 0) {
-    selectedIds.forEach(id => dispatch(removeAgencyFromCart(id, endpoint)));
+    dispatch(removeAllAgenciesFromCart(endpoint));
   } else {
-    allAgencies.allIds.forEach(id => dispatch(addAgencyToCart(id, endpoint)));
+    dispatch(addAgenciesToCart(allAgencies.allIds, endpoint));
   }
 };
 
@@ -69,6 +67,21 @@ export const modifyItemInCart = (id, endpoint, change) => ({
   meta: { endpoint },
   payload: { id, change }
 });
+
+export const addAgenciesToCart = (ids, endpoint) => {
+  return {
+    type: types.cart.ADD_AGENCIES,
+    meta: { endpoint },
+    payload: { ids }
+  };
+};
+
+export const removeAllAgenciesFromCart = endpoint => {
+  return {
+    type: types.cart.REMOVE_ALL_AGENCY,
+    meta: { endpoint }
+  };
+};
 
 const addAgencyToCart = (id, endpoint) => {
   return {

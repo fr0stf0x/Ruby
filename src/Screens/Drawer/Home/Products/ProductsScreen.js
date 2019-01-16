@@ -3,6 +3,8 @@ import { View } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import appConstants from "~/appConstants";
 import ProductList, { ProductItemContext } from "~/Components/ProductList";
+import { connect } from "react-redux";
+import selectors from "~/Selectors";
 
 class ProductsScreen extends Component {
   addProduct = () => {
@@ -10,6 +12,7 @@ class ProductsScreen extends Component {
   };
 
   render() {
+    const { availableProductIds, notAvailableProductIds } = this.props;
     return (
       <View style={{ flex: 1 }}>
         <ProductItemContext.Provider
@@ -18,8 +21,10 @@ class ProductsScreen extends Component {
             action: { navigation: this.props.navigation }
           }}
         >
-          <ProductList type="available" />
-          <ProductList type="not_available" />
+          <ProductList productIds={availableProductIds} />
+          {notAvailableProductIds.length > 0 && (
+            <ProductList productIds={notAvailableProductIds} />
+          )}
         </ProductItemContext.Provider>
       </View>
     );
@@ -48,4 +53,11 @@ ProductsScreen.navigationOptions = ({ navigation }) => {
   };
 };
 
-export default ProductsScreen;
+export default connect(state => ({
+  availableProductIds: selectors.data.getProductIdsByType(state, {
+    type: "available"
+  }),
+  notAvailableProductIds: selectors.data.getProductIdsByType(state, {
+    type: "not_available"
+  })
+}))(ProductsScreen);

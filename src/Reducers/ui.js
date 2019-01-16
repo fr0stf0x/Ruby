@@ -15,6 +15,7 @@ const ui = (
         isLoading: !state.isLoading
       });
     case types.ui.SET_APP_MODE:
+      console.log("setting app mode", action.payload.appMode);
       return mergeObj(state, {
         appMode: action.payload.appMode
       });

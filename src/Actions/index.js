@@ -4,12 +4,13 @@ import {
   initAppData,
   makeCreateOrder,
   makeCreateQuotation,
-  makeAddProductsToAgency,
+  makeAddProductsToAgencies,
   makeCreateAgencyAccount,
   acceptNewQuotation,
   rejectNewQuotation,
   acceptNewOrder,
-  rejectNewOrder
+  rejectNewOrder,
+  getAgencyProductsIfNeeded
 } from "./data.actions";
 import { setAppMode, toggleLoading } from "./ui.actions";
 import {
@@ -18,13 +19,16 @@ import {
   toggleCheckProducts,
   toggleCheckProduct,
   addAgencyToCartIfNeeded,
+  addAgenciesToCart,
   modifyItemInCart
 } from "./cart.actions";
 
 import {
+  addProductsToAgencies,
   globalToggleCheckProducts,
   globalToggleCheckAgencies,
-  createQuotation
+  createQuotation,
+  globalToggleLoading
 } from "./global";
 
 const actions = {
@@ -37,6 +41,7 @@ const actions = {
     setAppMode
   },
   data: {
+    getAgencyProductsIfNeeded,
     acceptNewOrder,
     rejectNewOrder,
     acceptNewQuotation,
@@ -44,7 +49,7 @@ const actions = {
     addProduct,
     makeCreateOrder,
     makeCreateQuotation,
-    makeAddProductsToAgency,
+    makeAddProductsToAgencies,
     makeCreateAgencyAccount,
     initAppData
   },
@@ -54,9 +59,12 @@ const actions = {
     modifyItemInCart,
     toggleCheckProduct,
     toggleCheckAllAgencies,
+    addAgenciesToCart,
     toggleCheckAgency
   },
   global: {
+    globalToggleLoading,
+    addProductsToAgencies,
     globalToggleCheckProducts,
     globalToggleCheckAgencies,
     createQuotation

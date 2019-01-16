@@ -1,31 +1,38 @@
 import React, { Component } from "react";
 import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
-import actions from "~/Actions";
-import appConstants from "~/appConstants";
-import ProductList, { ProductItemContext } from "~/Components/ProductList";
-import { globalColorsAndStyles } from "~/Theme";
 import { Button } from "react-native-elements";
 import { connect } from "react-redux";
+import actions from "~/Actions";
 import { promiseWithLoadingAnimation } from "~/Actions/global";
+import appConstants from "~/appConstants";
+import ProductList, { ProductItemContext } from "~/Components/ProductList";
+import selectors from "~/Selectors";
+import { globalColorsAndStyles } from "~/Theme";
 
 class AddProductsForAgency extends Component {
   state = {
     error: false
   };
 
+  componentDidMount() {
+    const { currentProductsOfAgency, toggleCheckProduct } = this.props;
+    currentProductsOfAgency &&
+      currentProductsOfAgency.allIds.forEach(id => toggleCheckProduct(id));
+  }
+
   goBackToList = () => {
     this.props.navigation.navigate("AgenciesScreen");
   };
   render() {
     const { error } = this.state;
-    const { addProductsToAgency } = this.props;
+    const { addProductsToAgency, availableProductIds } = this.props;
     return (
       <View style={styles.container}>
         <ScrollView style={styles.products}>
           <ProductItemContext.Provider
             value={{ type: appConstants.productItemContext.ADD_TO_AGENCY }}
           >
-            <ProductList type="available" />
+            <ProductList productIds={availableProductIds} />
           </ProductItemContext.Provider>
         </ScrollView>
         <View style={{ padding: 10 }}>
@@ -101,8 +108,29 @@ AddProductsForAgency.navigationOptions = {
 };
 
 export default connect(
-  state => ({}),
+  state => {
+    const agencyId = selectors.cart.getSelectedAgenciesInCart(
+      state,
+      appConstants.productItemContext.ADD_TO_AGENCY
+    )[0];
+    const allProductIds = selectors.data.getProducts(state).allIds;
+    const currentProductsOfAgency = selectors.data.getProductsOfAgency(state, {
+      id: agencyId
+    });
+    return {
+      availableProductIds: allProductIds,
+      currentProductsOfAgency
+    };
+  },
   dispatch => ({
-    addProductsToAgency: () => dispatch(actions.data.makeAddProductsToAgency())
+    addProductsToAgency: () =>
+      dispatch(actions.data.makeAddProductsToAgencies()),
+    toggleCheckProduct: id =>
+      dispatch(
+        actions.cart.toggleCheckProduct({
+          id,
+          endpoint: appConstants.productItemContext.ADD_TO_AGENCY
+        })
+      )
   })
 )(AddProductsForAgency);

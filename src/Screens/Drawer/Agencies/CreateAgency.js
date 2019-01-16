@@ -26,7 +26,7 @@ import actions from "~/Actions";
 import { promiseWithLoadingAnimation } from "~/Actions/global";
 import appConstants from "~/appConstants";
 import { globalColorsAndStyles } from "~/Theme";
-import { validateFields, formatDateTimeForFileName } from "~/Utils/utils";
+import { formatDateTimeForFileName, validateFields } from "~/Utils/utils";
 
 const constrants = {
   agencyName: {
@@ -188,18 +188,15 @@ class GroupInfoForm extends Component {
             return createAgency(data).then(async groupId => {
               const email = await AsyncStorage.getItem("email");
               const password = await AsyncStorage.getItem("password");
-              logOut().then(() =>
-                logIn({ email, password }).then(() => {
+              logOut().then(async () =>
+                logIn({ email, password }).then(async () => {
                   Alert.alert(
                     "Tạo đại lý thành công",
                     "Bạn có muốn thêm sản phẩm cho đại lý này không?",
                     [
                       {
                         text: "Có",
-                        onPress: () =>
-                          logOut().then(() =>
-                            redirectToAddProductsForAgency(groupId)
-                          )
+                        onPress: () => redirectToAddProductsForAgency(groupId)
                       },
                       {
                         text: "Không",

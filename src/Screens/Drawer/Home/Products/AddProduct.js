@@ -81,7 +81,6 @@ class AddProduct extends Component {
     const { name, defaultPrice, type, image, error } = this.state;
     if (!error) {
       const { addProduct } = this.props;
-      const image = this.state.image;
       promiseWithLoadingAnimation(() => {
         const storageRef = firebase.storage().ref();
         const productData = { name, defaultPrice, type };

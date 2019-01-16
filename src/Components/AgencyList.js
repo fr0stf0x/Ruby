@@ -84,7 +84,7 @@ const AgencyList = ({
   toggleAddAgencyToCart,
   toggleAddAgencyToCartAndRedirect
 }) => {
-  if (agencies && agencies.allIds && agencies.byId) {
+  if (agencies && agencies.allIds.length > 0) {
     const { allIds, byId } = agencies;
     const unSelectedAgencyIds = allIds.filter(
       id => !selectedAgencyIds.includes(id)

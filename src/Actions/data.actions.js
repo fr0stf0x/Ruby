@@ -8,7 +8,7 @@ import store from "~/configureStore";
 import selectors from "~/Selectors";
 import { promiseWrapper } from "~/Utils/utils";
 import types from "./ActionTypes";
-import { addProductsToAgency, createOrder, createQuotation } from "./global";
+import { addProductsToAgencies, createOrder, createQuotation } from "./global";
 import { setAppMode } from "./ui.actions";
 
 import type { QuerySnapshot, DocumentReference } from "react-native-firebase";
@@ -57,16 +57,21 @@ export const subscribeToTopicIfNeeded = async groupId => {
   }
 };
 
-export const makeAddProductsToAgency = () => (dispatch, getState) => {
+export const makeAddProductsToAgencies = () => (dispatch, getState) => {
   const state = getState();
-  const agencyId = selectors.cart.getSelectedAgenciesInCart(
+  const agencyIds = selectors.cart.getSelectedAgenciesInCart(
     state,
     appConstants.productItemContext.ADD_TO_AGENCY
   );
   const selectedProducts = selectors.cart.getProductsInCart(state, {
     endpoint: appConstants.productItemContext.ADD_TO_AGENCY
   });
-  return dispatch(addProductsToAgency(agencyId, selectedProducts));
+  const data = agencyIds.reduce((obj, agencyId) => {
+    obj[agencyId] = Object.keys(selectedProducts);
+    return obj;
+  }, {});
+  console.log("after transform", data);
+  return dispatch(addProductsToAgencies(data));
 };
 
 export const makeCreateQuotation = () => (dispatch, getState) => {
@@ -295,7 +300,6 @@ const getAppData = ({ group: { group_id, group_type } }): Promise => {
       getCollectionAndMergeDetails(groupDocRef, appConstants.collection.ORDERS)
     );
   }
-  console.log(appDataPromises);
   return Promise.all(appDataPromises);
 };
 
@@ -362,7 +366,7 @@ const getGroupAndParent = (groupDocRef): Promise => {
     );
 };
 
-const getCollectionAndMergeDetails = (
+const getCollectionAndMergeDetails = async (
   groupRef: DocumentReference,
   collectionName,
   parentCollectionName = collectionName
@@ -371,30 +375,64 @@ const getCollectionAndMergeDetails = (
   return groupRef
     .collection(collectionName)
     .onSnapshot((query: QuerySnapshot) => {
-      if (!query.empty) {
-        query.docs.forEach(async docSnapshot => {
-          const { error, data: snapshot } = await promiseWrapper(
-            firebase
-              .firestore()
-              .collection(parentCollectionName)
-              .doc(docSnapshot.id)
-              .get()
-          );
-          if (!error && snapshot.exists) {
+      query.docChanges.forEach(async docChange => {
+        const changeType = docChange.type;
+        const docSnapshot = docChange.doc;
+        const { data: detailSnapshot, error } = await promiseWrapper(
+          firebase
+            .firestore()
+            .collection(parentCollectionName)
+            .doc(docSnapshot.id)
+            .get()
+        );
+        if (!error) {
+          if (detailSnapshot.exists) {
             dispatch(
               observeData({
                 endpoint: collectionName,
                 id: docSnapshot.id,
-                data: {
-                  ...docSnapshot.data(),
-                  ...{ detail: snapshot.data() }
+                change: {
+                  type: changeType,
+                  data: {
+                    ...docSnapshot.data(),
+                    ...{ detail: detailSnapshot.data() }
+                  }
                 }
               })
             );
           }
-        });
-      }
+        }
+      });
     });
+};
+
+export const getAgencyProductsIfNeeded = agencyId => (dispatch, getState) => {
+  return new Promise((resolve, reject) => {
+    if (!selectors.data.getProductsOfAgency(getState(), { id: agencyId })) {
+      console.log("getting products of agency " + agencyId);
+      dispatch(requestAgencyProducts({ agencyId }));
+      return firebase
+        .firestore()
+        .collection(appConstants.collection.GROUPS)
+        .doc(agencyId)
+        .collection(appConstants.collection.PRODUCTS)
+        .onSnapshot(query => {
+          const productIds = query.docs.map(doc => doc.id);
+          dispatch(
+            observeAgencyProducts({
+              agencyId,
+              productIds
+            })
+          );
+          console.log("before resolve");
+          resolve(productIds);
+          console.log("after resolve");
+        });
+    } else {
+      console.log("getting products of agency " + agencyId);
+      resolve("Đã có dữ liệu");
+    }
+  });
 };
 
 const loadData = ({ endpoint }) => {
@@ -420,10 +458,32 @@ const receiveData = ({ endpoint, data }) => {
   };
 };
 
-const observeData = ({ endpoint, id, data }) => {
+const observeData = ({ endpoint, id, change }) => {
   return {
     type: types.data.OBSERVE_DATA,
     meta: { endpoint },
-    payload: { id, data }
+    payload: { id, change }
+  };
+};
+
+const observeDetail = ({ endpoint, id, detail }) => {
+  return {
+    type: types.data.OBSERVE_DETAIL,
+    meta: { endpoint },
+    payload: { id, detail }
+  };
+};
+
+const requestAgencyProducts = ({ agencyId }) => {
+  return {
+    type: types.data.LOAD_AGENCY_PRODUCTS,
+    payload: { agencyId }
+  };
+};
+
+const observeAgencyProducts = ({ agencyId, productIds }) => {
+  return {
+    type: types.data.OBSERVE_AGENCY_PRODUCTS,
+    payload: { agencyId, productIds }
   };
 };

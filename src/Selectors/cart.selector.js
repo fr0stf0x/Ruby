@@ -1,12 +1,12 @@
 import appConstants from "~/appConstants";
 
-export const getProductInCart = (state, { endpoint, id }) =>
-  state.cart[endpoint].products[id];
-
 export const getSelectedAgenciesInCart = (
   state,
   endpoint = appConstants.productItemContext.QUOTATION
 ): Array => state.cart[endpoint].agencies;
+
+export const getProductInCart = (state, { endpoint, id }) =>
+  state.cart[endpoint].products[id];
 
 export const getProductsInCart = (state, { endpoint }) =>
   state.cart[endpoint].products;

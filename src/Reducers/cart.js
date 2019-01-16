@@ -26,6 +26,10 @@ const products = (state = {}, action) => {
 
 const agencies = (state = [], action) => {
   switch (action.type) {
+    case types.cart.ADD_AGENCIES:
+      return action.payload.ids;
+    case types.cart.REMOVE_ALL_AGENCY:
+      return [];
     case types.cart.ADD_AGENCY:
       return [...state, action.payload.id];
     case types.cart.REMOVE_AGENCY:
@@ -44,7 +48,9 @@ const endpoint = (state = {}, action) => {
       return mergeObj(state, {
         products: products(state.products, action)
       });
+    case types.cart.ADD_AGENCIES:
     case types.cart.ADD_AGENCY:
+    case types.cart.REMOVE_ALL_AGENCY:
     case types.cart.REMOVE_AGENCY:
       return mergeObj(state, {
         agencies: agencies(state.agencies, action)
@@ -74,7 +80,9 @@ const cartReducer = (
     case types.cart.TOGGLE_ITEM_CART:
     case types.cart.MODIFY_ITEM_IN_CART:
     case types.cart.ADD_AGENCY:
+    case types.cart.ADD_AGENCIES:
     case types.cart.REMOVE_AGENCY:
+    case types.cart.REMOVE_ALL_AGENCY:
       return mergeObj(state, {
         [action.meta.endpoint]: endpoint(state[action.meta.endpoint], action)
       });

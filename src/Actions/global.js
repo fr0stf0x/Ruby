@@ -18,9 +18,9 @@ export const setAccountToAsyncStorage = async ({ email, password }) => {
 export const globalToggleCheckProducts = (
   endpoint = appConstants.productItemContext.QUOTATION
 ) => {
-  const products = selectors.data.getProductsByType(store.getState(), {
+  const products = selectors.data.getProductIdsByType(store.getState(), {
     type: "available"
-  }).allIds;
+  });
   return store.dispatch(toggleCheckProducts(products, { endpoint }));
 };
 
@@ -28,24 +28,29 @@ export const globalToggleCheckAgencies = () => {
   store.dispatch(toggleCheckAllAgencies());
 };
 
-export const addProductsToAgency = (agencyIds: Array, products) => (
+export const addProductsToAgencies = productsInAgencies => (
   dispatch,
   getState
 ) => {
-  if (Object.keys(products).length === 0) {
-    return Promise.reject("Chưa chọn sản phẩm");
-  }
+  console.log(productsInAgencies);
+  Object.entries(productsInAgencies).forEach(([agencyId, value]) => {
+    if (Object.keys(value).length === 0) {
+      return Promise.reject("Chưa chọn sản phẩm");
+    }
+  });
   const state = getState();
   const db = firebase.firestore();
   const batch = db.batch();
-  agencyIds.forEach(agencyId => {
+  Object.entries(productsInAgencies).forEach(([agencyId, value]) => {
     const agencyRef = db
       .collection(appConstants.collection.GROUPS)
       .doc(agencyId);
-    Object.keys(products).forEach(productId => {
+    console.log(value);
+    value.forEach(productId => {
       const productInfo = selectors.data.getProductById(state, {
         id: productId
       });
+      console.log(productInfo);
       const productRefInAgency = agencyRef
         .collection(appConstants.collection.PRODUCTS)
         .doc(productId);
@@ -79,6 +84,7 @@ export const createQuotation = (agencyIds: Array, products) => {
     verified: false
   };
   const createdAt = new Date();
+  const currentGroupId = selectors.data.getGroupInfo(store.getState()).id;
   agencyIds.forEach(agencyId => {
     const childRef = db
       .collection(appConstants.collection.GROUPS)
@@ -87,13 +93,18 @@ export const createQuotation = (agencyIds: Array, products) => {
     const orderDocRefInChild = childRef
       .collection(appConstants.collection.QUOTATIONS)
       .doc(newOrderDocRef.id);
-    batch.set(newOrderDocRef, { products, createdAt });
+    batch.set(newOrderDocRef, {
+      products,
+      createdAt,
+      from: currentGroupId,
+      to: agencyId
+    });
     batch.set(orderDocRefInChild, { status, createdAt });
   });
   return batch.commit();
 };
 
-export const createOrder = (parentId, products) => (dispatch, getState) => {
+export const createOrder = (parentId, products) => {
   if (Object.keys(products).length === 0) {
     return Promise.reject("Chưa chọn sản phẩm để báo giá");
   }
@@ -103,15 +114,24 @@ export const createOrder = (parentId, products) => (dispatch, getState) => {
     verified: false
   };
   const createdAt = new Date();
-  const currentGroupId = selectors.data.getGroupInfo(getState()).id;
+  const currentGroup = selectors.data.getGroupInfo(store.getState());
 
   const parentRef = db.collection(appConstants.collection.GROUPS).doc(parentId);
   const newOrderDocRef = db.collection(appConstants.collection.ORDERS).doc();
   const orderDocRefInParent = parentRef
     .collection(appConstants.collection.ORDERS)
     .doc(newOrderDocRef.id);
-  batch.set(newOrderDocRef, { products, createdAt });
-  batch.set(orderDocRefInParent, { status, createdAt, from: currentGroupId });
+  batch.set(newOrderDocRef, {
+    products,
+    createdAt,
+    from: currentGroup.id,
+    to: parentId
+  });
+  batch.set(orderDocRefInParent, {
+    status,
+    createdAt,
+    from: currentGroup.name
+  });
   return batch.commit();
 };
 

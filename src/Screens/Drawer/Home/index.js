@@ -6,6 +6,9 @@ import { globalColorsAndStyles } from "~/Theme";
 import OrdersStack from "./Orders";
 import ProductStack from "./Products";
 import QuotationsStack from "./Quotations";
+import appConstants from "~/appConstants";
+import store from "~/configureStore";
+import selectors from "~/Selectors";
 
 const tabIconNames = {
   Products: "ios-albums",
@@ -13,18 +16,19 @@ const tabIconNames = {
   Quotations: "ios-list"
 };
 
+const tabScreens = appMode => {
+  console.log(appMode);
+  const screens = {
+    Products: ProductStack
+  };
+  screens.Orders = OrdersStack;
+  screens.Quotations = QuotationsStack;
+  console.log(screens);
+  return screens;
+};
+
 const DashboardBottomNav = createBottomTabNavigator(
-  {
-    Products: {
-      screen: ProductStack
-    },
-    Orders: {
-      screen: OrdersStack
-    },
-    Quotations: {
-      screen: QuotationsStack
-    }
-  },
+  tabScreens(selectors.ui.getAppMode(store.getState())),
   {
     defaultNavigationOptions: ({ navigation }) => {
       return {
@@ -42,6 +46,9 @@ const DashboardBottomNav = createBottomTabNavigator(
       drawerIcon: <Icon name="ios-home" size={30} />
     },
     tabBarOptions: {
+      style: {
+        paddingTop: 10
+      },
       activeTintColor: globalColorsAndStyles.color.primary,
       labelStyle: {
         fontSize: 14

@@ -5,12 +5,12 @@ import { connect } from "react-redux";
 import { mergeObj } from "~/Reducers/utils";
 import selectors from "~/Selectors";
 import { globalColorsAndStyles } from "~/Theme";
-import { formatDate, formatTime, randomProductImage } from "~/Utils/utils";
+import { formatDate, formatTime } from "~/Utils/utils";
 
 class QuotationDetail extends Component {
   render() {
     const { quotation, allProducts } = this.props;
-    const { createdAt, products: productsOfQuotation } = quotation.detail;
+    const { createdAt, products: quotatedProducts } = quotation.detail;
     const { byId } = allProducts;
     const formatedDate = formatDate(createdAt);
     const formatedTime = formatTime(createdAt);
@@ -18,11 +18,11 @@ class QuotationDetail extends Component {
     return (
       <View>
         <Text h4>Báo giá ngày {formatedDate}</Text>
-        <Text>Đã nhận lúc {formatedTime} cùng ngày</Text>
+        <Text>Đã nhận: {formatedTime}</Text>
         <FlatList
           keyExtractor={(item, index) => index.toString()}
-          data={Object.keys(productsOfQuotation).map(id =>
-            mergeObj(byId[id], { id, inQuotation: productsOfQuotation[id] })
+          data={Object.keys(quotatedProducts).map(id =>
+            mergeObj(byId[id], { id, inQuotation: quotatedProducts[id] })
           )}
           renderItem={ReadOnlyProduct}
         />
@@ -36,7 +36,7 @@ const ReadOnlyProduct = ({ item: { id, detail, inQuotation }, index }) => {
     <View style={styles(index).listItem}>
       <View style={styles().imageContainer}>
         <Image
-          source={randomProductImage()}
+          source={{ uri: detail.imageUrl }}
           resizeMode="cover"
           style={{ width: 100, height: 100 }}
         />
@@ -95,5 +95,5 @@ const styles = key =>
 
 export default connect((state, props) => ({
   quotation: selectors.data.getQuotationByIdFromNavigationParam(state, props),
-  allProducts: selectors.data.getProductsByType(state, { type: "available" })
+  allProducts: selectors.data.getProducts(state)
 }))(QuotationDetail);

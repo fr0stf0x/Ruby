@@ -11,11 +11,16 @@ const INVALIDATE_DATA = "invalidate_data";
 const LOAD_DATA = "load_data";
 const GET_DATA = "get_data";
 const OBSERVE_DATA = "observe_data";
+const OBSERVE_DETAIL = "observe_detail";
+const LOAD_AGENCY_PRODUCTS = "load_agency_products";
+const OBSERVE_AGENCY_PRODUCTS = "observe_agency_products";
 
 const SET_APP_MODE = "set_app_mode";
 
 const ADD_AGENCY = "add_agency";
+const ADD_AGENCIES = "add_agencies";
 const REMOVE_AGENCY = "remove_agency";
+const REMOVE_ALL_AGENCY = "remove_all_agency";
 const TOGGLE_ADD_AGENCY = "toggle_add_agency";
 const TOGGLE_ITEM_CART = "toggle_item_cart";
 const ADD_ITEM_TO_CART = "add_item_cart";
@@ -39,11 +44,16 @@ const types = {
     INVALIDATE_DATA,
     LOAD_DATA,
     GET_DATA,
-    OBSERVE_DATA
+    OBSERVE_DATA,
+    OBSERVE_DETAIL,
+    LOAD_AGENCY_PRODUCTS,
+    OBSERVE_AGENCY_PRODUCTS
   },
   cart: {
+    ADD_AGENCIES,
     TOGGLE_ADD_AGENCY,
     ADD_AGENCY,
+    REMOVE_ALL_AGENCY,
     REMOVE_AGENCY,
     TOGGLE_ITEM_CART,
     ADD_ITEM_TO_CART,

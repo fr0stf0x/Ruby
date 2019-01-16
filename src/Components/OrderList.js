@@ -26,7 +26,7 @@ class OrderList extends Component {
       rejectNewOrder,
       goToDetail
     } = this.props;
-    if (orders && !orders.empty) {
+    if (orders && orders.allIds.length > 0) {
       const { allIds, byId, loading } = orders;
       return (
         (loading && <Text h1>Đang tải</Text>) || (
@@ -114,7 +114,7 @@ const OrderItem = ({
                 </View>
               )}
               <View style={{ alignItems: "flex-end" }}>
-                <Text>
+                <Text style={styles().listItemSubtitle}>
                   {formatedTime}, {formatedDate}
                 </Text>
               </View>
@@ -129,12 +129,13 @@ const OrderItem = ({
   );
 };
 
-const styles = (key, isNew, isRejected) =>
+const styles = (key, isNew) =>
   StyleSheet.create({
     listItem: {
       ...globalColorsAndStyles.style.boxShadow,
       flex: 1,
       flexDirection: "row",
+      padding: 5,
       margin: 10,
       backgroundColor: !isNew
         ? key % 2
@@ -145,6 +146,11 @@ const styles = (key, isNew, isRejected) =>
     listItemTitle: {
       fontSize: 18,
       color: globalColorsAndStyles.color.primaryText
+    },
+    listItemSubtitle: {
+      fontSize: 16,
+      fontStyle: "italic",
+      alignSelf: "center"
     },
     imageContainer: {
       alignSelf: "center"

@@ -8,10 +8,10 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { promiseWithLoadingAnimation } from "~/Actions/global";
 
 class AccountScreen extends Component {
-  logOut = () => {
+  dologOut = () => {
     const { logOut, navigation } = this.props;
     promiseWithLoadingAnimation(() =>
-      logOut().then(() => {
+      logOut().then(async () => {
         navigation.navigate("Login");
       })
     );
@@ -22,7 +22,7 @@ class AccountScreen extends Component {
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
         <Text>{authInfo.email}</Text>
-        <Button title={"Log out"} onPress={this.logOut} />
+        <Button title={"Log out"} onPress={this.dologOut} />
       </View>
     );
   }

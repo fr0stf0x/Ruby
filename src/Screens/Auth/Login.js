@@ -13,6 +13,7 @@ import { connect } from "react-redux";
 import actions from "~/Actions";
 import selectors from "~/Selectors";
 import { promiseWrapper } from "~/Utils/utils";
+import types from "~/Actions/ActionTypes";
 
 class LoginScreen extends Component {
   static navigationOptions = {
@@ -40,9 +41,9 @@ class LoginScreen extends Component {
   };
 
   componentDidMount() {
-    const { isUserLoggedIn, navigation } = this.props;
+    const { isUserLoggedIn, navigation, clearAppData } = this.props;
     (isUserLoggedIn && navigation.navigate("Welcome")) ||
-      this.getAccountAsync();
+      (clearAppData() && this.getAccountAsync());
   }
 
   toggleRevealPassword = () => {
@@ -138,6 +139,7 @@ export default connect(
   dispatch => ({
     logIn: ({ email, password }) =>
       dispatch(actions.auth.makeLogIn({ email, password })),
-    toggleLoading: () => dispatch(actions.ui.toggleLoading())
+    toggleLoading: () => dispatch(actions.ui.toggleLoading()),
+    clearAppData: () => dispatch({ type: types.data.CLEAR_DATA })
   })
 )(LoginScreen);

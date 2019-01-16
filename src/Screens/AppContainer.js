@@ -15,9 +15,7 @@ const RootSwitch = createSwitchNavigator(
     Welcome: {
       screen: WelcomeStack
     },
-    Dashboard: {
-      screen: DashboardDrawer
-    }
+    Dashboard: DashboardDrawer
   },
   {
     initialRouteName: "Login"
@@ -25,5 +23,4 @@ const RootSwitch = createSwitchNavigator(
 );
 
 const AppContainer = createAppContainer(RootSwitch);
-
 export default AppContainer;

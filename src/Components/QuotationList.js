@@ -26,7 +26,7 @@ class QuotationList extends Component {
       acceptNewQuotation,
       rejectNewQuotation
     } = this.props;
-    if (quotations && !quotations.empty) {
+    if (quotations && quotations.allIds.length > 0) {
       const { allIds, byId, loading } = quotations;
       return (
         (loading && <Text h1>Đang tải</Text>) || (
@@ -103,11 +103,7 @@ const QuotationListItem = ({
               </View>
             </View>
             <View style={styles().actions}>
-              <Icon
-                name="ios-arrow-forward"
-                size={24}
-                onPress={() => goToDetail(id)}
-              />
+              <Icon name="ios-arrow-forward" size={24} />
             </View>
           </View>
         </View>

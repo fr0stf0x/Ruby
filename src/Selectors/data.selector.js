@@ -9,24 +9,16 @@ export const getQuotations = state =>
 
 export const getOrders = state => state.appData[appConstants.collection.ORDERS];
 
-export const getProductsByType = (state, { type = "all" }) => {
-  const products = state.appData[appConstants.collection.PRODUCTS];
-  if (products) {
-    if (type === "all") return products;
-    const { allIds, byId, loading } = products;
-    const newAllIds = allIds.filter(
-      id => byId[id].status.available === (type === "available")
-    );
-    return {
-      loading,
-      allIds: newAllIds,
-      byId: newAllIds.reduce((obj, id) => {
-        obj[id] = byId[id];
-        return obj;
-      }, {})
-    };
-  }
-  return null;
+export const getProducts = state =>
+  state.appData[appConstants.collection.PRODUCTS];
+
+export const getProductIdsByType = (state, { type = "all" }) => {
+  const products = getProducts(state);
+  const { allIds, byId } = products;
+  if (type === "all") return allIds;
+  return allIds.filter(
+    id => byId[id].status.available === (type === "available")
+  );
 };
 
 // data endpoints
@@ -40,25 +32,29 @@ export const getParent = state =>
   state.appData[appConstants.dataEndpoint.PARENT];
 
 // piece of collection
-export const getProductByIdFromNavigationParam = (state, props) =>
-  state.appData[appConstants.collection.PRODUCTS].byId[
-    props.navigation.getParam("id")
-  ];
-
 export const getProductById = (state, { id }) =>
   state.appData[appConstants.collection.PRODUCTS].byId[id];
 
+export const getAgencyById = (state, { id }) =>
+  state.appData[appConstants.collection.CHILDREN].byId[id];
+
+export const getQuotationById = (state, { id }) =>
+  state.appData[appConstants.collection.QUOTATIONS].byId[id];
+
+export const getOrderById = (state, { id }) =>
+  state.appData[appConstants.collection.ORDERS].byId[id];
+
+export const getProductByIdFromNavigationParam = (state, props) =>
+  getProductById(state, { id: props.navigation.getParam("id") });
+
 export const getAgencyByIdFromNavigationParam = (state, props) =>
-  state.appData[appConstants.collection.CHILDREN].byId[
-    props.navigation.getParam("id")
-  ];
+  getAgencyById(state, { id: props.navigation.getParam("id") });
 
 export const getOrderByIdFromNavigationParam = (state, props) =>
-  state.appData[appConstants.collection.ORDERS].byId[
-    props.navigation.getParam("id")
-  ];
+  getOrderById(state, { id: props.navigation.getParam("id") });
 
 export const getQuotationByIdFromNavigationParam = (state, props) =>
-  state.appData[appConstants.collection.QUOTATIONS].byId[
-    props.navigation.getParam("id")
-  ];
+  getQuotationById(state, { id: props.navigation.getParam("id") });
+
+export const getProductsOfAgency = (state, { id }) =>
+  getAgencyById(state, { id })[appConstants.collection.PRODUCTS];

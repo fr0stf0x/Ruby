@@ -50,7 +50,7 @@ class AgenciesBox extends Component {
               ))}
             <TouchableOpacity
               style={styles.addButton}
-              onPress={() => navigation.navigate("SelectAgencies")}
+              onPress={() => navigation.navigate("SelectAgenciesScreen")}
             >
               <Icon name="ios-add" size={20} />
             </TouchableOpacity>

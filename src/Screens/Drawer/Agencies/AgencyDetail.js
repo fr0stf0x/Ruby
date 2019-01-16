@@ -1,33 +1,38 @@
 import React, { Component } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { connect } from "react-redux";
 import selectors from "~/Selectors";
-import { Card, Button } from "react-native-elements";
+import { Card, Text, Button } from "react-native-elements";
 import { globalColorsAndStyles } from "~/Theme";
-import { randomAgencyImage, makeCall } from "~/Utils/utils";
+import { makeCall } from "~/Utils/utils";
 import actions from "~/Actions";
 import Icon from "react-native-vector-icons/Ionicons";
 import appConstants from "~/appConstants";
+import ProductList, { ProductItemContext } from "~/Components/ProductList";
 
 class AgencyDetail extends Component {
+  componentDidMount() {
+    this.props.getAgencyProducts();
+  }
   render() {
     const {
       agency,
+      productsOfAgency,
       toggleAddAgencyToCartAndRedirect,
       redirectToAddProductsForAgency
     } = this.props;
     const { info } = agency.detail;
     return (
-      <View>
+      <ScrollView>
         <Card
           containerStyle={globalColorsAndStyles.style.boxShadow}
           title={info.name}
-          image={randomAgencyImage()}
+          image={{ uri: info.imageUrl }}
         >
           <View>
             <View
               style={{
-                height: 200,
+                height: 150,
                 alignItems: "center",
                 justifyContent: "center"
               }}
@@ -85,14 +90,29 @@ class AgencyDetail extends Component {
             </View>
           </View>
         </Card>
-      </View>
+        <Text h3 style={{ textAlign: "center" }}>
+          Sản phẩm
+        </Text>
+        {productsOfAgency &&
+          ((productsOfAgency.loading && <Text h4>Đang tải</Text>) || (
+            <View style={{ padding: 5 }}>
+              <ProductItemContext.Provider
+                value={{
+                  type: appConstants.productItemContext.SHOW
+                }}
+              >
+                <ProductList productIds={productsOfAgency.allIds} />
+              </ProductItemContext.Provider>
+            </View>
+          ))}
+      </ScrollView>
     );
   }
 }
 
 const styles = StyleSheet.create({
   agencyInfo: {
-    fontSize: 16
+    fontSize: 17
   },
   actions: {
     flex: 1,
@@ -110,7 +130,10 @@ const styles = StyleSheet.create({
 
 export default connect(
   (state, props) => ({
-    agency: selectors.data.getAgencyByIdFromNavigationParam(state, props)
+    agency: selectors.data.getAgencyByIdFromNavigationParam(state, props),
+    productsOfAgency: selectors.data.getProductsOfAgency(state, {
+      id: props.navigation.getParam("id")
+    })
   }),
   (dispatch, props) => ({
     toggleAddAgencyToCartAndRedirect: () => {
@@ -132,6 +155,10 @@ export default connect(
         )
       );
       props.navigation.navigate("AddProductsForAgency", { id });
-    }
+    },
+    getAgencyProducts: () =>
+      dispatch(
+        actions.data.getAgencyProductsIfNeeded(props.navigation.getParam("id"))
+      )
   })
 )(AgencyDetail);

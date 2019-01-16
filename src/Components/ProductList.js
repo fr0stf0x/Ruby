@@ -20,7 +20,9 @@ const ProductItem = ({ item: { id, detail, status }, index }) => {
         context.type === appConstants.productItemContext.SHOW ? (
           <TouchableOpacity
             onPress={() =>
-              context.action.navigation.navigate("ProductDetail", { id })
+              context.action
+                ? context.action.navigation.navigate("ProductDetail", { id })
+                : {}
             }
           >
             <ReadOnlyProductListItem
@@ -45,31 +47,27 @@ const ProductItem = ({ item: { id, detail, status }, index }) => {
   );
 };
 
-const ProductList = ({ products, type }) => {
-  if (products && !products.empty) {
-    const { allIds, byId, loading } = products;
+const ProductList = ({ productIds, productDetailsById }) => {
+  if (productIds.length > 0) {
     return (
-      (loading && <Text h1>Đang tải</Text>) || (
-        <FlatList
-          contentContainerStyle={{ paddingVertical: 10 }}
-          refreshing={true}
-          keyExtractor={(item, index) => index.toString()}
-          data={allIds.map(id => mergeObj(byId[id], { id }))}
-          renderItem={ProductItem}
-        />
-      )
+      <FlatList
+        contentContainerStyle={{ paddingVertical: 10 }}
+        refreshing={true}
+        keyExtractor={(item, index) => index.toString()}
+        data={productIds.map(id => mergeObj(productDetailsById[id], { id }))}
+        renderItem={ProductItem}
+      />
     );
   }
-
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
       <Text style={{ fontSize: 16, color: globalColorsAndStyles.color.error }}>
-        <Text>{type === "available" && "Không có sản phẩm nào"}</Text>
+        <Text>Không có sản phẩm nào</Text>
       </Text>
     </View>
   );
 };
 
 export default connect((state, props) => ({
-  products: selectors.data.getProductsByType(state, props)
+  productDetailsById: selectors.data.getProducts(state).byId
 }))(ProductList);
