@@ -8,6 +8,7 @@ import ProductList, { ProductItemContext } from "~/Components/ProductList";
 import selectors from "~/Selectors";
 import { globalColorsAndStyles } from "~/Theme";
 import Icon from "react-native-vector-icons/Ionicons";
+import { promiseWithLoadingAnimation } from "~/Actions/global";
 
 class CreateOrderScreen extends Component {
   state = {
@@ -18,9 +19,27 @@ class CreateOrderScreen extends Component {
     this.props.navigation.navigate("OrderList");
   };
 
+  doCreateOrder = () =>
+    promiseWithLoadingAnimation(() =>
+      this.props
+        .createOrder()
+        .then(() => {
+          this.setState({ error: false });
+          Alert.alert("Thành công", "Đợi đối phương xác nhận", [
+            {
+              text: "Quay về trang chủ",
+              onPress: this.goBackToList
+            }
+          ]);
+        })
+        .catch(error => {
+          this.setState({ error });
+        })
+    );
+
   render() {
     const { error } = this.state;
-    const { createOrder, products, toggleLoading } = this.props;
+    const { products } = this.props;
     return (
       <View style={styles.container}>
         <ScrollView style={styles.products}>
@@ -45,23 +64,7 @@ class CreateOrderScreen extends Component {
           <Button
             style={{ alignSelf: "center", width: 150 }}
             title="Đồng ý"
-            onPress={() => {
-              toggleLoading();
-              createOrder()
-                .then(() => {
-                  this.setState({ error: false });
-                  Alert.alert("Thành công", "", [
-                    {
-                      text: "Đợi đối phương xác nhận",
-                      onPress: this.goBackToList
-                    }
-                  ]);
-                })
-                .catch(err => {
-                  this.setState({ error: err });
-                })
-                .finally(toggleLoading);
-            }}
+            onPress={this.doCreateOrder}
           />
         </View>
       </View>

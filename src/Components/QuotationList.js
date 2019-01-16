@@ -93,8 +93,8 @@ const QuotationListItem = ({
               {!status.verified && (
                 <View style={{ alignItems: "center" }}>
                   <AcceptAndRejectButtons
-                    onAccept={() => onAccept(id)}
-                    onReject={() => onReject(id)}
+                    onAccept={onAccept}
+                    onReject={onReject}
                   />
                 </View>
               )}

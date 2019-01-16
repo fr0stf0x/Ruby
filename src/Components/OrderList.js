@@ -16,6 +16,7 @@ import { globalColorsAndStyles } from "~/Theme";
 import { formatDate, formatTime } from "~/Utils/utils";
 import AcceptAndRejectButtons from "./AcceptAndRejectButtons";
 import NewItemBadge from "./NewItemBadge";
+import { mergeObj } from "~/Reducers/utils";
 
 class OrderList extends Component {
   render() {
@@ -28,6 +29,7 @@ class OrderList extends Component {
     } = this.props;
     if (orders && orders.allIds.length > 0) {
       const { allIds, byId, loading } = orders;
+      console.log(orders);
       return (
         (loading && <Text h1>Đang tải</Text>) || (
           <FlatList
@@ -39,30 +41,24 @@ class OrderList extends Component {
                 (id1, id2) =>
                   byId[id2].detail.createdAt - byId[id1].detail.createdAt
               )
-              .map(id => {
-                const { from, products, detail, status } = byId[id];
-                return {
+              .map(id =>
+                mergeObj(byId[id], {
                   id,
-                  agencyId: from,
-                  agencyName: agencies.byId[from].detail.info.name,
-                  status,
-                  detail,
-                  products,
                   goToDetail,
                   onAccept: () =>
                     promiseWithLoadingAnimation(() =>
-                      acceptNewOrder(from, id).then(() =>
+                      acceptNewOrder(byId[id].detail.from, id).then(() =>
                         Alert.alert("Thành công")
                       )
                     ),
                   onReject: () =>
                     promiseWithLoadingAnimation(() =>
-                      rejectNewOrder(from, id).then(() =>
+                      rejectNewOrder(byId[id].detail.from, id).then(() =>
                         Alert.alert("Đã từ chối")
                       )
                     )
-                };
-              })}
+                })
+              )}
             renderItem={OrderItem}
           />
         )
@@ -81,16 +77,7 @@ class OrderList extends Component {
 }
 
 const OrderItem = ({
-  item: {
-    id,
-    status,
-    agencyId,
-    agencyName,
-    detail,
-    goToDetail,
-    onAccept,
-    onReject
-  },
+  item: { id, status, from, detail, goToDetail, onAccept, onReject },
   index
 }) => {
   const formatedDate = formatDate(detail.createdAt);
@@ -103,13 +90,13 @@ const OrderItem = ({
             <View style={styles().info}>
               <Text style={styles().listItemTitle}>
                 {!status.verified && <NewItemBadge />}
-                Đơn đặt hàng từ {agencyName}
+                Đơn đặt hàng từ {from}
               </Text>
               {!status.verified && (
                 <View style={{ alignItems: "center" }}>
                   <AcceptAndRejectButtons
-                    onAccept={() => onAccept(agencyId)}
-                    onReject={() => onReject(agencyId)}
+                    onAccept={onAccept}
+                    onReject={onReject}
                   />
                 </View>
               )}

@@ -92,7 +92,7 @@ export const makeCreateOrder = () => (dispatch, getState) => {
     endpoint: appConstants.productItemContext.ORDER
   });
   console.log("products", selectedProducts);
-  return dispatch(createOrder(parentId, selectedProducts));
+  return createOrder(parentId, selectedProducts);
 };
 
 export const addProduct = ({ name, type, defaultPrice, imageUrl }) => (
