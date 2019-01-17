@@ -19,6 +19,9 @@ import actions from "~/Actions";
 import { promiseWithLoadingAnimation } from "~/Actions/global";
 import { globalColorsAndStyles } from "~/Theme";
 import { validateFields, formatDateTimeForFileName } from "~/Utils/utils";
+import AccessDenied from "~/Screens/AccessDenied";
+import selectors from "~/Selectors";
+import appConstants from "~/appConstants";
 
 const constrants = {
   name: {
@@ -58,8 +61,8 @@ class AddProduct extends Component {
   selectPhotos = () => {
     const { navigation } = this.props;
     navigation.navigate("ImageBrowser", {
-      selectPicture: image => {
-        this.setState({ image });
+      selectPicture: ({ image, localImage }) => {
+        this.setState({ image, localImage });
       }
     });
   };
@@ -78,7 +81,7 @@ class AddProduct extends Component {
   };
 
   submitForm = () => {
-    const { name, defaultPrice, type, image, error } = this.state;
+    const { name, defaultPrice, type, image, error, localImage } = this.state;
     if (!error) {
       const { addProduct } = this.props;
       promiseWithLoadingAnimation(() => {
@@ -95,6 +98,7 @@ class AddProduct extends Component {
           .putFile("file://" + image.uri)
           .then(file => {
             productData.imageUrl = file.downloadURL;
+            productData.localImage = localImage || image.uri;
             return addProduct(productData).then(
               Alert.alert("Thành công", "", [
                 {
@@ -113,121 +117,130 @@ class AddProduct extends Component {
   };
 
   render() {
-    const { error, name, defaultPrice, type, image } = this.state;
+    const { error, name, defaultPrice, type, image, localImage } = this.state;
     return (
-      <KeyboardAvoidingView
-        behavior={Platform.select({ ios: "padding", android: "" })}
-        style={{ flex: 1, padding: 10 }}
-      >
-        <ScrollView
-          keyboardDismissMode="on-drag"
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{
-            flex: 1,
-            alignItems: "center",
-            justifyContent: "center"
-          }}
+      (this.props.appMode !== appConstants.mode.MODE_COMPANY && (
+        <AccessDenied
+          navigation={this.props.navigation}
+          mode="đại lý hoặc bán lẻ"
+        />
+      )) || (
+        <KeyboardAvoidingView
+          behavior={Platform.select({ ios: "padding", android: "" })}
+          style={{ flex: 1, padding: 10 }}
         >
-          <View style={styles.imageInputContainer}>
-            {(image && (
-              <View>
-                <Icon
-                  style={styles.removeImageIcon}
-                  name="remove"
-                  size={24}
-                  onPress={() => this.setState({ image: null })}
-                />
-                <TouchableOpacity onPress={this.selectPhotos}>
-                  <Image
-                    source={{ uri: image.uri }}
-                    style={{
-                      width: width / 1.5,
-                      height: width / 1.5,
-                      marginBottom: 10
-                    }}
+          <ScrollView
+            keyboardDismissMode="on-drag"
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={{
+              flex: 1,
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+          >
+            <View style={styles.imageInputContainer}>
+              {(image && (
+                <View>
+                  <Icon
+                    style={styles.removeImageIcon}
+                    name="remove"
+                    size={24}
+                    onPress={() => this.setState({ image: null })}
                   />
-                </TouchableOpacity>
-                <Text style={{ textAlign: "center", fontSize: 16 }}>
-                  {image.filename}
-                </Text>
-              </View>
-            )) || (
-              <Button
-                title="Chọn ảnh"
-                buttonStyle={{
-                  backgroundColor:
-                    (error &&
-                      error.image &&
-                      globalColorsAndStyles.color.error) ||
-                    globalColorsAndStyles.color.secondary
-                }}
-                onPress={this.selectPhotos}
+                  <TouchableOpacity onPress={this.selectPhotos}>
+                    <Image
+                      source={{ uri: localImage || image.uri }}
+                      style={{
+                        width: width / 1.5,
+                        height: width / 1.5,
+                        marginBottom: 10
+                      }}
+                    />
+                  </TouchableOpacity>
+                  <Text style={{ textAlign: "center", fontSize: 16 }}>
+                    {image.filename}
+                  </Text>
+                </View>
+              )) || (
+                <Button
+                  title="Chọn ảnh"
+                  buttonStyle={{
+                    backgroundColor:
+                      (error &&
+                        error.image &&
+                        globalColorsAndStyles.color.error) ||
+                      globalColorsAndStyles.color.secondary
+                  }}
+                  onPress={this.selectPhotos}
+                />
+              )}
+            </View>
+            <View style={styles.flexBasis}>
+              <Input
+                textContentType="name"
+                value={name}
+                placeholder="Tên sản phẩm"
+                onChangeText={name => this.setState({ name })}
               />
-            )}
-          </View>
-          <View style={styles.flexBasis}>
-            <Input
-              textContentType="name"
-              value={name}
-              placeholder="Tên sản phẩm"
-              onChangeText={name => this.setState({ name })}
-            />
-            {error &&
-              error.name &&
-              error.name.map((err, key) => (
-                <View key={key}>
-                  <Text style={styles.error}>{err}</Text>
-                </View>
-              ))}
-          </View>
-          <View style={styles.flexBasis}>
-            <Input
-              textContentType="name"
-              value={type}
-              placeholder="Loại sản phẩm"
-              onChangeText={type => this.setState({ type })}
-            />
-            {error &&
-              error.type &&
-              error.type.map((err, key) => (
-                <View key={key}>
-                  <Text style={styles.error}>{err}</Text>
-                </View>
-              ))}
-          </View>
-          <View style={styles.flexBasis}>
-            <View style={styles.priceInputContainer}>
-              <Text style={{ fontSize: 17, color: "#5b7296", paddingEnd: 10 }}>
-                Giá khởi điểm
-              </Text>
-              <NumericInput
-                initValue={defaultPrice}
-                value={defaultPrice}
-                onChange={defaultPrice => this.setState({ defaultPrice })}
-                type="up-down"
-                minValue={0}
-                totalHeight={40}
-                iconSize={20}
-                step={500}
-                rounded
-                textColor="#B0228C"
-                iconStyle={{ color: "white" }}
-                upDownButtonsBackgroundColor="#EA3788"
+              {error &&
+                error.name &&
+                error.name.map((err, key) => (
+                  <View key={key}>
+                    <Text style={styles.error}>{err}</Text>
+                  </View>
+                ))}
+            </View>
+            <View style={styles.flexBasis}>
+              <Input
+                textContentType="name"
+                value={type}
+                placeholder="Loại sản phẩm"
+                onChangeText={type => this.setState({ type })}
+              />
+              {error &&
+                error.type &&
+                error.type.map((err, key) => (
+                  <View key={key}>
+                    <Text style={styles.error}>{err}</Text>
+                  </View>
+                ))}
+            </View>
+            <View style={styles.flexBasis}>
+              <View style={styles.priceInputContainer}>
+                <Text
+                  style={{ fontSize: 17, color: "#5b7296", paddingEnd: 10 }}
+                >
+                  Giá khởi điểm
+                </Text>
+                <NumericInput
+                  initValue={defaultPrice}
+                  value={defaultPrice}
+                  onChange={defaultPrice => this.setState({ defaultPrice })}
+                  type="up-down"
+                  minValue={0}
+                  totalHeight={40}
+                  iconSize={20}
+                  step={500}
+                  rounded
+                  textColor="#B0228C"
+                  iconStyle={{ color: "white" }}
+                  upDownButtonsBackgroundColor="#EA3788"
+                />
+              </View>
+            </View>
+            <View style={styles.buttonGroup}>
+              <Button title="Đồng ý" onPress={this.validateForm} />
+              <Button
+                buttonStyle={{
+                  backgroundColor: globalColorsAndStyles.color.secondary
+                }}
+                title="Huỷ bỏ"
+                onPress={this.goBackToList}
               />
             </View>
-          </View>
-          <View style={styles.buttonGroup}>
-            <Button title="Đồng ý" onPress={this.validateForm} />
-            <Button
-              buttonStyle={{
-                backgroundColor: globalColorsAndStyles.color.secondary
-              }}
-              title="Huỷ bỏ"
-              onPress={this.goBackToList}
-            />
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      )
     );
   }
 }
@@ -274,7 +287,9 @@ const styles = StyleSheet.create({
 });
 
 export default connect(
-  state => ({}),
+  state => ({
+    appMode: selectors.ui.getAppMode(state)
+  }),
   dispatch => ({
     addProduct: data => dispatch(actions.data.addProduct(data)),
     toggleLoading: () => dispatch(actions.ui.toggleLoading())

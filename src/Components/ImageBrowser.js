@@ -124,7 +124,9 @@ export default class ImageBrowser extends Component {
 
   goBack = () => {
     const { navigation } = this.props;
-    this.state.image && navigation.state.params.selectPicture(this.state.image);
+    const { image, localImage } = this.state;
+    this.state.image &&
+      navigation.state.params.selectPicture({ image, localImage });
     navigation.goBack();
   };
 
@@ -262,13 +264,15 @@ export default class ImageBrowser extends Component {
     if (this.camera) {
       const options = { quality: 0.5, base64: true };
       const data = await this.camera.takePictureAsync(options);
-      data.filename = formatDateTimeForFileName(new Date()) + ".jpg";
-      this.setState(
-        {
-          image: data
-        },
-        this.toggleCamera
-      );
+      this.toggleCamera();
+      CameraRoll.saveToCameraRoll(data.uri).then(res => {
+        console.log("saved image to camera roll", res);
+        data.filename = formatDateTimeForFileName(new Date()) + ".jpg";
+        this.setState({
+          image: data,
+          localImage: res
+        });
+      });
     }
   };
 }

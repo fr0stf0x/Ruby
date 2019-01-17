@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import {
+  Image,
   TouchableOpacity,
   Alert,
   FlatList,
@@ -20,14 +21,8 @@ import { mergeObj } from "~/Reducers/utils";
 
 class OrderList extends Component {
   render() {
-    const {
-      agencies,
-      orders,
-      acceptNewOrder,
-      rejectNewOrder,
-      goToDetail
-    } = this.props;
-    if (orders && orders.allIds.length > 0) {
+    const { orders, acceptNewOrder, rejectNewOrder, goToDetail } = this.props;
+    if (orders.allIds && orders.allIds.length > 0) {
       const { allIds, byId, loading } = orders;
       console.log(orders);
       return (
@@ -65,9 +60,20 @@ class OrderList extends Component {
       );
     }
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <View
+        style={{
+          flex: 1,
+          padding: 20,
+          alignItems: "center",
+          justifyContent: "center"
+        }}
+      >
+        <Image
+          style={{ maxHeight: 250, maxWidth: 250 }}
+          source={require("~/assets/img/sad-emoji.jpg")}
+        />
         <Text
-          style={{ fontSize: 16, color: globalColorsAndStyles.color.error }}
+          style={{ fontSize: 24, color: globalColorsAndStyles.color.error }}
         >
           Không có đơn đặt hàng nào
         </Text>
@@ -162,8 +168,7 @@ const styles = (key, isNew) =>
 
 export default connect(
   state => ({
-    orders: selectors.data.getOrders(state),
-    agencies: selectors.data.getAgencies(state)
+    orders: selectors.data.getOrders(state)
   }),
   (dispatch, props) => ({
     goToDetail: id => props.navigation.navigate("OrderDetail", { id }),

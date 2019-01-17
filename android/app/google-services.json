@@ -1,27 +1,27 @@
 {
   "project_info": {
-    "project_number": "951902061451",
-    "firebase_url": "https://ruby-ordering-app.firebaseio.com",
-    "project_id": "ruby-ordering-app",
-    "storage_bucket": "ruby-ordering-app.appspot.com"
+    "project_number": "80054587481",
+    "firebase_url": "https://ruby-app-5e889.firebaseio.com",
+    "project_id": "ruby-app-5e889",
+    "storage_bucket": "ruby-app-5e889.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:951902061451:android:a6bfec31715b0f91",
+        "mobilesdk_app_id": "1:80054587481:android:a6bfec31715b0f91",
         "android_client_info": {
           "package_name": "com.ruby"
         }
       },
       "oauth_client": [
         {
-          "client_id": "951902061451-te18h88u15o8uft7fgpnl29icp8v234v.apps.googleusercontent.com",
+          "client_id": "80054587481-ork71v6gos2ogos17064ute5urjg6j9d.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDRhSYOBjDUJ83Q7GL2r4ImvKMEJG19qeE"
+          "current_key": "AIzaSyA1gVrZ24wbxBNVUp8co59hBFkVWwJNIe0"
         }
       ],
       "services": {

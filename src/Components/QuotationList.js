@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import {
+  Image,
   TouchableOpacity,
   Alert,
   FlatList,
@@ -26,7 +27,7 @@ class QuotationList extends Component {
       acceptNewQuotation,
       rejectNewQuotation
     } = this.props;
-    if (quotations && quotations.allIds.length > 0) {
+    if (quotations.allIds && quotations.allIds.length > 0) {
       const { allIds, byId, loading } = quotations;
       return (
         (loading && <Text h1>Đang tải</Text>) || (
@@ -63,9 +64,20 @@ class QuotationList extends Component {
       );
     }
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <View
+        style={{
+          flex: 1,
+          padding: 20,
+          alignItems: "center",
+          justifyContent: "center"
+        }}
+      >
+        <Image
+          style={{ maxHeight: 250, maxWidth: 250 }}
+          source={require("~/assets/img/sad-emoji.jpg")}
+        />
         <Text
-          style={{ fontSize: 16, color: globalColorsAndStyles.color.error }}
+          style={{ fontSize: 24, color: globalColorsAndStyles.color.error }}
         >
           Không có báo giá nào
         </Text>

@@ -4,12 +4,14 @@ import { Text } from "react-native-elements";
 import Icon from "react-native-vector-icons/Ionicons";
 import styles from "./productStyles";
 
-const ReadOnlyProductListItem = ({ detail, status, index }) => {
+const ReadOnlyProductListItem = ({ id, detail, status, index }) => {
   return (
     <View style={styles(index, status.available).listItem}>
       <View style={styles().imageContainer}>
         <Image
-          source={{ uri: detail.imageUrl }}
+          source={{
+            uri: detail.localImage || detail.imageUrl
+          }}
           resizeMode="cover"
           style={{ width: 100, height: 100 }}
         />
@@ -20,7 +22,7 @@ const ReadOnlyProductListItem = ({ detail, status, index }) => {
           <Text>{detail.type}</Text>
           <Text>
             Giá:
-            {" " + (status.price.current || status.price.default).toString()}
+            {(status.price.current || status.price.default).toString()}
           </Text>
         </View>
         <View style={styles().actions}>

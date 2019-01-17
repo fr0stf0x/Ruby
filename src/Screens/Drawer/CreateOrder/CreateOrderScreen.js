@@ -1,14 +1,15 @@
 import React, { Component } from "react";
 import { Alert, ScrollView, StyleSheet, View } from "react-native";
 import { Button, Text } from "react-native-elements";
+import Icon from "react-native-vector-icons/Ionicons";
 import { connect } from "react-redux";
 import actions from "~/Actions";
+import { promiseWithLoadingAnimation } from "~/Actions/global";
 import appConstants from "~/appConstants";
 import ProductList, { ProductItemContext } from "~/Components/ProductList";
+import AccessDenied from "~/Screens/AccessDenied";
 import selectors from "~/Selectors";
 import { globalColorsAndStyles } from "~/Theme";
-import Icon from "react-native-vector-icons/Ionicons";
-import { promiseWithLoadingAnimation } from "~/Actions/global";
 
 class CreateOrderScreen extends Component {
   state = {
@@ -39,35 +40,43 @@ class CreateOrderScreen extends Component {
 
   render() {
     const { error } = this.state;
-    const { products } = this.props;
+    const { products, appMode } = this.props;
     return (
-      <View style={styles.container}>
-        <ScrollView style={styles.products}>
-          <ProductItemContext.Provider
-            value={{ type: appConstants.productItemContext.ORDER }}
-          >
-            <ProductList productIds={products.allIds} />
-          </ProductItemContext.Provider>
-        </ScrollView>
-        <View style={{ padding: 10 }}>
-          {error && (
-            <Text
-              style={{
-                textAlign: "center",
-                fontSize: 16,
-                color: globalColorsAndStyles.color.error
-              }}
+      (appMode === appConstants.mode.MODE_COMPANY && (
+        <AccessDenied
+          navigation={this.props.navigation}
+          mode="công ty"
+          functional="Chức năng đặt hàng"
+        />
+      )) || (
+        <View style={styles.container}>
+          <ScrollView style={styles.products}>
+            <ProductItemContext.Provider
+              value={{ type: appConstants.productItemContext.ORDER }}
             >
-              {error}
-            </Text>
-          )}
-          <Button
-            style={{ alignSelf: "center", width: 150 }}
-            title="Đồng ý"
-            onPress={this.doCreateOrder}
-          />
+              <ProductList productIds={products.allIds} />
+            </ProductItemContext.Provider>
+          </ScrollView>
+          <View style={{ padding: 10 }}>
+            {error && (
+              <Text
+                style={{
+                  textAlign: "center",
+                  fontSize: 16,
+                  color: globalColorsAndStyles.color.error
+                }}
+              >
+                {error}
+              </Text>
+            )}
+            <Button
+              style={{ alignSelf: "center", width: 150 }}
+              title="Đồng ý"
+              onPress={this.doCreateOrder}
+            />
+          </View>
         </View>
-      </View>
+      )
     );
   }
 }
@@ -115,7 +124,8 @@ CreateOrderScreen.navigationOptions = ({ navigation }) => ({
 
 export default connect(
   state => ({
-    products: selectors.data.getProducts(state)
+    products: selectors.data.getProducts(state),
+    appMode: selectors.ui.getAppMode(state)
   }),
   dispatch => ({
     toggleLoading: () => dispatch(actions.ui.toggleLoading()),

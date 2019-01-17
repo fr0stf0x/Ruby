@@ -1,14 +1,13 @@
 import React, { Component } from "react";
-import { Text, Image, View } from "react-native";
-import { connect } from "react-redux";
-import { randomProductImage } from "~/Utils/utils";
-import styles from "./productStyles";
-import appConstants from "~/appConstants";
-import NumericInput from "react-native-numeric-input";
-import { globalColorsAndStyles } from "~/Theme";
+import { Image, Text, View } from "react-native";
 import { CheckBox } from "react-native-elements";
-import selectors from "~/Selectors";
+import NumericInput from "react-native-numeric-input";
+import { connect } from "react-redux";
 import actions from "~/Actions";
+import appConstants from "~/appConstants";
+import selectors from "~/Selectors";
+import { globalColorsAndStyles } from "~/Theme";
+import styles from "./productStyles";
 
 class ProductListItemWithInputs extends Component {
   toggleCheck = () => {
@@ -35,7 +34,6 @@ class ProductListItemWithInputs extends Component {
 
   render() {
     const { detail, endpoint, status, index, productInCart } = this.props;
-
     const currentPrice = status.price.current || status.price.default;
     const currentOffPercent =
       status.off_percent.current || status.off_percent.default;
@@ -50,9 +48,11 @@ class ProductListItemWithInputs extends Component {
         <View style={styles(index, status.available).listItem}>
           <View style={styles().imageContainer}>
             <Image
-              source={{ uri: detail.imageUrl }}
+              source={{
+                uri: detail.localImage || detail.imageUrl
+              }}
               resizeMode="cover"
-              style={{ width: 80, height: 130 }}
+              style={{ width: 100, height: 100 }}
             />
           </View>
           <View style={styles().infoAndActions}>

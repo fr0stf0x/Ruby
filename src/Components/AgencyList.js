@@ -21,10 +21,14 @@ const AgencyCard = ({ id, info, goToDetail, action }) => {
       <Card
         containerStyle={globalColorsAndStyles.style.boxShadow}
         title={info.name}
-        image={{ uri: info.imageUrl }}
+        image={{ uri: info.localImage || info.imageUrl }}
       >
-        <View style={{ flexDirection: "row", justifyContent: "center" }}>
+        <View
+          key={id}
+          style={{ flexDirection: "row", justifyContent: "center" }}
+        >
           <Button
+            key={"btnQuotation"}
             title="Báo giá"
             icon={<Icon color="#fff" name="ios-calculator" size={20} />}
             buttonStyle={styles().actionButton}
@@ -32,6 +36,7 @@ const AgencyCard = ({ id, info, goToDetail, action }) => {
             onPress={() => action(id)}
           />
           <Button
+            key={"btnPhone"}
             title={info.phone}
             icon={<Icon color="#fff" name="ios-call" size={20} />}
             titleStyle={styles().actionButtonTitle}
@@ -53,8 +58,8 @@ const AgencyItem = ({ info, index, checked, action }) => {
       <View style={styles(index).listItem}>
         <View style={styles().imageContainer}>
           <Image
-            source={{ uri: info.imageUrl }}
             resizeMode="cover"
+            source={{ uri: info.localImage || info.imageUrl }}
             style={{ width: 100, height: 100 }}
           />
         </View>
@@ -84,55 +89,46 @@ const AgencyList = ({
   toggleAddAgencyToCart,
   toggleAddAgencyToCartAndRedirect
 }) => {
-  if (agencies && agencies.allIds.length > 0) {
+  if (agencies.allIds && agencies.allIds.length > 0) {
     const { allIds, byId } = agencies;
-    const unSelectedAgencyIds = allIds.filter(
-      id => !selectedAgencyIds.includes(id)
-    );
-
     return (
       <ScrollView style={{ flex: 1 }}>
-        {type === appConstants.productItemContext.SHOW ? (
-          allIds.map((id, key) => (
-            <View key={key}>
+        {allIds.map((id, key) => (
+          <View key={key}>
+            {type === appConstants.productItemContext.SHOW ? (
               <AgencyCard
                 id={id}
                 goToDetail={goToDetail}
                 info={byId[id].detail.info}
                 action={toggleAddAgencyToCartAndRedirect}
               />
-            </View>
-          ))
-        ) : (
-          <View>
-            {selectedAgencyIds.map((id, key) => (
-              <View key={key}>
-                <AgencyItem
-                  index={key}
-                  checked={true}
-                  info={byId[id].detail.info}
-                  action={() => toggleAddAgencyToCart(id)}
-                />
-              </View>
-            ))}
-            {unSelectedAgencyIds.map((id, key) => (
-              <View key={key}>
-                <AgencyItem
-                  index={selectedAgencyIds.length + key}
-                  checked={false}
-                  info={byId[id].detail.info}
-                  action={() => toggleAddAgencyToCart(id)}
-                />
-              </View>
-            ))}
+            ) : (
+              <AgencyItem
+                index={key}
+                checked={selectedAgencyIds.includes(id)}
+                info={byId[id].detail.info}
+                action={() => toggleAddAgencyToCart(id)}
+              />
+            )}
           </View>
-        )}
+        ))}
       </ScrollView>
     );
   }
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <Text style={{ fontSize: 16, color: globalColorsAndStyles.color.error }}>
+    <View
+      style={{
+        flex: 1,
+        padding: 20,
+        alignItems: "center",
+        justifyContent: "center"
+      }}
+    >
+      <Image
+        style={{ maxHeight: 250, maxWidth: 250 }}
+        source={require("~/assets/img/sad-emoji.jpg")}
+      />
+      <Text style={{ fontSize: 24, color: globalColorsAndStyles.color.error }}>
         Không có đại lý nào
       </Text>
     </View>
@@ -160,6 +156,9 @@ const styles = key =>
     infoAndActions: {
       flex: 1,
       flexDirection: "row"
+    },
+    imageContainer: {
+      alignSelf: "center"
     },
     info: {
       paddingLeft: 20,

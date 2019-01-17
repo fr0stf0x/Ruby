@@ -3,17 +3,25 @@ import { StyleSheet, View } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import appConstants from "~/appConstants";
 import AgencyList from "~/Components/AgencyList";
+import AccessDenied from "~/Screens/AccessDenied";
+import store from "~/configureStore";
+import selectors from "~/Selectors";
 
 class AgenciesScreen extends Component {
   render() {
     const { navigation } = this.props;
+    const appMode = selectors.ui.getAppMode(store.getState());
     return (
-      <View style={styles.container}>
-        <AgencyList
-          type={appConstants.productItemContext.SHOW}
-          navigation={navigation}
-        />
-      </View>
+      (appMode === appConstants.mode.MODE_RETAIL && (
+        <AccessDenied navigation={this.props.navigation} mode="công ty" />
+      )) || (
+        <View style={styles.container}>
+          <AgencyList
+            type={appConstants.productItemContext.SHOW}
+            navigation={navigation}
+          />
+        </View>
+      )
     );
   }
 }

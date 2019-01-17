@@ -1,5 +1,5 @@
 import React from "react";
-import { FlatList, TouchableOpacity, View } from "react-native";
+import { Image, FlatList, TouchableOpacity, View } from "react-native";
 import { Text } from "react-native-elements";
 import { connect } from "react-redux";
 import appConstants from "~/appConstants";
@@ -26,6 +26,7 @@ const ProductItem = ({ item: { id, detail, status }, index }) => {
             }
           >
             <ReadOnlyProductListItem
+              id={id}
               key={index}
               index={index}
               status={status}
@@ -48,7 +49,7 @@ const ProductItem = ({ item: { id, detail, status }, index }) => {
 };
 
 const ProductList = ({ productIds, productDetailsById }) => {
-  if (productIds.length > 0) {
+  if (productIds && productIds.length > 0) {
     return (
       <FlatList
         contentContainerStyle={{ paddingVertical: 10 }}
@@ -60,14 +61,25 @@ const ProductList = ({ productIds, productDetailsById }) => {
     );
   }
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <Text style={{ fontSize: 16, color: globalColorsAndStyles.color.error }}>
+    <View
+      style={{
+        flex: 1,
+        padding: 20,
+        alignItems: "center",
+        justifyContent: "center"
+      }}
+    >
+      <Image
+        style={{ maxHeight: 250, maxWidth: 250 }}
+        source={require("~/assets/img/sad-emoji.jpg")}
+      />
+      <Text style={{ fontSize: 24, color: globalColorsAndStyles.color.error }}>
         <Text>Không có sản phẩm nào</Text>
       </Text>
     </View>
   );
 };
 
-export default connect((state, props) => ({
+export default connect(state => ({
   productDetailsById: selectors.data.getProducts(state).byId
 }))(ProductList);

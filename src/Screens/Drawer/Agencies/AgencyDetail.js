@@ -22,72 +22,82 @@ class AgencyDetail extends Component {
       redirectToAddProductsForAgency
     } = this.props;
     const { info } = agency.detail;
+    const id = this.props.navigation.getParam("id");
     return (
       <ScrollView>
         <Card
           containerStyle={globalColorsAndStyles.style.boxShadow}
           title={info.name}
-          image={{ uri: info.imageUrl }}
+          image={{ uri: info.localImage || info.imageUrl }}
         >
-          <View>
-            <View
-              style={{
-                height: 150,
-                alignItems: "center",
-                justifyContent: "center"
+          <View
+            key="viewInfo"
+            style={{
+              height: 150,
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+          >
+            <Text key="address" style={styles.agencyInfo}>
+              {info.address}
+            </Text>
+            <Text key="phone" style={styles.agencyInfo}>
+              {info.phone}
+            </Text>
+            <Text key="type" style={styles.agencyInfo}>
+              {info.type === appConstants.groupType.AGENCY
+                ? "Đại lý"
+                : "Nhà bán lẻ"}
+            </Text>
+          </View>
+          <View
+            key="btnGroup1"
+            style={{ flexDirection: "row", justifyContent: "center" }}
+          >
+            <Button
+              key="btnQuotate"
+              title="Báo giá"
+              icon={<Icon color="#fff" name="ios-calculator" size={20} />}
+              buttonStyle={styles.actionButton}
+              titleStyle={styles.actionButtonTitle}
+              onPress={toggleAddAgencyToCartAndRedirect}
+            />
+            <Button
+              key="btnPhone"
+              title={info.phone}
+              icon={<Icon color="#fff" name="ios-call" size={20} />}
+              titleStyle={styles.actionButtonTitle}
+              buttonStyle={{
+                ...styles.actionButton,
+                backgroundColor: globalColorsAndStyles.color.secondary
               }}
-            >
-              <Text style={styles.agencyInfo}>{info.address}</Text>
-              <Text style={styles.agencyInfo}>{info.phone}</Text>
-              <Text style={styles.agencyInfo}>
-                {info.type === appConstants.groupType.AGENCY
-                  ? "Đại lý"
-                  : "Nhà bán lẻ"}
-              </Text>
-            </View>
-            <View style={{ flexDirection: "row", justifyContent: "center" }}>
-              <Button
-                title="Báo giá"
-                icon={<Icon color="#fff" name="ios-calculator" size={20} />}
-                buttonStyle={styles.actionButton}
-                titleStyle={styles.actionButtonTitle}
-                onPress={toggleAddAgencyToCartAndRedirect}
-              />
-              <Button
-                title={info.phone}
-                icon={<Icon color="#fff" name="ios-call" size={20} />}
-                titleStyle={styles.actionButtonTitle}
-                buttonStyle={{
-                  ...styles.actionButton,
-                  backgroundColor: globalColorsAndStyles.color.secondary
-                }}
-                onPress={() => makeCall(info.phone)}
-              />
-            </View>
-            <View style={{ flexDirection: "row", justifyContent: "center" }}>
-              <Button
-                title="Thêm sản phẩm"
-                titleStyle={styles.actionButtonTitle}
-                buttonStyle={{
-                  ...styles.actionButton,
-                  backgroundColor: globalColorsAndStyles.color.secondary
-                }}
-                onPress={redirectToAddProductsForAgency}
-              />
-              <Button
-                title="Xoá đại lý"
-                icon={
-                  <Icon
-                    color="#fff"
-                    name="ios-remove-circle-outline"
-                    size={20}
-                  />
-                }
-                titleStyle={styles.actionButtonTitle}
-                buttonStyle={{ ...styles.actionButton, backgroundColor: "red" }}
-                onPress={() => makeCall(info.phone)}
-              />
-            </View>
+              onPress={() => makeCall(info.phone)}
+            />
+          </View>
+          <View
+            key="btnGroup2"
+            style={{ flexDirection: "row", justifyContent: "center" }}
+          >
+            <Button
+              key="btnAddProducts"
+              title="Thêm sản phẩm"
+              titleStyle={styles.actionButtonTitle}
+              buttonStyle={{
+                ...styles.actionButton,
+                backgroundColor: globalColorsAndStyles.color.secondary
+              }}
+              onPress={redirectToAddProductsForAgency}
+            />
+            <Button
+              key="btnRemove"
+              title="Xoá đại lý"
+              icon={
+                <Icon color="#fff" name="ios-remove-circle-outline" size={20} />
+              }
+              titleStyle={styles.actionButtonTitle}
+              buttonStyle={{ ...styles.actionButton, backgroundColor: "red" }}
+              onPress={() => makeCall(info.phone)}
+            />
           </View>
         </Card>
         <Text h3 style={{ textAlign: "center" }}>

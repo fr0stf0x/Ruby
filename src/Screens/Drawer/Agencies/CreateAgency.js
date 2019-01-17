@@ -70,8 +70,8 @@ class GroupInfoForm extends Component {
   selectPhotos = () => {
     const { navigation } = this.props;
     navigation.navigate("ImageBrowser", {
-      selectPicture: image => {
-        this.setState({ image });
+      selectPicture: ({ image, localImage }) => {
+        this.setState({ image, localImage });
       }
     });
   };
@@ -144,7 +144,8 @@ class GroupInfoForm extends Component {
       agencyAddress,
       agencyPhone,
       defaultOffPercent,
-      image
+      image,
+      localImage
     } = this.state;
 
     const data = {
@@ -185,6 +186,7 @@ class GroupInfoForm extends Component {
           .putFile("file://" + image.uri)
           .then(file => {
             data.groupInfo.imageUrl = file.downloadURL;
+            data.groupInfo.localImage = localImage || image.uri;
             return createAgency(data).then(async groupId => {
               const email = await AsyncStorage.getItem("email");
               const password = await AsyncStorage.getItem("password");
@@ -219,6 +221,7 @@ class GroupInfoForm extends Component {
       agencyAddress,
       agencyPhone,
       image,
+      localImage,
       defaultOffPercent
     } = this.state;
     return (
@@ -249,7 +252,7 @@ class GroupInfoForm extends Component {
                 />
                 <TouchableOpacity onPress={this.selectPhotos}>
                   <Image
-                    source={{ uri: image.uri }}
+                    source={{ uri: localImage || image.uri }}
                     style={{
                       width: 200,
                       height: 200,

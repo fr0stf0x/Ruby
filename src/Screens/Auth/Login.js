@@ -90,7 +90,7 @@ class LoginScreen extends Component {
               leftIcon={<Icon name="account" size={24} color="black" />}
             />
             <Input
-              placeholder="Password"
+              placeholder="Mật khẩu"
               secureTextEntry={!passwordShown}
               value={password}
               returnKeyType="go"
@@ -111,14 +111,14 @@ class LoginScreen extends Component {
             />
             <Text style={{ color: "red" }}>{authError.message}</Text>
             <Button
-              title="Login"
+              title="Đăng nhập"
               buttonStyle={{
                 backgroundColor: "rgba(92, 99, 216, 1)"
               }}
               onPress={this.logIn}
             />
             <Button
-              title="Sign up"
+              title="Đăng kí"
               buttonStyle={{
                 backgroundColor: "rgba(200, 125, 231, 1)"
               }}

@@ -5,6 +5,7 @@ import store from "~/configureStore";
 import selectors from "~/Selectors";
 import { toggleCheckAllAgencies, toggleCheckProducts } from "./cart.actions";
 import { toggleLoading } from "./ui.actions";
+import { promiseWrapper } from "~/Utils/utils";
 
 export const setAccountToAsyncStorage = async ({ email, password }) => {
   try {
@@ -15,17 +16,38 @@ export const setAccountToAsyncStorage = async ({ email, password }) => {
   }
 };
 
+export const setImageToAsyncStorage = async (id, imageUri) => {
+  try {
+    await AsyncStorage.setItem(`@Images/${id}`, imageUri);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getImageFromAsyncStorage = async id => {
+  const { data: image, error } = await promiseWrapper(
+    AsyncStorage.getItem(`@Images/${id}`)
+  );
+  if (!error) {
+    return image;
+  }
+};
+
 export const globalToggleCheckProducts = (
   endpoint = appConstants.productItemContext.QUOTATION
 ) => {
-  const products = selectors.data.getProductIdsByType(store.getState(), {
-    type: "available"
-  });
-  return store.dispatch(toggleCheckProducts(products, { endpoint }));
+  const allProducts = selectors.data.getProducts(store.getState());
+  if (allProducts && allProducts.allIds) {
+    const productIds = selectors.data.getProductIdsByType(store.getState(), {
+      type: "available"
+    });
+    return store.dispatch(toggleCheckProducts(productIds, { endpoint }));
+  }
 };
 
 export const globalToggleCheckAgencies = () => {
-  store.dispatch(toggleCheckAllAgencies());
+  const agencies = selectors.data.getAgencies(store.getState());
+  if (agencies && agencies.allIds) store.dispatch(toggleCheckAllAgencies());
 };
 
 export const addProductsToAgencies = productsInAgencies => (

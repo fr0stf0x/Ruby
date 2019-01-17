@@ -9,9 +9,9 @@ import appConstants from "~/appConstants";
 import AgenciesBox from "~/Components/AgenciesBox";
 import ProductList, { ProductItemContext } from "~/Components/ProductList";
 import store from "~/configureStore";
+import AccessDenied from "~/Screens/AccessDenied";
 import selectors from "~/Selectors";
 import { globalColorsAndStyles } from "~/Theme";
-
 class CreateQuotationScreen extends Component {
   state = {
     error: false
@@ -114,37 +114,41 @@ class CreateQuotationScreen extends Component {
 
   render() {
     const { error } = this.state;
-    const { allProducts } = this.props;
+    const { allProducts, appMode } = this.props;
     const productIds = allProducts.allIds;
     return (
-      <View style={styles.container}>
-        <AgenciesBox navigation={this.props.navigation} />
-        <ScrollView style={styles.products}>
-          <ProductItemContext.Provider
-            value={{ type: appConstants.productItemContext.QUOTATION }}
-          >
-            <ProductList productIds={productIds} />
-          </ProductItemContext.Provider>
-        </ScrollView>
-        <View style={{ padding: 10 }}>
-          {error && (
-            <Text
-              style={{
-                textAlign: "center",
-                fontSize: 16,
-                color: globalColorsAndStyles.color.error
-              }}
+      (appMode === appConstants.mode.MODE_RETAIL && (
+        <AccessDenied navigation={this.props.navigation} mode="bán lẻ" />
+      )) || (
+        <View style={styles.container}>
+          <AgenciesBox navigation={this.props.navigation} />
+          <ScrollView style={styles.products}>
+            <ProductItemContext.Provider
+              value={{ type: appConstants.productItemContext.QUOTATION }}
             >
-              {error}
-            </Text>
-          )}
-          <Button
-            style={{ alignSelf: "center", width: 150 }}
-            title="Đồng ý"
-            onPress={this.validateForm}
-          />
+              <ProductList productIds={productIds} />
+            </ProductItemContext.Provider>
+          </ScrollView>
+          <View style={{ padding: 10 }}>
+            {error && (
+              <Text
+                style={{
+                  textAlign: "center",
+                  fontSize: 16,
+                  color: globalColorsAndStyles.color.error
+                }}
+              >
+                {error}
+              </Text>
+            )}
+            <Button
+              style={{ alignSelf: "center", width: 150 }}
+              title="Đồng ý"
+              onPress={this.validateForm}
+            />
+          </View>
         </View>
-      </View>
+      )
     );
   }
 }
@@ -188,6 +192,7 @@ CreateQuotationScreen.navigationOptions = ({ navigation }) => ({
 
 export default connect(
   state => ({
+    appMode: selectors.ui.getAppMode(state),
     agencies: selectors.data.getAgencies(state),
     selectedAgencyIds: selectors.cart.getSelectedAgenciesInCart(state),
     allProducts: selectors.data.getProducts(state)

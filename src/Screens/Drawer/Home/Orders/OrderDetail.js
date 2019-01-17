@@ -2,9 +2,8 @@ import React, { Component } from "react";
 import { FlatList, Image, Text, View } from "react-native";
 import { connect } from "react-redux";
 import selectors from "~/Selectors";
-import { formatDate, formatTime } from "~/Utils/utils";
 import { globalColorsAndStyles } from "~/Theme";
-import { mergeObj } from "~/Reducers/utils";
+import { formatDate, formatTime } from "~/Utils/utils";
 
 class OrderDetail extends Component {
   render() {
@@ -16,11 +15,14 @@ class OrderDetail extends Component {
 
     return (
       <View>
-        <Text h4>Đơn đặt hàng từ {order.from}</Text>
-        <Text>
-          Đã nhận: {formatedDate}, {formatedTime}{" "}
-        </Text>
+        <View style={{ padding: 10 }}>
+          <Text style={{ fontSize: 24 }}>Đơn đặt hàng từ {order.from}</Text>
+          <Text style={{ fontSize: 18 }}>
+            Đã nhận: {formatedDate}, {formatedTime}
+          </Text>
+        </View>
         <FlatList
+          contentContainerStyle={{ paddingVertical: 10 }}
           keyExtractor={(item, index) => index.toString()}
           data={Object.keys(orderedProducts).map(id => byId[id])}
           renderItem={ReadOnlyProduct}
@@ -35,7 +37,7 @@ const ReadOnlyProduct = ({ item: { detail }, index }) => {
     <View style={styles(index).listItem}>
       <View style={styles().imageContainer}>
         <Image
-          source={{ uri: detail.imageUrl }}
+          source={{ uri: detail.localImage || detail.imageUrl }}
           resizeMode="cover"
           style={{ width: 100, height: 100 }}
         />

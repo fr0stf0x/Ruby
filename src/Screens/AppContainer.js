@@ -3,6 +3,7 @@ import DashboardDrawer from "~/Screens/Drawer";
 import Loading from "~/Screens/Loading";
 import AuthStack from "./Auth";
 import WelcomeStack from "./Welcome";
+import AccessDenied from "./AccessDenied";
 
 const RootSwitch = createSwitchNavigator(
   {
@@ -15,7 +16,8 @@ const RootSwitch = createSwitchNavigator(
     Welcome: {
       screen: WelcomeStack
     },
-    Dashboard: DashboardDrawer
+    Dashboard: DashboardDrawer,
+    AccessDeniedScreen: AccessDenied
   },
   {
     initialRouteName: "Login"

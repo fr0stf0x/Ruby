@@ -17,9 +17,12 @@ class QuotationDetail extends Component {
 
     return (
       <View>
-        <Text h4>Báo giá ngày {formatedDate}</Text>
-        <Text>Đã nhận: {formatedTime}</Text>
+        <View style={{ padding: 10 }}>
+          <Text style={{ fontSize: 24 }}>Báo giá ngày {formatedDate}</Text>
+          <Text style={{ fontSize: 18 }}>Đã nhận: {formatedTime}</Text>
+        </View>
         <FlatList
+          contentContainerStyle={{ paddingVertical: 10 }}
           keyExtractor={(item, index) => index.toString()}
           data={Object.keys(quotatedProducts).map(id =>
             mergeObj(byId[id], { id, inQuotation: quotatedProducts[id] })
@@ -36,7 +39,7 @@ const ReadOnlyProduct = ({ item: { id, detail, inQuotation }, index }) => {
     <View style={styles(index).listItem}>
       <View style={styles().imageContainer}>
         <Image
-          source={{ uri: detail.imageUrl }}
+          source={{ uri: detail.localImage || detail.imageUrl }}
           resizeMode="cover"
           style={{ width: 100, height: 100 }}
         />

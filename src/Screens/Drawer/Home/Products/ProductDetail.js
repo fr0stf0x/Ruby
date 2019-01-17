@@ -12,13 +12,12 @@ class ProductDetail extends Component {
 
   render() {
     const { product } = this.props;
-    console.log(product);
     return (
       <View style={{ flex: 1, padding: 20 }}>
         <Image
           style={{ width: 300, height: 300, alignSelf: "center" }}
           source={{
-            uri: product.detail.imageUrl
+            uri: product.detail.localImage || product.detail.imageUrl
           }}
         />
         <View

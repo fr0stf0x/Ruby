@@ -8,8 +8,14 @@ import store from "~/configureStore";
 import selectors from "~/Selectors";
 import { promiseWrapper } from "~/Utils/utils";
 import types from "./ActionTypes";
-import { addProductsToAgencies, createOrder, createQuotation } from "./global";
+import {
+  addProductsToAgencies,
+  createOrder,
+  createQuotation,
+  setImageToAsyncStorage
+} from "./global";
 import { setAppMode } from "./ui.actions";
+import RNFetchBlob from "rn-fetch-blob";
 
 import type { QuerySnapshot, DocumentReference } from "react-native-firebase";
 
@@ -95,14 +101,18 @@ export const makeCreateOrder = () => (dispatch, getState) => {
   return createOrder(parentId, selectedProducts);
 };
 
-export const addProduct = ({ name, type, defaultPrice, imageUrl }) => (
-  dispatch,
-  getState
-) => {
+export const addProduct = ({
+  name,
+  type,
+  defaultPrice,
+  imageUrl,
+  localImage
+}) => (dispatch, getState) => {
   const db = firebase.firestore();
   const productInfo = {
     name,
     type,
+    localImage,
     imageUrl,
     createdAt: new Date()
   };
@@ -113,6 +123,7 @@ export const addProduct = ({ name, type, defaultPrice, imageUrl }) => (
     .doc(companyId)
     .collection(appConstants.collection.PRODUCTS)
     .doc(newProductRef.id);
+
   return db
     .batch()
     .set(newProductRef, productInfo)
@@ -387,6 +398,26 @@ const getCollectionAndMergeDetails = async (
         );
         if (!error) {
           if (detailSnapshot.exists) {
+            const detail = detailSnapshot.data();
+            const imageDownloaded = await new Promise((resolve, reject) => {
+              if (detail.imageUrl) {
+                resolve(
+                  RNFetchBlob.fs.exists(detail.localImage).then(exists =>
+                    !exists
+                      ? RNFetchBlob.config({
+                          fileCache: true,
+                          appendExt: "jpg"
+                        }).fetch("GET", detail.imageUrl)
+                      : false
+                  )
+                );
+              } else resolve(false);
+            });
+            if (imageDownloaded) {
+              detail.localImage =
+                (Platform.OS === "android" ? "file://" : "") +
+                imageDownloaded.path();
+            }
             dispatch(
               observeData({
                 endpoint: collectionName,
@@ -395,7 +426,7 @@ const getCollectionAndMergeDetails = async (
                   type: changeType,
                   data: {
                     ...docSnapshot.data(),
-                    ...{ detail: detailSnapshot.data() }
+                    ...{ detail }
                   }
                 }
               })

@@ -2,18 +2,20 @@ import appConstants from "~/appConstants";
 
 // data collection
 export const getAgencies = state =>
-  state.appData[appConstants.collection.CHILDREN];
+  state.appData[appConstants.collection.CHILDREN] || {};
 
 export const getQuotations = state =>
-  state.appData[appConstants.collection.QUOTATIONS];
+  state.appData[appConstants.collection.QUOTATIONS] || {};
 
-export const getOrders = state => state.appData[appConstants.collection.ORDERS];
+export const getOrders = state =>
+  state.appData[appConstants.collection.ORDERS] || {};
 
 export const getProducts = state =>
-  state.appData[appConstants.collection.PRODUCTS];
+  state.appData[appConstants.collection.PRODUCTS] || {};
 
 export const getProductIdsByType = (state, { type = "all" }) => {
   const products = getProducts(state);
+  if (!products.allIds) return [];
   const { allIds, byId } = products;
   if (type === "all") return allIds;
   return allIds.filter(
@@ -32,17 +34,14 @@ export const getParent = state =>
   state.appData[appConstants.dataEndpoint.PARENT];
 
 // piece of collection
-export const getProductById = (state, { id }) =>
-  state.appData[appConstants.collection.PRODUCTS].byId[id];
+export const getProductById = (state, { id }) => getProducts(state).byId[id];
 
-export const getAgencyById = (state, { id }) =>
-  state.appData[appConstants.collection.CHILDREN].byId[id];
+export const getAgencyById = (state, { id }) => getAgencies(state).byId[id];
 
 export const getQuotationById = (state, { id }) =>
-  state.appData[appConstants.collection.QUOTATIONS].byId[id];
+  getQuotations(state).byId[id];
 
-export const getOrderById = (state, { id }) =>
-  state.appData[appConstants.collection.ORDERS].byId[id];
+export const getOrderById = (state, { id }) => getOrders(state).byId[id];
 
 export const getProductByIdFromNavigationParam = (state, props) =>
   getProductById(state, { id: props.navigation.getParam("id") });
