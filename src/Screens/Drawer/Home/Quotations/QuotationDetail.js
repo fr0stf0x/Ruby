@@ -16,7 +16,7 @@ class QuotationDetail extends Component {
     const formatedTime = formatTime(createdAt);
 
     return (
-      <View>
+      <View style={{ flex: 1 }}>
         <View style={{ padding: 10 }}>
           <Text style={{ fontSize: 24 }}>Báo giá ngày {formatedDate}</Text>
           <Text style={{ fontSize: 18 }}>Đã nhận: {formatedTime}</Text>

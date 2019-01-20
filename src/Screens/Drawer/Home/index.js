@@ -1,14 +1,12 @@
 import React from "react";
 import Icon from "react-native-vector-icons/Ionicons";
 import { createBottomTabNavigator } from "react-navigation";
-import IconWithBadge from "~/Components/IconWithBadge";
+import store from "~/configureStore";
+import selectors from "~/Selectors";
 import { globalColorsAndStyles } from "~/Theme";
 import OrdersStack from "./Orders";
 import ProductStack from "./Products";
 import QuotationsStack from "./Quotations";
-import appConstants from "~/appConstants";
-import store from "~/configureStore";
-import selectors from "~/Selectors";
 
 const tabIconNames = {
   Products: "ios-albums",
@@ -34,7 +32,8 @@ const DashboardBottomNav = createBottomTabNavigator(
           const { routeName } = navigation.state;
           let iconName = tabIconNames[routeName];
           return (
-            <IconWithBadge name={iconName} color={tintColor} badgeCount={1} />
+            <Icon name={iconName} size={20} color={tintColor} />
+            // <IconWithBadge name={iconName} color={tintColor} badgeCount={0} />
           );
         }
       };

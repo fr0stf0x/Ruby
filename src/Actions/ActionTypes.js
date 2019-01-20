@@ -27,6 +27,9 @@ const ADD_ITEM_TO_CART = "add_item_cart";
 const MODIFY_ITEM_IN_CART = "modify_item_cart";
 const REMOVE_ITEM_FROM_CART = "remove_item_cart";
 
+const NEW_NOTIFICATION = "new_notification";
+const SEEN_NOTIFICATION = "seen_notification";
+
 const types = {
   auth: {
     LOG_IN,
@@ -59,6 +62,10 @@ const types = {
     ADD_ITEM_TO_CART,
     MODIFY_ITEM_IN_CART,
     REMOVE_ITEM_FROM_CART
+  },
+  notification: {
+    NEW_NOTIFICATION,
+    SEEN_NOTIFICATION
   }
 };
 

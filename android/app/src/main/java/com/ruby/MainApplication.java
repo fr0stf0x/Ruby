@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.facebook.react.ReactApplication;
 import com.RNFetchBlob.RNFetchBlobPackage;
+import com.azendoo.reactnativesnackbar.SnackbarPackage;
 import org.reactnative.camera.RNCameraPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
@@ -35,6 +36,7 @@ public class MainApplication extends Application implements ReactApplication {
           new MainReactPackage(),
           new RNFetchBlobPackage(),
           new VectorIconsPackage(),
+          new SnackbarPackage(),
           new RNGestureHandlerPackage(),
           new RNCameraPackage(),
           new RNFirebasePackage(),

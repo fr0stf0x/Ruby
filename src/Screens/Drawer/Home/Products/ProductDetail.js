@@ -106,7 +106,7 @@ class ProductDetail extends Component {
               <Text>{currentPrice}</Text>
             </View>
           </View>
-          {this.state.edit && product.status.available === true && (
+          {this.state.edit && (
             <View style={{ width: "100%" }}>
               <View style={styles.container}>
                 <Text style={{ paddingEnd: 20 }}>Giá</Text>

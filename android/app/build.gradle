@@ -150,6 +150,7 @@ android {
 
 dependencies {
     implementation project(':rn-fetch-blob')
+    implementation project(':react-native-snackbar')
     implementation project(':react-native-camera')
     implementation project(':react-native-firebase')
     implementation project(':react-native-vector-icons')

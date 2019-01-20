@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View } from "react-native";
+import { ScrollView, View } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import appConstants from "~/appConstants";
 import ProductList, { ProductItemContext } from "~/Components/ProductList";
@@ -11,24 +11,38 @@ class ProductsScreen extends Component {
   render() {
     const { availableProductIds, notAvailableProductIds } = this.props;
     return (
-      <View style={{ flex: 1 }}>
+      <ScrollView style={{ backgroundColor: "#dee6f2" }}>
         <ProductItemContext.Provider
           value={{
             type: appConstants.productItemContext.SHOW,
             action: { navigation: this.props.navigation }
           }}
         >
-          <ProductList productIds={availableProductIds} />
+          <View>
+            <Text
+              style={{
+                fontSize: 24,
+                fontWeight: "500",
+                marginStart: 10,
+                marginTop: 10
+              }}
+            >
+              Sản phẩm có sẵn
+            </Text>
+            <ProductList productIds={availableProductIds} />
+          </View>
           {notAvailableProductIds.length > 0 && (
             <View>
-              <Text style={{ fontSize: 18, textAlign: "center" }}>
+              <Text
+                style={{ fontSize: 24, fontWeight: "500", marginStart: 10 }}
+              >
                 Sản phẩm không có sẵn
               </Text>
               <ProductList productIds={notAvailableProductIds} />
             </View>
           )}
         </ProductItemContext.Provider>
-      </View>
+      </ScrollView>
     );
   }
 }

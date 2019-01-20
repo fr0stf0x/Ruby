@@ -151,16 +151,11 @@ export const editProduct = data => (dispatch, getState) => {
   return productDocRef.get().then(snapshot => {
     if (snapshot.exists) {
       let status = { ...snapshot.data().status };
-      console.log(Object.isExtensible(status));
-      if (data.change.price) {
-        status.price = {
-          ...status.price,
-          ...{ current: data.change.price }
-        };
-      }
-      if (data.change.available) {
-        status.available = data.change.available;
-      }
+      status.price = {
+        ...status.price,
+        ...{ current: data.change.price }
+      };
+      status.available = data.change.available;
       return productDocRef.update({ status });
     }
   });
@@ -188,7 +183,7 @@ export const acceptNewQuotation = quotationId => (dispatch, getState) => {
     id: quotationId
   });
   batch.update(quotationRef, update);
-  batch.set(orderRefInParent, { ...update, ...{ from: currentGroup.id } });
+  batch.set(orderRefInParent, { ...update, ...{ from: currentGroup.name } });
   return Promise.all(
     Object.entries(quotationDetail.detail.products).map(([id, value]) => {
       if (value.price) {

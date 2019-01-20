@@ -14,7 +14,7 @@ class OrderDetail extends Component {
     const formatedTime = formatTime(createdAt);
 
     return (
-      <View>
+      <View style={{ flex: 1 }}>
         <View style={{ padding: 10 }}>
           <Text style={{ fontSize: 24 }}>Đơn đặt hàng từ {order.from}</Text>
           <Text style={{ fontSize: 18 }}>
