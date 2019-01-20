@@ -13,6 +13,8 @@ import {
   getOrders,
   getProductById,
   getOrderByIdFromNavigationParam,
+  getOrderById,
+  getQuotationById,
   getQuotationByIdFromNavigationParam
 } from "./data.selector";
 import { isLoading, getAppMode } from "./ui.selector";
@@ -45,6 +47,8 @@ const selectors = {
     getUserProfile,
     getProductsOfAgency,
     getProductIdsByType,
+    getOrderById,
+    getQuotationById,
     getProductByIdFromNavigationParam,
     getOrderByIdFromNavigationParam,
     getQuotationByIdFromNavigationParam

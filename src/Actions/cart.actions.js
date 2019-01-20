@@ -15,6 +15,17 @@ export const toggleCheckAllAgencies = (
   }
 };
 
+export const addAgencyToCartIfNeeded = (
+  id,
+  endpoint = appConstants.productItemContext.QUOTATION
+) => (dispatch, getState) => {
+  const state = getState();
+  const selectedIds = getSelectedAgenciesInCart(state, endpoint);
+  if (!selectedIds.includes(id)) {
+    dispatch(addAgencyToCart(id, endpoint));
+  }
+};
+
 export const toggleCheckAgency = (
   id,
   endpoint = appConstants.productItemContext.QUOTATION
@@ -26,21 +37,11 @@ export const toggleCheckAgency = (
     : dispatch(addAgencyToCart(id, endpoint));
 };
 
-export const toggleCheckProduct = ({ id, endpoint }) => ({
-  type: types.cart.TOGGLE_ITEM_CART,
-  meta: { endpoint },
-  payload: { id }
-});
-
-export const addAgencyToCartIfNeeded = (
-  id,
-  endpoint = appConstants.productItemContext.QUOTATION
-) => (dispatch, getState) => {
-  const state = getState();
-  const selectedIds = getSelectedAgenciesInCart(state, endpoint);
-  if (!selectedIds.includes(id)) {
-    dispatch(addAgencyToCart(id, endpoint));
-  }
+export const toggleCheckProducts = (
+  allIds: Array,
+  { endpoint }
+) => dispatch => {
+  allIds.forEach(id => dispatch(toggleCheckProduct({ id, endpoint })));
 };
 
 export const addProductToCartIfNeeded = (id, { endpoint }) => (
@@ -55,12 +56,11 @@ export const addProductToCartIfNeeded = (id, { endpoint }) => (
   }
 };
 
-export const toggleCheckProducts = (
-  allIds: Array,
-  { endpoint }
-) => dispatch => {
-  allIds.forEach(id => dispatch(toggleCheckProduct({ id, endpoint })));
-};
+export const toggleCheckProduct = ({ id, endpoint }) => ({
+  type: types.cart.TOGGLE_ITEM_CART,
+  meta: { endpoint },
+  payload: { id }
+});
 
 export const modifyItemInCart = (id, endpoint, change) => ({
   type: types.cart.MODIFY_ITEM_IN_CART,

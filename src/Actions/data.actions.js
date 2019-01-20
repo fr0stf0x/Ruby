@@ -1,21 +1,15 @@
 // @flow
-
 // eslint-disable-next-line import/named
-import { Platform } from "react-native";
+import { PermissionsAndroid, Platform } from "react-native";
 import firebase from "react-native-firebase";
+import RNFetchBlob from "rn-fetch-blob";
 import appConstants from "~/appConstants";
 import store from "~/configureStore";
 import selectors from "~/Selectors";
 import { promiseWrapper } from "~/Utils/utils";
 import types from "./ActionTypes";
-import {
-  addProductsToAgencies,
-  createOrder,
-  createQuotation,
-  setImageToAsyncStorage
-} from "./global";
+import { addProductsToAgencies, createOrder, createQuotation } from "./global";
 import { setAppMode } from "./ui.actions";
-import RNFetchBlob from "rn-fetch-blob";
 
 import type { QuerySnapshot, DocumentReference } from "react-native-firebase";
 
@@ -30,19 +24,27 @@ export const initAppData = ({ uid }) => async dispatch => {
       .doc(uid)
       .get()
   );
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     if (!error && snapshot.exists) {
-      const userProfile = snapshot.data();
+      const userProfile = { ...snapshot.data(), id: snapshot.uid };
       dispatch(
         receiveData({
           endpoint: appConstants.dataEndpoint.USER_PROFILE,
-          data: { [uid]: userProfile }
+          data: { info: userProfile }
         })
       );
       dispatch(setAppMode(userProfile));
-      getAppData(userProfile).then(() => {
-        resolve(subscribeToTopicIfNeeded(userProfile.group.group_id));
-      });
+      const needToRequestPermission = Platform.OS === "android";
+      if (
+        !needToRequestPermission ||
+        (await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
+        )) === PermissionsAndroid.RESULTS.GRANTED
+      ) {
+        return getAppData(userProfile).then(() => {
+          resolve(subscribeToTopicIfNeeded(userProfile.group.group_id));
+        });
+      }
     } else {
       reject("Không có dữ liệu");
     }
@@ -61,6 +63,7 @@ export const subscribeToTopicIfNeeded = async groupId => {
       firebase.messaging().subscribeToTopic(`/topics/${groupId}`);
     }
   }
+  return true;
 };
 
 export const makeAddProductsToAgencies = () => (dispatch, getState) => {
@@ -76,18 +79,15 @@ export const makeAddProductsToAgencies = () => (dispatch, getState) => {
     obj[agencyId] = Object.keys(selectedProducts);
     return obj;
   }, {});
-  console.log("after transform", data);
   return dispatch(addProductsToAgencies(data));
 };
 
 export const makeCreateQuotation = () => (dispatch, getState) => {
   const state = getState();
   const selectedAgencyIds = selectors.cart.getSelectedAgenciesInCart(state);
-  console.log("agencies", selectedAgencyIds);
   const selectedProducts = selectors.cart.getProductsInCart(state, {
     endpoint: appConstants.productItemContext.QUOTATION
   });
-  console.log("products", selectedProducts);
   return createQuotation(selectedAgencyIds, selectedProducts);
 };
 
@@ -139,15 +139,43 @@ export const addProduct = ({
     .commit();
 };
 
+export const editProduct = data => (dispatch, getState) => {
+  const state = getState();
+  const db = firebase.firestore();
+  const currentGroupDocRef = db
+    .collection(appConstants.collection.GROUPS)
+    .doc(selectors.data.getGroupInfo(state).id);
+  const productDocRef = currentGroupDocRef
+    .collection(appConstants.collection.PRODUCTS)
+    .doc(data.id);
+  return productDocRef.get().then(snapshot => {
+    if (snapshot.exists) {
+      let status = { ...snapshot.data().status };
+      console.log(Object.isExtensible(status));
+      if (data.change.price) {
+        status.price = {
+          ...status.price,
+          ...{ current: data.change.price }
+        };
+      }
+      if (data.change.available) {
+        status.available = data.change.available;
+      }
+      return productDocRef.update({ status });
+    }
+  });
+};
+
 export const acceptNewQuotation = quotationId => (dispatch, getState) => {
   const db = firebase.firestore();
   const batch = db.batch();
-  const currentGroup = selectors.data.getGroupInfo(getState());
-  const parentGroup = selectors.data.getParent(getState());
+  const state = getState();
+  const currentGroup = selectors.data.getGroupInfo(state);
+  const parentGroup = selectors.data.getParent(state);
   const currentGroupDocRef = db
     .collection(appConstants.collection.GROUPS)
     .doc(currentGroup.id);
-  const quotationRefInParent = db
+  const orderRefInParent = db
     .collection(appConstants.collection.GROUPS)
     .doc(parentGroup.info.id)
     .collection(appConstants.collection.ORDERS)
@@ -156,9 +184,39 @@ export const acceptNewQuotation = quotationId => (dispatch, getState) => {
     .collection(appConstants.collection.QUOTATIONS)
     .doc(quotationId);
   const update = { status: { verified: "accepted" } };
+  const quotationDetail = selectors.data.getQuotationById(state, {
+    id: quotationId
+  });
   batch.update(quotationRef, update);
-  batch.set(quotationRefInParent, { ...update, ...{ from: currentGroup.id } });
-  return batch.commit();
+  batch.set(orderRefInParent, { ...update, ...{ from: currentGroup.id } });
+  return Promise.all(
+    Object.entries(quotationDetail.detail.products).map(([id, value]) => {
+      if (value.price) {
+        console.log(id, value);
+        const productDocRefInGroup = currentGroupDocRef
+          .collection(appConstants.collection.PRODUCTS)
+          .doc(id);
+        return productDocRefInGroup.get().then(snapshot => {
+          if (snapshot.exists) {
+            let status = { ...snapshot.data().status };
+            status.price = {
+              ...status.price,
+              ...{ current: value.price }
+            };
+            status.off_percent = {
+              ...status.off_percent,
+              ...{ current: value.offPercent }
+            };
+            return batch.update(productDocRefInGroup, { status });
+          } else return Promise.resolve();
+        });
+      } else {
+        return Promise.resolve();
+      }
+    })
+  ).then(() => {
+    return batch.commit();
+  });
 };
 
 export const rejectNewQuotation = quotationId => (dispatch, getState) => {
@@ -400,23 +458,35 @@ const getCollectionAndMergeDetails = async (
           if (detailSnapshot.exists) {
             const detail = detailSnapshot.data();
             const imageDownloaded = await new Promise((resolve, reject) => {
-              if (detail.imageUrl) {
+              if (detail.imageUrl || (detail.info && detail.info.imageUrl)) {
+                const imageUrl = detail.imageUrl
+                  ? detail.imageUrl
+                  : detail.info.imageUrl;
+                const localImage = detail.localImage
+                  ? detail.localImage
+                  : detail.info.localImage;
                 resolve(
-                  RNFetchBlob.fs.exists(detail.localImage).then(exists =>
+                  RNFetchBlob.fs.exists(localImage).then(exists =>
                     !exists
                       ? RNFetchBlob.config({
                           fileCache: true,
                           appendExt: "jpg"
-                        }).fetch("GET", detail.imageUrl)
+                        }).fetch("GET", imageUrl)
                       : false
                   )
                 );
               } else resolve(false);
             });
             if (imageDownloaded) {
-              detail.localImage =
-                (Platform.OS === "android" ? "file://" : "") +
-                imageDownloaded.path();
+              if (detail.imageUrl)
+                detail.localImage =
+                  (Platform.OS === "android" ? "file://" : "") +
+                  imageDownloaded.path();
+              else {
+                detail.info.localImage =
+                  (Platform.OS === "android" ? "file://" : "") +
+                  imageDownloaded.path();
+              }
             }
             dispatch(
               observeData({
@@ -440,7 +510,6 @@ const getCollectionAndMergeDetails = async (
 export const getAgencyProductsIfNeeded = agencyId => (dispatch, getState) => {
   return new Promise((resolve, reject) => {
     if (!selectors.data.getProductsOfAgency(getState(), { id: agencyId })) {
-      console.log("getting products of agency " + agencyId);
       dispatch(requestAgencyProducts({ agencyId }));
       return firebase
         .firestore()
@@ -455,12 +524,9 @@ export const getAgencyProductsIfNeeded = agencyId => (dispatch, getState) => {
               productIds
             })
           );
-          console.log("before resolve");
           resolve(productIds);
-          console.log("after resolve");
         });
     } else {
-      console.log("getting products of agency " + agencyId);
       resolve("Đã có dữ liệu");
     }
   });
@@ -508,6 +574,7 @@ const observeDetail = ({ endpoint, id, detail }) => {
 const requestAgencyProducts = ({ agencyId }) => {
   return {
     type: types.data.LOAD_AGENCY_PRODUCTS,
+    meta: { endpoint: appConstants.collection.CHILDREN },
     payload: { agencyId }
   };
 };
@@ -515,6 +582,7 @@ const requestAgencyProducts = ({ agencyId }) => {
 const observeAgencyProducts = ({ agencyId, productIds }) => {
   return {
     type: types.data.OBSERVE_AGENCY_PRODUCTS,
+    meta: { endpoint: appConstants.collection.CHILDREN },
     payload: { agencyId, productIds }
   };
 };

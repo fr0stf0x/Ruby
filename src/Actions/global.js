@@ -54,7 +54,6 @@ export const addProductsToAgencies = productsInAgencies => (
   dispatch,
   getState
 ) => {
-  console.log(productsInAgencies);
   Object.entries(productsInAgencies).forEach(([agencyId, value]) => {
     if (Object.keys(value).length === 0) {
       return Promise.reject("Chưa chọn sản phẩm");

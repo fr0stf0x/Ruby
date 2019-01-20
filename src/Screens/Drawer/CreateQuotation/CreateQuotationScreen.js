@@ -1,5 +1,11 @@
 import React, { Component } from "react";
-import { Alert, ScrollView, StyleSheet, View } from "react-native";
+import {
+  TouchableOpacity,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  View
+} from "react-native";
 import { Button, Text } from "react-native-elements";
 import Icon from "react-native-vector-icons/Ionicons";
 import { connect } from "react-redux";
@@ -50,7 +56,6 @@ class CreateQuotationScreen extends Component {
       });
       missingProductsInAgencies[agencyId] = missingProducts;
     });
-    console.log(missingProductsInAgencies);
     Alert.alert("Cảnh báo", message, [
       {
         text: "Thêm tất cả và gởi báo giá",
@@ -160,11 +165,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1
   },
-  actionText: {
-    fontSize: 17,
-    color: "#2a72ef",
-    paddingEnd: 5
-  },
   products: {
     flex: 1
   }
@@ -181,12 +181,13 @@ CreateQuotationScreen.navigationOptions = ({ navigation }) => ({
     />
   ),
   headerRight: (
-    <Text
-      style={styles.actionText}
+    <TouchableOpacity
       onPress={() => actions.global.globalToggleCheckProducts()}
     >
-      Chọn tất cả
-    </Text>
+      <Text style={globalColorsAndStyles.style.headerRightText}>
+        Chọn tất cả
+      </Text>
+    </TouchableOpacity>
   )
 });
 

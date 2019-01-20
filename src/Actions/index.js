@@ -1,6 +1,7 @@
 import { makeLogIn, makeLogOut } from "./auth.actions";
 import {
   addProduct,
+  editProduct,
   initAppData,
   makeCreateOrder,
   makeCreateQuotation,
@@ -47,6 +48,7 @@ const actions = {
     acceptNewQuotation,
     rejectNewQuotation,
     addProduct,
+    editProduct,
     makeCreateOrder,
     makeCreateQuotation,
     makeAddProductsToAgencies,

@@ -24,7 +24,6 @@ class OrderList extends Component {
     const { orders, acceptNewOrder, rejectNewOrder, goToDetail } = this.props;
     if (orders.allIds && orders.allIds.length > 0) {
       const { allIds, byId, loading } = orders;
-      console.log(orders);
       return (
         (loading && <Text h1>Đang tải</Text>) || (
           <FlatList
@@ -68,10 +67,6 @@ class OrderList extends Component {
           justifyContent: "center"
         }}
       >
-        <Image
-          style={{ maxHeight: 250, maxWidth: 250 }}
-          source={require("~/assets/img/sad-emoji.jpg")}
-        />
         <Text
           style={{ fontSize: 24, color: globalColorsAndStyles.color.error }}
         >

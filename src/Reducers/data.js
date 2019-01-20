@@ -10,51 +10,12 @@ const appData = (state = {}, action) => {
       return mergeObj(state, {
         [action.meta.endpoint]: endpoint(state[action.meta.endpoint], action)
       });
+    case types.data.LOAD_AGENCY_PRODUCTS:
+    case types.data.OBSERVE_AGENCY_PRODUCTS:
     case types.data.OBSERVE_DETAIL:
     case types.data.OBSERVE_DATA:
       return mergeObj(state, {
         [action.meta.endpoint]: collection(state[action.meta.endpoint], action)
-      });
-    case types.data.LOAD_AGENCY_PRODUCTS:
-      return mergeObj(state, {
-        [appConstants.collection.CHILDREN]: mergeObj(
-          state[appConstants.collection.CHILDREN],
-          {
-            byId: mergeObj(state[appConstants.collection.CHILDREN].byId, {
-              [action.payload.agencyId]: mergeObj(
-                state[appConstants.collection.CHILDREN].byId[
-                  action.payload.agencyId
-                ],
-                {
-                  [appConstants.collection.PRODUCTS]: {
-                    loading: true
-                  }
-                }
-              )
-            })
-          }
-        )
-      });
-    case types.data.OBSERVE_AGENCY_PRODUCTS:
-      return mergeObj(state, {
-        [appConstants.collection.CHILDREN]: mergeObj(
-          state[appConstants.collection.CHILDREN],
-          {
-            byId: mergeObj(state[appConstants.collection.CHILDREN].byId, {
-              [action.payload.agencyId]: mergeObj(
-                state[appConstants.collection.CHILDREN].byId[
-                  action.payload.agencyId
-                ],
-                {
-                  [appConstants.collection.PRODUCTS]: {
-                    loading: false,
-                    allIds: action.payload.productIds
-                  }
-                }
-              )
-            })
-          }
-        )
       });
     case types.data.CLEAR_DATA:
       return {};
@@ -64,20 +25,55 @@ const appData = (state = {}, action) => {
 };
 
 // TODO classificate docChanges to 3 types: "added", "modified", "removed"
-const collection = (state = {}, action) => {
+const collection = (
+  state = {
+    allIds: [],
+    byId: {}
+  },
+  action
+) => {
   switch (action.type) {
+    case types.data.LOAD_AGENCY_PRODUCTS:
+      return mergeObj(state, {
+        byId: mergeObj(state.byId, {
+          [action.payload.agencyId]: mergeObj(
+            state.byId[action.payload.agencyId],
+            {
+              [appConstants.collection.PRODUCTS]: { loading: true }
+            }
+          )
+        })
+      });
+    case types.data.OBSERVE_AGENCY_PRODUCTS:
+      return mergeObj(state, {
+        byId: mergeObj(state.byId, {
+          [action.payload.agencyId]: mergeObj(
+            state.byId[action.payload.agencyId],
+            {
+              [appConstants.collection.PRODUCTS]: {
+                loading: false,
+                allIds: action.payload.productIds
+              }
+            }
+          )
+        })
+      });
     case types.data.OBSERVE_DATA:
       switch (action.payload.change.type) {
         case "added":
+          console.log(
+            "data added",
+            action.payload.id,
+            action.payload.change.data
+          );
           return mergeObj(state, {
-            allIds: state.allIds
-              ? [...state.allIds, action.payload.id]
-              : [action.payload.id],
-            byId: mergeObj(state.byId ? state.byId : {}, {
+            allIds: [...state.allIds, action.payload.id],
+            byId: mergeObj(state.byId, {
               [action.payload.id]: action.payload.change.data
             })
           });
         case "removed":
+          console.log("data removed", action.payload.id);
           // eslint-disable-next-line no-case-declarations
           const index = state.allIds.indexOf(action.payload.id);
           return mergeObj(state, {
@@ -90,6 +86,12 @@ const collection = (state = {}, action) => {
             })
           });
         case "modified":
+          console.log(
+            "data modified",
+            state.byId[action.payload.id],
+            "->",
+            action.payload.change.data
+          );
           return mergeObj(state, {
             byId: mergeObj(state.byId, {
               [action.payload.id]: action.payload.change.data

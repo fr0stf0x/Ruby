@@ -1,5 +1,12 @@
 import React, { Component } from "react";
-import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  TouchableOpacity,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View
+} from "react-native";
 import { Button } from "react-native-elements";
 import { connect } from "react-redux";
 import actions from "~/Actions";
@@ -94,16 +101,17 @@ const styles = StyleSheet.create({
 AddProductsForAgency.navigationOptions = {
   title: "Thêm sản phẩm",
   headerRight: (
-    <Text
-      style={styles.actionText}
+    <TouchableOpacity
       onPress={() =>
         actions.global.globalToggleCheckProducts(
           appConstants.productItemContext.ADD_TO_AGENCY
         )
       }
     >
-      Chọn tất cả
-    </Text>
+      <Text style={globalColorsAndStyles.style.headerRightText}>
+        Chọn tất cả
+      </Text>
+    </TouchableOpacity>
   )
 };
 

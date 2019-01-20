@@ -19,6 +19,11 @@ export const globalColorsAndStyles = {
         height: 2
       },
       shadowColor: "gray"
+    },
+    headerRightText: {
+      fontSize: 17,
+      color: "#2a72ef",
+      paddingEnd: 10
     }
   }
 };

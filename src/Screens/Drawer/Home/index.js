@@ -17,13 +17,11 @@ const tabIconNames = {
 };
 
 const tabScreens = appMode => {
-  console.log(appMode);
   const screens = {
     Products: ProductStack
   };
   screens.Orders = OrdersStack;
   screens.Quotations = QuotationsStack;
-  console.log(screens);
   return screens;
 };
 

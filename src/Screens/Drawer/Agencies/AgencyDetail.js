@@ -22,7 +22,6 @@ class AgencyDetail extends Component {
       redirectToAddProductsForAgency
     } = this.props;
     const { info } = agency.detail;
-    const id = this.props.navigation.getParam("id");
     return (
       <ScrollView>
         <Card

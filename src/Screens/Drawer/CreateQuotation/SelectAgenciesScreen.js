@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { StyleSheet, View } from "react-native";
+import { TouchableOpacity, StyleSheet, View } from "react-native";
 import { Text } from "react-native-elements";
 import actions from "~/Actions";
 import appConstants from "~/appConstants";
@@ -26,12 +26,9 @@ const styles = StyleSheet.create({
 SelectAgenciesScreen.navigationOptions = {
   title: "Chọn đại lý",
   headerRight: (
-    <Text
-      style={styles.actionText}
-      onPress={actions.global.globalToggleCheckAgencies}
-    >
-      Chọn tất cả
-    </Text>
+    <TouchableOpacity onPress={actions.global.globalToggleCheckAgencies}>
+      <Text style={styles.actionText}>Chọn tất cả</Text>
+    </TouchableOpacity>
   )
 };
 

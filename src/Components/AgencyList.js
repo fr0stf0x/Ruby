@@ -124,10 +124,6 @@ const AgencyList = ({
         justifyContent: "center"
       }}
     >
-      <Image
-        style={{ maxHeight: 250, maxWidth: 250 }}
-        source={require("~/assets/img/sad-emoji.jpg")}
-      />
       <Text style={{ fontSize: 24, color: globalColorsAndStyles.color.error }}>
         Không có đại lý nào
       </Text>

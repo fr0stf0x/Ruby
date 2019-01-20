@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { FlatList, Image, Text, View } from "react-native";
+import { StyleSheet, FlatList, Image, Text, View } from "react-native";
 import { connect } from "react-redux";
 import selectors from "~/Selectors";
 import { globalColorsAndStyles } from "~/Theme";
@@ -8,7 +8,7 @@ import { formatDate, formatTime } from "~/Utils/utils";
 class OrderDetail extends Component {
   render() {
     const { order, allProducts } = this.props;
-    const { createdAt, orderedProducts } = order.detail;
+    const { createdAt, products: orderedProducts } = order.detail;
     const { byId } = allProducts;
     const formatedDate = formatDate(createdAt);
     const formatedTime = formatTime(createdAt);

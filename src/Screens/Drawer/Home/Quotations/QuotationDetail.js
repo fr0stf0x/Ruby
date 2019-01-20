@@ -24,9 +24,11 @@ class QuotationDetail extends Component {
         <FlatList
           contentContainerStyle={{ paddingVertical: 10 }}
           keyExtractor={(item, index) => index.toString()}
-          data={Object.keys(quotatedProducts).map(id =>
-            mergeObj(byId[id], { id, inQuotation: quotatedProducts[id] })
-          )}
+          data={Object.entries(quotatedProducts)
+            .filter(([id, value]) => value.checked)
+            .map(([id]) =>
+              mergeObj(byId[id], { id, inQuotation: quotatedProducts[id] })
+            )}
           renderItem={ReadOnlyProduct}
         />
       </View>
@@ -50,7 +52,7 @@ const ReadOnlyProduct = ({ item: { id, detail, inQuotation }, index }) => {
             <Text style={styles().listItemTitle}>{detail.name}</Text>
             <Text>{detail.type}</Text>
             <View style={{ flexDirection: "row", alignSelf: "center" }}>
-              <Text>{inQuotation.price}</Text>
+              <Text>Giá mới {inQuotation.price}</Text>
             </View>
           </View>
         </View>

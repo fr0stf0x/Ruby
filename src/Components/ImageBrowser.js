@@ -89,7 +89,7 @@ export default class ImageBrowser extends Component {
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         this.takePhoto();
       } else {
-        console.log("Camera permission denied");
+        console.log("Storage permission denied");
       }
     } catch (err) {
       console.warn(err);
@@ -266,7 +266,7 @@ export default class ImageBrowser extends Component {
       const data = await this.camera.takePictureAsync(options);
       this.toggleCamera();
       CameraRoll.saveToCameraRoll(data.uri).then(res => {
-        console.log("saved image to camera roll", res);
+        console.log("Saved image to camera roll", res);
         data.filename = formatDateTimeForFileName(new Date()) + ".jpg";
         this.setState({
           image: data,

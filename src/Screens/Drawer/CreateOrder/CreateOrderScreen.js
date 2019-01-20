@@ -1,5 +1,11 @@
 import React, { Component } from "react";
-import { Alert, ScrollView, StyleSheet, View } from "react-native";
+import {
+  TouchableOpacity,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  View
+} from "react-native";
 import { Button, Text } from "react-native-elements";
 import Icon from "react-native-vector-icons/Ionicons";
 import { connect } from "react-redux";
@@ -109,16 +115,17 @@ CreateOrderScreen.navigationOptions = ({ navigation }) => ({
     />
   ),
   headerRight: (
-    <Text
-      style={styles.actionText}
+    <TouchableOpacity
       onPress={() =>
         actions.global.globalToggleCheckProducts(
           appConstants.productItemContext.ORDER
         )
       }
     >
-      Chọn tất cả
-    </Text>
+      <Text style={globalColorsAndStyles.style.headerRightText}>
+        Chọn tất cả
+      </Text>
+    </TouchableOpacity>
   )
 });
 

@@ -5,12 +5,9 @@ import appConstants from "~/appConstants";
 import ProductList, { ProductItemContext } from "~/Components/ProductList";
 import { connect } from "react-redux";
 import selectors from "~/Selectors";
+import { Text } from "react-native-elements";
 
 class ProductsScreen extends Component {
-  addProduct = () => {
-    this.props.navigation.navigate("AddProduct");
-  };
-
   render() {
     const { availableProductIds, notAvailableProductIds } = this.props;
     return (
@@ -23,7 +20,12 @@ class ProductsScreen extends Component {
         >
           <ProductList productIds={availableProductIds} />
           {notAvailableProductIds.length > 0 && (
-            <ProductList productIds={notAvailableProductIds} />
+            <View>
+              <Text style={{ fontSize: 18, textAlign: "center" }}>
+                Sản phẩm không có sẵn
+              </Text>
+              <ProductList productIds={notAvailableProductIds} />
+            </View>
           )}
         </ProductItemContext.Provider>
       </View>
