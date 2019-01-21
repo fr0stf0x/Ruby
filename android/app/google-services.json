@@ -1,27 +1,27 @@
 {
   "project_info": {
-    "project_number": "80054587481",
-    "firebase_url": "https://ruby-app-5e889.firebaseio.com",
-    "project_id": "ruby-app-5e889",
-    "storage_bucket": "ruby-app-5e889.appspot.com"
+    "project_number": "386003655868",
+    "firebase_url": "https://ruby-app-2.firebaseio.com",
+    "project_id": "ruby-app-2",
+    "storage_bucket": "ruby-app-2.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:80054587481:android:a6bfec31715b0f91",
+        "mobilesdk_app_id": "1:386003655868:android:a6bfec31715b0f91",
         "android_client_info": {
           "package_name": "com.ruby"
         }
       },
       "oauth_client": [
         {
-          "client_id": "80054587481-ork71v6gos2ogos17064ute5urjg6j9d.apps.googleusercontent.com",
+          "client_id": "386003655868-18ff9puu60qh8q93lca66nillgj5htip.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyA1gVrZ24wbxBNVUp8co59hBFkVWwJNIe0"
+          "current_key": "AIzaSyC4iCnEwYjJgHrQbilMpSItFWFJu8A9KII"
         }
       ],
       "services": {

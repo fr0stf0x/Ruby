@@ -82,7 +82,7 @@ const collection = (
               ...state.allIds.slice(index + 1)
             ],
             byId: mergeObj(state.byId, {
-              [action.payload.id]: "removed"
+              [action.payload.id]: undefined
             })
           });
         case "modified":

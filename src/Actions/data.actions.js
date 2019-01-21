@@ -16,7 +16,7 @@ import type { QuerySnapshot, DocumentReference } from "react-native-firebase";
 // how to ignore warning /^(?!Require cycle).*$/
 
 export const initAppData = ({ uid }) => async dispatch => {
-  // // console.log("init app data");
+  console.log("init app data");
   const { data: snapshot, error } = await promiseWrapper(
     firebase
       .firestore()

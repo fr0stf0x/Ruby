@@ -12,6 +12,9 @@ import { connect } from "react-redux";
 import actions from "~/Actions";
 import { globalColorsAndStyles } from "~/Theme";
 import { validateFieldsWithCheckEmailExistenceAsync } from "~/Utils/utils";
+import appConstants from "~/appConstants";
+import AccessDenied from "~/Screens/AccessDenied";
+import selectors from "~/Selectors";
 
 const constrants = {
   email: {
@@ -71,89 +74,98 @@ class CreateAccount extends Component {
   };
 
   render() {
+    const { appMode } = this.props;
     const { email, password, name, passwordShown, error } = this.state;
     return (
-      <KeyboardAvoidingView
-        behavior={Platform.select({ ios: "padding", android: "none" })}
-        style={{ flex: 1 }}
-      >
-        <ScrollView
-          keyboardShouldPersistTaps="handled"
-          keyboardDismissMode={"on-drag"}
-          contentContainerStyle={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center"
-          }}
+      (appMode === appConstants.mode.MODE_RETAIL && (
+        <AccessDenied
+          navigation={this.props.navigation}
+          mode="bán lẻ"
+          functional="Chức năng tạo đại lý"
+        />
+      )) || (
+        <KeyboardAvoidingView
+          behavior={Platform.select({ ios: "padding", android: "none" })}
+          style={{ flex: 1 }}
         >
-          <Text style={Styles.FlexBasis} h4>
-            Tài khoản
-          </Text>
-          <View style={Styles.FlexBasis}>
-            <Input
-              textContentType="emailAddress"
-              keyboardType="email-address"
-              value={email}
-              placeholder="Email"
-              onChangeText={email => this.setState({ email })}
-            />
-            {error &&
-              error.email &&
-              error.email.map((err, key) => (
-                <View key={key}>
-                  <Text style={Styles.Error}>{err}</Text>
-                </View>
-              ))}
-          </View>
-          <View style={Styles.FlexBasis}>
-            <Input
-              secureTextEntry={!passwordShown}
-              value={password}
-              placeholder="Mật khẩu"
-              onChangeText={password => this.setState({ password })}
-              rightIcon={
-                password.length > 0 && (
-                  <Icon
-                    name={(passwordShown && "eye-off") || "eye"}
-                    onPress={this.toggleRevealPassword}
-                    size={24}
-                  />
-                )
-              }
-            />
-            {error &&
-              error.password &&
-              error.password.map((err, key) => (
-                <View key={key}>
-                  <Text style={Styles.Error}>{err}</Text>
-                </View>
-              ))}
-          </View>
-          <View style={Styles.FlexBasis}>
-            <Input
-              textContentType="name"
-              value={name}
-              placeholder="Tên người dùng"
-              onChangeText={name => this.setState({ name })}
-            />
-            {error &&
-              error.name &&
-              error.name.map((err, key) => (
-                <View key={key}>
-                  <Text style={Styles.Error}>{err}</Text>
-                </View>
-              ))}
-          </View>
-          <Button title="Tiếp tục" onPress={this.validateForm} />
-          <Button
-            buttonStyle={{
-              backgroundColor: globalColorsAndStyles.color.secondary
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode={"on-drag"}
+            contentContainerStyle={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center"
             }}
-            title="Huỷ bỏ"
-            onPress={() => this.props.navigation.navigate("AgenciesScreen")}
-          />
-        </ScrollView>
-      </KeyboardAvoidingView>
+          >
+            <Text style={Styles.FlexBasis} h4>
+              Tài khoản
+            </Text>
+            <View style={Styles.FlexBasis}>
+              <Input
+                textContentType="emailAddress"
+                keyboardType="email-address"
+                value={email}
+                placeholder="Email"
+                onChangeText={email => this.setState({ email })}
+              />
+              {error &&
+                error.email &&
+                error.email.map((err, key) => (
+                  <View key={key}>
+                    <Text style={Styles.Error}>{err}</Text>
+                  </View>
+                ))}
+            </View>
+            <View style={Styles.FlexBasis}>
+              <Input
+                secureTextEntry={!passwordShown}
+                value={password}
+                placeholder="Mật khẩu"
+                onChangeText={password => this.setState({ password })}
+                rightIcon={
+                  password.length > 0 && (
+                    <Icon
+                      name={(passwordShown && "eye-off") || "eye"}
+                      onPress={this.toggleRevealPassword}
+                      size={24}
+                    />
+                  )
+                }
+              />
+              {error &&
+                error.password &&
+                error.password.map((err, key) => (
+                  <View key={key}>
+                    <Text style={Styles.Error}>{err}</Text>
+                  </View>
+                ))}
+            </View>
+            <View style={Styles.FlexBasis}>
+              <Input
+                textContentType="name"
+                value={name}
+                placeholder="Tên người dùng"
+                onChangeText={name => this.setState({ name })}
+              />
+              {error &&
+                error.name &&
+                error.name.map((err, key) => (
+                  <View key={key}>
+                    <Text style={Styles.Error}>{err}</Text>
+                  </View>
+                ))}
+            </View>
+            <Button title="Tiếp tục" onPress={this.validateForm} />
+            <Button
+              buttonStyle={{
+                backgroundColor: globalColorsAndStyles.color.secondary
+              }}
+              title="Huỷ bỏ"
+              onPress={() => this.props.navigation.navigate("AgenciesScreen")}
+            />
+          </ScrollView>
+        </KeyboardAvoidingView>
+      )
     );
   }
 }
@@ -169,6 +181,8 @@ const Styles = StyleSheet.create({
 });
 
 export default connect(
-  state => ({}),
+  state => ({
+    appMode: selectors.ui.getAppMode(state)
+  }),
   dispatch => ({ toggleLoading: () => dispatch(actions.ui.toggleLoading()) })
 )(CreateAccount);
