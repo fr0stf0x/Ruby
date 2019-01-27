@@ -28,7 +28,7 @@ export const getUserProfile = state =>
   state.appData[appConstants.dataEndpoint.USER_PROFILE];
 
 export const getGroupInfo = state =>
-  state.appData[[appConstants.dataEndpoint.GROUP_INFO]];
+  state.appData[appConstants.dataEndpoint.GROUP_INFO];
 
 export const getParent = state =>
   state.appData[appConstants.dataEndpoint.PARENT];

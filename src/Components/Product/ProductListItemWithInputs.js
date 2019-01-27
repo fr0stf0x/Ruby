@@ -9,7 +9,6 @@ import selectors from "~/Selectors";
 import { globalColorsAndStyles } from "~/Theme";
 import { formatMoney } from "~/Utils/utils";
 import styles from "./productStyles";
-import types from "~/Actions/ActionTypes";
 
 class ProductListItemWithInputs extends Component {
   toggleCheck = () => {
@@ -65,108 +64,112 @@ class ProductListItemWithInputs extends Component {
     const totalPrice = count * price;
 
     return (
-      <View style={{ flex: 1, flexDirection: "row" }}>
-        <View style={styles(index, status.available).listItem}>
-          <View style={styles().imageContainer}>
-            <Image
-              source={{
-                uri: detail.localImage || detail.imageUrl
-              }}
-              resizeMode="cover"
-              style={{ width: 100, height: 100 }}
-            />
-          </View>
-          <View style={styles().infoAndActions}>
-            <View style={[styles().info, { flex: 1, alignContent: "center" }]}>
-              <Text style={styles().listItemTitle}>{detail.name}</Text>
-              {endpoint === appConstants.productItemContext.QUOTATION &&
-                checked && (
+      detail && (
+        <View style={{ flex: 1, flexDirection: "row" }}>
+          <View style={styles(index, status.available).listItem}>
+            <View style={styles().imageContainer}>
+              <Image
+                source={{
+                  uri: detail.localImage || detail.imageUrl
+                }}
+                resizeMode="cover"
+                style={{ width: 100, height: 100 }}
+              />
+            </View>
+            <View style={styles().infoAndActions}>
+              <View
+                style={[styles().info, { flex: 1, alignContent: "center" }]}
+              >
+                <Text style={styles().listItemTitle}>{detail.name}</Text>
+                {endpoint === appConstants.productItemContext.QUOTATION &&
+                  checked && (
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignSelf: "center"
+                      }}
+                    >
+                      <NumericInput
+                        type="up-down"
+                        initValue={offPercent}
+                        onChange={offPercent =>
+                          this.inputChange({
+                            name: "offPercent",
+                            value: offPercent
+                          })
+                        }
+                        minValue={0}
+                        maxValue={100}
+                        totalWidth={90}
+                        totalHeight={40}
+                        iconSize={20}
+                        valueType="real"
+                        step={0.5}
+                        rounded
+                        textColor="#B0228C"
+                        iconStyle={{ color: "white" }}
+                        upDownButtonsBackgroundColor="#EA3788"
+                      />
+                      <NumericInput
+                        type="up-down"
+                        initValue={price}
+                        onChange={price =>
+                          this.inputChange({ name: "price", value: price })
+                        }
+                        minValue={0}
+                        totalWidth={90}
+                        totalHeight={40}
+                        iconSize={20}
+                        step={500}
+                        rounded
+                        textColor="#B0228C"
+                        iconStyle={{ color: "white" }}
+                        upDownButtonsBackgroundColor="#EA3788"
+                      />
+                    </View>
+                  )}
+                {endpoint === appConstants.productItemContext.ORDER && checked && (
                   <View
                     style={{
                       flexDirection: "row",
-                      alignSelf: "center"
+                      alignSelf: "center",
+                      alignItems: "center",
+                      justifyContent: "center"
                     }}
                   >
                     <NumericInput
                       type="up-down"
-                      initValue={offPercent}
-                      onChange={offPercent =>
-                        this.inputChange({
-                          name: "offPercent",
-                          value: offPercent
-                        })
-                      }
-                      minValue={0}
-                      maxValue={100}
+                      initValue={count}
+                      onChange={this.changeCount}
+                      minValue={1}
                       totalWidth={90}
                       totalHeight={40}
                       iconSize={20}
-                      valueType="real"
-                      step={0.5}
                       rounded
                       textColor="#B0228C"
                       iconStyle={{ color: "white" }}
                       upDownButtonsBackgroundColor="#EA3788"
                     />
-                    <NumericInput
-                      type="up-down"
-                      initValue={price}
-                      onChange={price =>
-                        this.inputChange({ name: "price", value: price })
-                      }
-                      minValue={0}
-                      totalWidth={90}
-                      totalHeight={40}
-                      iconSize={20}
-                      step={500}
-                      rounded
-                      textColor="#B0228C"
-                      iconStyle={{ color: "white" }}
-                      upDownButtonsBackgroundColor="#EA3788"
-                    />
+                    <Text style={{ paddingStart: 10 }}>
+                      {formatMoney(totalPrice)}
+                    </Text>
                   </View>
                 )}
-              {endpoint === appConstants.productItemContext.ORDER && checked && (
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignSelf: "center",
-                    alignItems: "center",
-                    justifyContent: "center"
-                  }}
-                >
-                  <NumericInput
-                    type="up-down"
-                    initValue={count}
-                    onChange={this.changeCount}
-                    minValue={1}
-                    totalWidth={90}
-                    totalHeight={40}
-                    iconSize={20}
-                    rounded
-                    textColor="#B0228C"
-                    iconStyle={{ color: "white" }}
-                    upDownButtonsBackgroundColor="#EA3788"
-                  />
-                  <Text style={{ paddingStart: 10 }}>
-                    {formatMoney(totalPrice)}
-                  </Text>
-                </View>
-              )}
+              </View>
             </View>
           </View>
+          <View style={{ alignSelf: "center" }}>
+            <CheckBox
+              containerStyle={{ padding: 0 }}
+              checkedIcon="dot-circle-o"
+              uncheckedColor={globalColorsAndStyles.color.primaryText}
+              uncheckedIcon="circle-o"
+              checked={checked}
+              onPress={this.toggleCheck}
+            />
+          </View>
         </View>
-        <View style={{ alignSelf: "center" }}>
-          <CheckBox
-            containerStyle={{ padding: 0 }}
-            checkedIcon="dot-circle-o"
-            uncheckedColor={globalColorsAndStyles.color.primaryText}
-            uncheckedIcon="circle-o"
-            checked={checked}
-            onPress={this.toggleCheck}
-          />
-        </View>
-      </View>
+      )
     );
   }
 }

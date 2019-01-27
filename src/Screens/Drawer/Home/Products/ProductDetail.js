@@ -98,7 +98,9 @@ class ProductDetail extends Component {
               <Text>Giá hiện tại</Text>
             </View>
             <View style={{ flex: 1 }}>
-              <Text>{product.detail.name}</Text>
+              <Text style={{ textTransform: "uppercase", letterSpacing: 1 }}>
+                {product.detail.name}
+              </Text>
               <Text>{product.detail.type}</Text>
               {product.detail.createdAt && (
                 <Text>{formatDate(product.detail.createdAt)}</Text>

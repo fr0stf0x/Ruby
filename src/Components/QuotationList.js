@@ -1,11 +1,9 @@
 import React, { Component } from "react";
 import {
-  Image,
-  TouchableOpacity,
   Alert,
   FlatList,
   StyleSheet,
-  Text,
+  TouchableOpacity,
   View
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -18,10 +16,12 @@ import { globalColorsAndStyles } from "~/Theme";
 import { formatDate, formatTime } from "~/Utils/utils";
 import AcceptAndRejectButtons from "./AcceptAndRejectButtons";
 import NewItemBadge from "./NewItemBadge";
+import { Text } from "react-native-elements";
 
 class QuotationList extends Component {
   render() {
     const {
+      agencyDetailById,
       goToDetail,
       quotations,
       acceptNewQuotation,
@@ -38,11 +38,14 @@ class QuotationList extends Component {
             data={allIds
               .sort(
                 (id1, id2) =>
+                  byId[id2].detail &&
+                  byId[id1].detail &&
                   byId[id2].detail.createdAt - byId[id1].detail.createdAt
               )
               .map(id =>
                 mergeObj(byId[id], {
                   id,
+                  agencyDetailById,
                   goToDetail,
                   onAccept: () =>
                     promiseWithLoadingAnimation(() =>
@@ -83,41 +86,64 @@ class QuotationList extends Component {
 }
 
 const QuotationListItem = ({
-  item: { id, status, detail, onAccept, onReject, goToDetail },
+  item: {
+    id,
+    status,
+    detail,
+    agencyDetailById,
+    type,
+    onAccept,
+    onReject,
+    goToDetail
+  },
   index
 }) => {
-  const formatedDate = formatDate(detail.createdAt);
-  const formatedTime = formatTime(detail.createdAt);
-  return (
-    <TouchableOpacity onPress={() => goToDetail(id)}>
-      <View style={styles(index, !status.verified).listItem}>
-        <View style={styles().infoAndActions}>
-          <View style={{ flex: 1, flexDirection: "row" }}>
-            <View style={styles().info}>
-              <Text style={styles().listItemTitle}>
-                {!status.verified && <NewItemBadge />}
-                Báo giá ngày {formatedDate}
-              </Text>
-              {!status.verified && (
-                <View style={{ alignItems: "center" }}>
-                  <AcceptAndRejectButtons
-                    onAccept={onAccept}
-                    onReject={onReject}
-                  />
+  let formatedTime, formatedDate;
+  if (detail) {
+    formatedDate = formatDate(detail.createdAt);
+    formatedTime = formatTime(detail.createdAt);
+
+    return (
+      <TouchableOpacity onPress={() => goToDetail(id)}>
+        <View style={styles(index, !detail.status.verified).listItem}>
+          <View style={styles().infoAndActions}>
+            <View style={{ flex: 1, flexDirection: "row" }}>
+              <View style={styles().info}>
+                <Text style={styles().listItemTitle}>
+                  {!detail.status.verified && <NewItemBadge />}
+                  {type === "received"
+                    ? "Báo giá ngày " + formatedDate
+                    : "Báo giá đến " +
+                      agencyDetailById(detail.to).detail.info.name}
+                </Text>
+                {!detail.status.verified && (
+                  <View style={{ alignItems: "center" }}>
+                    {type === "received" && (
+                      <AcceptAndRejectButtons
+                        onAccept={onAccept}
+                        onReject={onReject}
+                      />
+                    )}
+                  </View>
+                )}
+                <View style={styles().timeContainer}>
+                  <Text>
+                    {detail.status.verified ? "Đã xác nhận" : "Chưa xác nhận"}
+                  </Text>
+                  <Text style={styles().listItemSubtitle}>{formatedTime}</Text>
                 </View>
-              )}
-              <View style={styles().timeContainer}>
-                <Text style={styles().listItemSubtitle}>{formatedTime}</Text>
               </View>
-            </View>
-            <View style={styles().actions}>
-              <Icon name="ios-arrow-forward" size={24} />
+              <View style={styles().actions}>
+                <Icon name="ios-arrow-forward" size={24} />
+              </View>
             </View>
           </View>
         </View>
-      </View>
-    </TouchableOpacity>
-  );
+      </TouchableOpacity>
+    );
+  } else {
+    return <Text h1>Đang tải</Text>;
+  }
 };
 
 const styles = (key, isNew) =>
@@ -139,7 +165,9 @@ const styles = (key, isNew) =>
       color: globalColorsAndStyles.color.primaryText
     },
     timeContainer: {
-      flexDirection: "row-reverse"
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between"
     },
     listItemSubtitle: {
       fontSize: 16,
@@ -169,7 +197,8 @@ const styles = (key, isNew) =>
 
 export default connect(
   state => ({
-    quotations: selectors.data.getQuotations(state)
+    quotations: selectors.data.getQuotations(state),
+    agencyDetailById: id => selectors.data.getAgencyById(state, { id })
   }),
   (dispatch, props) => ({
     goToDetail: id => props.navigation.navigate("QuotationDetail", { id }),

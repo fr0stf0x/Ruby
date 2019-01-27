@@ -172,27 +172,29 @@ export const acceptNewQuotation = quotationId => (dispatch, getState) => {
   const currentGroupDocRef = db
     .collection(appConstants.collection.GROUPS)
     .doc(currentGroup.id);
-  const orderRefInParent = db
-    .collection(appConstants.collection.GROUPS)
-    .doc(parentGroup.info.id)
+  console.log(parentGroup);
+  // const quotationRefInParent = db
+  //   .collection(appConstants.collection.GROUPS)
+  //   .doc(parentGroup.info.id)
+  //   .collection(appConstants.collection.QUOTATIONS)
+  //   .doc(quotationId);
+  const centralRef = db
     .collection(appConstants.collection.ORDERS)
-    .doc(quotationId);
-  const quotationRef = currentGroupDocRef
-    .collection(appConstants.collection.QUOTATIONS)
     .doc(quotationId);
   const update = { status: { verified: "accepted" } };
   const quotationDetail = selectors.data.getQuotationById(state, {
     id: quotationId
   });
-  batch.update(quotationRef, update);
-  batch.set(orderRefInParent, { ...update, ...{ from: currentGroup.name } });
+  batch.update(centralRef, update);
+  // batch.update(quotationRefInParent, update);
+  const productCollectionInGroup = currentGroupDocRef.collection(
+    appConstants.collection.PRODUCTS
+  );
+  console.log("changing price");
   return Promise.all(
     Object.entries(quotationDetail.detail.products).map(([id, value]) => {
       if (value.price) {
-        console.log(id, value);
-        const productDocRefInGroup = currentGroupDocRef
-          .collection(appConstants.collection.PRODUCTS)
-          .doc(id);
+        const productDocRefInGroup = productCollectionInGroup.doc(id);
         return productDocRefInGroup.get().then(snapshot => {
           if (snapshot.exists) {
             let status = { ...snapshot.data().status };
@@ -224,20 +226,17 @@ export const rejectNewQuotation = quotationId => (dispatch, getState) => {
   const currentGroupDocRef = db
     .collection(appConstants.collection.GROUPS)
     .doc(currentGroup.id);
-  const orderRefInParent = db
-    .collection(appConstants.collection.GROUPS)
-    .doc(parentGroup.info.id)
+  // const quotationRefInParent = db
+  //   .collection(appConstants.collection.GROUPS)
+  //   .doc(parentGroup.info.id)
+  //   .collection(appConstants.collection.QUOTATIONS)
+  //   .doc(quotationId);
+  const centralRef = db
     .collection(appConstants.collection.ORDERS)
     .doc(quotationId);
-  const quotationRef = currentGroupDocRef
-    .collection(appConstants.collection.QUOTATIONS)
-    .doc(quotationId);
   const update = { status: { verified: "rejected" } };
-  batch.update(quotationRef, update);
-  batch.set(orderRefInParent, {
-    ...update,
-    ...{ from: currentGroup.name }
-  });
+  batch.update(centralRef, update);
+  // batch.update(quotationRefInParent, update);
   return batch.commit();
 };
 
@@ -248,17 +247,15 @@ export const acceptNewOrder = (fromId, orderId) => (dispatch, getState) => {
   const currentGroupDocRef = db
     .collection(appConstants.collection.GROUPS)
     .doc(currentGroup.id);
-  const quotationRefInChild = db
+  const orderRefInChild = db
     .collection(appConstants.collection.GROUPS)
     .doc(fromId)
-    .collection(appConstants.collection.QUOTATIONS)
-    .doc(orderId);
-  const quotationRef = currentGroupDocRef
     .collection(appConstants.collection.ORDERS)
     .doc(orderId);
+  const orderRef = db.collection(appConstants.collection.ORDERS).doc(orderId);
   const update = { status: { verified: "accepted" } };
-  batch.update(quotationRef, update);
-  batch.set(quotationRefInChild, { ...update });
+  batch.update(orderRef, update);
+  // batch.update(orderRefInChild, update);
   return batch.commit();
 };
 
@@ -269,17 +266,15 @@ export const rejectNewOrder = (fromId, orderId) => (dispatch, getState) => {
   const currentGroupDocRef = db
     .collection(appConstants.collection.GROUPS)
     .doc(currentGroup.id);
-  const quotationRefInChild = db
-    .collection(appConstants.collection.GROUPS)
-    .doc(fromId)
-    .collection(appConstants.collection.ORDERS)
-    .doc(orderId);
-  const quotationRef = currentGroupDocRef
-    .collection(appConstants.collection.QUOTATIONS)
-    .doc(orderId);
+  const orderRef = db.collection(appConstants.collection.ORDERS).doc(orderId);
+  // const orderRefInChild = db
+  //   .collection(appConstants.collection.GROUPS)
+  //   .doc(fromId)
+  //   .collection(appConstants.collection.ORDERS)
+  //   .doc(orderId);
   const update = { status: { verified: "rejected" } };
-  batch.update(quotationRef, update);
-  batch.set(quotationRefInChild, { ...update });
+  batch.update(orderRef, update);
+  // batch.update(orderRefInChild, update);
   return batch.commit();
 };
 
@@ -364,11 +359,9 @@ const getAppData = ({ group: { group_id, group_type } }): Promise => {
       appConstants.collection.ORDERS
     )
   );
-  if (group_type !== appConstants.groupType.RETAIL) {
-    appDataPromises.push(
-      getCollectionAndMergeDetails(groupDocRef, appConstants.collection.ORDERS)
-    );
-  }
+  appDataPromises.push(
+    getCollectionAndMergeDetails(groupDocRef, appConstants.collection.ORDERS)
+  );
   return Promise.all(appDataPromises);
 };
 
@@ -447,62 +440,74 @@ const getCollectionAndMergeDetails = async (
       query.docChanges.forEach(async docChange => {
         const changeType = docChange.type;
         const docSnapshot = docChange.doc;
-        const { data: detailSnapshot, error } = await promiseWrapper(
-          firebase
-            .firestore()
-            .collection(parentCollectionName)
-            .doc(docSnapshot.id)
-            .get()
-        );
-        if (!error) {
-          if (detailSnapshot.exists) {
-            const detail = detailSnapshot.data();
-            const imageDownloaded = await new Promise((resolve, reject) => {
-              if (detail.imageUrl || (detail.info && detail.info.imageUrl)) {
-                const imageUrl = detail.imageUrl
-                  ? detail.imageUrl
-                  : detail.info.imageUrl;
-                const localImage = detail.localImage
-                  ? detail.localImage
-                  : detail.info.localImage;
-                resolve(
-                  RNFetchBlob.fs.exists(localImage).then(exists =>
-                    !exists
-                      ? RNFetchBlob.config({
-                          fileCache: true,
-                          appendExt: "jpg"
-                        }).fetch("GET", imageUrl)
-                      : false
-                  )
-                );
-              } else resolve(false);
-            });
-            if (imageDownloaded) {
-              if (detail.imageUrl)
-                detail.localImage =
-                  (Platform.OS === "android" ? "file://" : "") +
-                  imageDownloaded.path();
-              else {
-                detail.info.localImage =
-                  (Platform.OS === "android" ? "file://" : "") +
-                  imageDownloaded.path();
-              }
+        dispatch(
+          observeData({
+            endpoint: collectionName,
+            id: docSnapshot.id,
+            change: {
+              type: changeType,
+              data: docSnapshot.data()
             }
-            dispatch(
-              observeData({
-                endpoint: collectionName,
-                id: docSnapshot.id,
-                change: {
-                  type: changeType,
-                  data: {
-                    ...docSnapshot.data(),
-                    ...{ detail }
+          })
+        );
+        // const { data: detailSnapshot, error } = await promiseWrapper(
+        firebase
+          .firestore()
+          .collection(parentCollectionName)
+          .doc(docSnapshot.id)
+          .onSnapshot(
+            async detailSnapshot => {
+              if (detailSnapshot.exists) {
+                const detail = detailSnapshot.data();
+                console.log("detail", detail);
+                const imageDownloaded = await new Promise((resolve, reject) => {
+                  if (
+                    detail.imageUrl ||
+                    (detail.info && detail.info.imageUrl)
+                  ) {
+                    const imageUrl = detail.imageUrl
+                      ? detail.imageUrl
+                      : detail.info.imageUrl;
+                    const localImage = detail.localImage
+                      ? detail.localImage
+                      : detail.info.localImage;
+                    resolve(
+                      RNFetchBlob.fs.exists(localImage).then(exists =>
+                        !exists
+                          ? RNFetchBlob.config({
+                              fileCache: true,
+                              appendExt: "jpg"
+                            }).fetch("GET", imageUrl)
+                          : false
+                      )
+                    );
+                  } else resolve(false);
+                });
+                if (imageDownloaded) {
+                  if (detail.imageUrl)
+                    detail.localImage =
+                      (Platform.OS === "android" ? "file://" : "") +
+                      imageDownloaded.path();
+                  else {
+                    detail.info.localImage =
+                      (Platform.OS === "android" ? "file://" : "") +
+                      imageDownloaded.path();
                   }
                 }
-              })
-            );
-          }
-        }
+                dispatch(
+                  observeDetail({
+                    endpoint: collectionName,
+                    id: docSnapshot.id,
+                    detail
+                  })
+                );
+              }
+            }
+            // })
+            // .get()
+          );
+        // if (!error) {
+        // }
       });
     });
 };

@@ -105,22 +105,38 @@ export const createQuotation = (agencyIds: Array, products) => {
     verified: false
   };
   const createdAt = new Date();
-  const currentGroupId = selectors.data.getGroupInfo(store.getState()).id;
+  const currentGroup = selectors.data.getGroupInfo(store.getState());
+  const currentGroupQuotationCollectionRef = db
+    .collection(appConstants.collection.GROUPS)
+    .doc(currentGroup.id)
+    .collection(appConstants.collection.QUOTATIONS);
+  console.log("agencies", agencyIds);
   agencyIds.forEach(agencyId => {
     const childRef = db
       .collection(appConstants.collection.GROUPS)
       .doc(agencyId);
-    const newOrderDocRef = db.collection(appConstants.collection.ORDERS).doc();
-    const orderDocRefInChild = childRef
+    const centralOrderDocRef = db
+      .collection(appConstants.collection.ORDERS)
+      .doc();
+    const quotationRefInChild = childRef
       .collection(appConstants.collection.QUOTATIONS)
-      .doc(newOrderDocRef.id);
-    batch.set(newOrderDocRef, {
+      .doc(centralOrderDocRef.id);
+    batch.set(quotationRefInChild, {
+      createdAt,
+      type: "received"
+    });
+    batch.set(currentGroupQuotationCollectionRef.doc(centralOrderDocRef.id), {
+      createdAt,
+      type: "going"
+    });
+    // central doc
+    batch.set(centralOrderDocRef, {
+      status,
       products,
       createdAt,
-      from: currentGroupId,
+      from: currentGroup.id,
       to: agencyId
     });
-    batch.set(orderDocRefInChild, { status, createdAt });
   });
   return batch.commit();
 };
@@ -140,21 +156,33 @@ export const createOrder = (parentId, products, totalPrice) => {
   const currentGroup = selectors.data.getGroupInfo(store.getState());
 
   const parentRef = db.collection(appConstants.collection.GROUPS).doc(parentId);
-  const newOrderDocRef = db.collection(appConstants.collection.ORDERS).doc();
+  const centralOrderDocRef = db
+    .collection(appConstants.collection.ORDERS)
+    .doc();
+  const orderDocRefInCurrentGroup = db
+    .collection(appConstants.collection.GROUPS)
+    .doc(currentGroup.id)
+    .collection(appConstants.collection.ORDERS)
+    .doc(centralOrderDocRef.id);
   const orderDocRefInParent = parentRef
     .collection(appConstants.collection.ORDERS)
-    .doc(newOrderDocRef.id);
-  batch.set(newOrderDocRef, {
+    .doc(centralOrderDocRef.id);
+  batch.set(orderDocRefInCurrentGroup, {
+    createdAt,
+    type: "going"
+  });
+  batch.set(orderDocRefInParent, {
+    createdAt,
+    from: currentGroup.name,
+    type: "received"
+  });
+  batch.set(centralOrderDocRef, {
+    status,
     products,
     createdAt,
     from: currentGroup.id,
     to: parentId,
     totalPrice
-  });
-  batch.set(orderDocRefInParent, {
-    status,
-    createdAt,
-    from: currentGroup.name
   });
   return batch.commit();
 };

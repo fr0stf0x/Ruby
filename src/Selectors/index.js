@@ -12,6 +12,7 @@ import {
   getQuotations,
   getOrders,
   getProductById,
+  getAgencyById,
   getOrderByIdFromNavigationParam,
   getOrderById,
   getQuotationById,
@@ -39,6 +40,7 @@ const selectors = {
   data: {
     getProductById,
     getOrders,
+    getAgencyById,
     getAgencyByIdFromNavigationParam,
     getGroupInfo,
     getQuotations,

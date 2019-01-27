@@ -21,6 +21,7 @@ const AgencyCard = ({ id, info, goToDetail, action }) => {
       <Card
         containerStyle={globalColorsAndStyles.style.boxShadow}
         title={info.name}
+        titleStyle={{ textTransform: "uppercase", letterSpacing: 1 }}
         image={{ uri: info.localImage || info.imageUrl }}
       >
         <View

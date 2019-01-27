@@ -28,6 +28,7 @@ class AgencyDetail extends Component {
           containerStyle={globalColorsAndStyles.style.boxShadow}
           title={info.name}
           image={{ uri: info.localImage || info.imageUrl }}
+          titleStyle={{ textTransform: "uppercase", letterSpacing: 1 }}
         >
           <View
             key="viewInfo"
@@ -99,7 +100,7 @@ class AgencyDetail extends Component {
             />
           </View>
         </Card>
-        <Text h3 style={{ textAlign: "center" }}>
+        <Text h4 style={{ textAlign: "center" }}>
           Sản phẩm
         </Text>
         {productsOfAgency &&

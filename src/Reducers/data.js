@@ -61,11 +61,11 @@ const collection = (
     case types.data.OBSERVE_DATA:
       switch (action.payload.change.type) {
         case "added":
-          console.log(
-            "data added",
-            action.payload.id,
-            action.payload.change.data
-          );
+          // console.log(
+          //   "data added",
+          //   action.payload.id,
+          //   action.payload.change.data
+          // );
           return mergeObj(state, {
             allIds: [...state.allIds, action.payload.id],
             byId: mergeObj(state.byId, {
@@ -73,7 +73,7 @@ const collection = (
             })
           });
         case "removed":
-          console.log("data removed", action.payload.id);
+          // console.log("data removed", action.payload.id);
           // eslint-disable-next-line no-case-declarations
           const index = state.allIds.indexOf(action.payload.id);
           return mergeObj(state, {
@@ -87,7 +87,7 @@ const collection = (
           });
         case "modified":
           console.log(
-            "data modified",
+            action.meta.endpoint + " modified",
             state.byId[action.payload.id],
             "->",
             action.payload.change.data

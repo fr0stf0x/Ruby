@@ -11,13 +11,13 @@ class QuotationsScreen extends Component {
   render() {
     const appMode = selectors.ui.getAppMode(store.getState());
     return (
-      (appMode === appConstants.mode.MODE_COMPANY && (
-        <AccessDenied navigation={this.props.navigation} mode="công ty" />
-      )) || (
-        <View style={{ flex: 1 }}>
-          <QuotationList navigation={this.props.navigation} />
-        </View>
-      )
+      // (appMode === appConstants.mode.MODE_COMPANY && (
+      //   <AccessDenied navigation={this.props.navigation} mode="công ty" />
+      // )) || (
+      <View style={{ flex: 1 }}>
+        <QuotationList navigation={this.props.navigation} />
+      </View>
+      // )
     );
   }
 }

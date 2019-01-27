@@ -5,7 +5,6 @@ import {
   Alert,
   FlatList,
   StyleSheet,
-  Text,
   View
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -18,6 +17,7 @@ import { formatDate, formatTime, formatMoney } from "~/Utils/utils";
 import AcceptAndRejectButtons from "./AcceptAndRejectButtons";
 import NewItemBadge from "./NewItemBadge";
 import { mergeObj } from "~/Reducers/utils";
+import { Text } from "react-native-elements";
 
 class OrderList extends Component {
   render() {
@@ -31,9 +31,10 @@ class OrderList extends Component {
             refreshing={true}
             keyExtractor={item => item.id}
             data={allIds
-              .sort(
-                (id1, id2) =>
-                  byId[id2].detail.createdAt - byId[id1].detail.createdAt
+              .sort((id1, id2) =>
+                byId[id2].detail && byId[id1].detail
+                  ? byId[id2].detail.createdAt - byId[id1].detail.createdAt
+                  : 1
               )
               .map(id =>
                 mergeObj(byId[id], {
@@ -78,44 +79,52 @@ class OrderList extends Component {
 }
 
 const OrderItem = ({
-  item: { id, status, from, detail, goToDetail, onAccept, onReject },
+  item: { id, status, from, type, detail, goToDetail, onAccept, onReject },
   index
 }) => {
-  const formatedDate = formatDate(detail.createdAt);
-  const formatedTime = formatTime(detail.createdAt);
-  return (
-    <TouchableOpacity onPress={() => goToDetail(id)}>
-      <View style={styles(index, !status.verified).listItem}>
-        <View style={styles().infoAndActions}>
-          <View style={{ flex: 1, flexDirection: "row" }}>
-            <View style={styles().info}>
-              <Text style={styles().listItemTitle}>
-                {!status.verified && <NewItemBadge />}
-                Đơn đặt hàng từ {from}
-              </Text>
-              {!status.verified && (
-                <View style={{ alignItems: "center" }}>
-                  <AcceptAndRejectButtons
-                    onAccept={onAccept}
-                    onReject={onReject}
-                  />
-                </View>
-              )}
-              <View style={{ alignItems: "flex-end" }}>
-                <Text style={styles().listItemSubtitle}>
-                  <Text>{formatMoney(detail.totalPrice)}</Text> - {formatedTime}
-                  , {formatedDate}
+  if (detail) {
+    const formatedDate = formatDate(detail.createdAt);
+    const formatedTime = formatTime(detail.createdAt);
+    return (
+      <TouchableOpacity onPress={() => goToDetail(id)}>
+        <View style={styles(index, !detail.status.verified).listItem}>
+          <View style={styles().infoAndActions}>
+            <View style={{ flex: 1, flexDirection: "row" }}>
+              <View style={styles().info}>
+                <Text style={styles().listItemTitle}>
+                  {!detail.status.verified && <NewItemBadge />}
+                  {type === "received"
+                    ? `Đơn đặt hàng từ ${from}`
+                    : `Đơn đặt hàng ngày ${formatedDate}`}
                 </Text>
+                {!detail.status.verified && (
+                  <View style={{ alignItems: "center" }}>
+                    {type === "received" && (
+                      <AcceptAndRejectButtons
+                        onAccept={onAccept}
+                        onReject={onReject}
+                      />
+                    )}
+                  </View>
+                )}
+                <View style={{ alignItems: "flex-end" }}>
+                  <Text style={styles().listItemSubtitle}>
+                    <Text>{formatMoney(detail.totalPrice)}</Text> -{" "}
+                    {formatedTime}, {formatedDate}
+                  </Text>
+                </View>
               </View>
             </View>
-          </View>
-          <View style={styles().actions}>
-            <Icon name="ios-arrow-forward" size={24} />
+            <View style={styles().actions}>
+              <Icon name="ios-arrow-forward" size={24} />
+            </View>
           </View>
         </View>
-      </View>
-    </TouchableOpacity>
-  );
+      </TouchableOpacity>
+    );
+  } else {
+    return <Text h1>Đang tải</Text>;
+  }
 };
 
 const styles = (key, isNew) =>

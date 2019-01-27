@@ -9,8 +9,8 @@ import { formatDate, formatTime } from "~/Utils/utils";
 
 class QuotationDetail extends Component {
   render() {
-    const { quotation, allProducts } = this.props;
-    const { createdAt, products: quotatedProducts } = quotation.detail;
+    const { quotation, allProducts, agencyDetailById } = this.props;
+    const { createdAt, products: quotatedProducts, to } = quotation.detail;
     const { byId } = allProducts;
     const formatedDate = formatDate(createdAt);
     const formatedTime = formatTime(createdAt);
@@ -18,8 +18,24 @@ class QuotationDetail extends Component {
     return (
       <View style={{ flex: 1 }}>
         <View style={{ padding: 10 }}>
-          <Text style={{ fontSize: 24 }}>Báo giá ngày {formatedDate}</Text>
-          <Text style={{ fontSize: 18 }}>Đã nhận: {formatedTime}</Text>
+          <Text style={{ fontSize: 24 }}>
+            {(quotation.type === "received" &&
+              `Báo giá ngày ${formatedDate}`) ||
+              `Báo giá đến ${agencyDetailById(to).detail.info.name}`}
+          </Text>
+          <Text style={{ fontSize: 18 }}>
+            {quotation.type === "received"
+              ? `Đã nhận: ${formatedTime}`
+              : `Đã gởi: ${formatedTime}, ${formatedDate}`}
+          </Text>
+          {quotation.type === "going" && (
+            <Text style={{ fontSize: 18, fontStyle: "italic" }}>
+              {agencyDetailById(to).detail.info.name}
+              {quotation.detail.status.verified
+                ? " đã xác nhận"
+                : " chưa xác nhận"}
+            </Text>
+          )}
         </View>
         <FlatList
           contentContainerStyle={{ paddingVertical: 10 }}
@@ -49,9 +65,10 @@ const ReadOnlyProduct = ({ item: { id, detail, inQuotation }, index }) => {
       {detail && (
         <View style={styles().infoAndActions}>
           <View style={styles().info}>
-            <Text style={styles().listItemTitle}>{detail.name}</Text>
-            <Text>{detail.type}</Text>
-            <View style={{ flexDirection: "row", alignSelf: "center" }}>
+            <Text style={styles().listItemTitle}>
+              {detail.name} - {detail.type}
+            </Text>
+            <View style={{ flexDirection: "row" }}>
               <Text>Giá mới {inQuotation.price}</Text>
             </View>
           </View>
@@ -100,5 +117,6 @@ const styles = key =>
 
 export default connect((state, props) => ({
   quotation: selectors.data.getQuotationByIdFromNavigationParam(state, props),
-  allProducts: selectors.data.getProducts(state)
+  allProducts: selectors.data.getProducts(state),
+  agencyDetailById: id => selectors.data.getAgencyById(state, { id })
 }))(QuotationDetail);

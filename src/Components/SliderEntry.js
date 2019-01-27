@@ -28,7 +28,7 @@ export default class SliderEntry extends Component {
       even
     } = this.props;
 
-    return parallax ? (
+    return detail && parallax ? (
       <ParallaxImage
         source={{ uri: detail.localImage || detail.imageUrl }}
         containerStyle={[
@@ -51,11 +51,7 @@ export default class SliderEntry extends Component {
 
   render() {
     const {
-      data: {
-        detail: { name, type },
-        status,
-        goToDetail
-      },
+      data: { detail, status, goToDetail },
       even
     } = this.props;
 
@@ -71,40 +67,45 @@ export default class SliderEntry extends Component {
     );
 
     const price = status.price.current || status.price.default;
-
+    const { name, type } = detail;
     return (
-      <TouchableOpacity
-        activeOpacity={1}
-        style={styles.slideInnerContainer}
-        onPress={goToDetail}
-      >
-        <View style={styles.shadow} />
-        <View
-          style={[styles.imageContainer, even ? styles.imageContainerEven : {}]}
+      detail && (
+        <TouchableOpacity
+          activeOpacity={1}
+          style={styles.slideInnerContainer}
+          onPress={goToDetail}
         >
-          {this.image}
+          <View style={styles.shadow} />
           <View
-            style={[styles.radiusMask, even ? styles.radiusMaskEven : {}]}
-          />
-        </View>
-        <View
-          style={[styles.textContainer, even ? styles.textContainerEven : {}]}
-        >
-          {uppercaseTitle}
-          <Text
-            style={[styles.subtitle, even ? styles.subtitleEven : {}]}
-            numberOfLines={2}
+            style={[
+              styles.imageContainer,
+              even ? styles.imageContainerEven : {}
+            ]}
           >
-            {type}
-          </Text>
-          <Text
-            style={[styles.subtitle, even ? styles.subtitleEven : {}]}
-            numberOfLines={2}
+            {this.image}
+            <View
+              style={[styles.radiusMask, even ? styles.radiusMaskEven : {}]}
+            />
+          </View>
+          <View
+            style={[styles.textContainer, even ? styles.textContainerEven : {}]}
           >
-            {formatMoney(price)}
-          </Text>
-        </View>
-      </TouchableOpacity>
+            {uppercaseTitle}
+            <Text
+              style={[styles.subtitle, even ? styles.subtitleEven : {}]}
+              numberOfLines={2}
+            >
+              {type}
+            </Text>
+            <Text
+              style={[styles.subtitle, even ? styles.subtitleEven : {}]}
+              numberOfLines={2}
+            >
+              {formatMoney(price)}
+            </Text>
+          </View>
+        </TouchableOpacity>
+      )
     );
   }
 }

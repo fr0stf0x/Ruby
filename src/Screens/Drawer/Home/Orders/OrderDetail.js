@@ -9,16 +9,22 @@ import { mergeObj } from "~/Reducers/utils";
 class OrderDetail extends Component {
   render() {
     const { order, allProducts } = this.props;
-    const { createdAt, products: orderedProducts, totalPrice } = order.detail;
+    const { detail, type } = order;
+    const { createdAt, products: orderedProducts, totalPrice } = detail;
     const { byId } = allProducts;
     const formatedDate = formatDate(createdAt);
     const formatedTime = formatTime(createdAt);
     return (
       <View style={{ flex: 1 }}>
         <View style={{ padding: 10 }}>
-          <Text style={{ fontSize: 24 }}>Đơn đặt hàng từ {order.from}</Text>
+          <Text style={{ fontSize: 24 }}>
+            {type === "received"
+              ? `Đơn đặt hàng từ ${order.from}`
+              : `Đơn đặt hàng ngày ${formatedDate}`}
+          </Text>
           <Text style={{ fontSize: 18 }}>
-            Đã nhận: {formatedDate}, {formatedTime}
+            Đã {(type === "received" && "nhận") || "gởi"}:{formatedDate},{" "}
+            {formatedTime}
           </Text>
           <Text style={{ fontSize: 18 }}>
             Tổng số tiền: {formatMoney(totalPrice)}
