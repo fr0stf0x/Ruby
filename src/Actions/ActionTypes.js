@@ -17,6 +17,7 @@ const OBSERVE_AGENCY_PRODUCTS = "observe_agency_products";
 
 const SET_APP_MODE = "set_app_mode";
 
+const CLEAR_CART = "clear_cart";
 const CAL_PRICE = "cal_price";
 const ADD_AGENCY = "add_agency";
 const ADD_AGENCIES = "add_agencies";
@@ -54,6 +55,7 @@ const types = {
     OBSERVE_AGENCY_PRODUCTS
   },
   cart: {
+    CLEAR_CART,
     CAL_PRICE,
     ADD_AGENCIES,
     TOGGLE_ADD_AGENCY,

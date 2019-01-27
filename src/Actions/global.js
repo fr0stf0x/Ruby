@@ -129,7 +129,6 @@ export const createQuotation = (agencyIds: Array, products) => {
       createdAt,
       type: "going"
     });
-    // central doc
     batch.set(centralOrderDocRef, {
       status,
       products,
@@ -154,27 +153,26 @@ export const createOrder = (parentId, products, totalPrice) => {
   };
   const createdAt = new Date();
   const currentGroup = selectors.data.getGroupInfo(store.getState());
-
   const parentRef = db.collection(appConstants.collection.GROUPS).doc(parentId);
   const centralOrderDocRef = db
     .collection(appConstants.collection.ORDERS)
     .doc();
+  const orderDocRefInParent = parentRef
+    .collection(appConstants.collection.ORDERS)
+    .doc(centralOrderDocRef.id);
   const orderDocRefInCurrentGroup = db
     .collection(appConstants.collection.GROUPS)
     .doc(currentGroup.id)
     .collection(appConstants.collection.ORDERS)
     .doc(centralOrderDocRef.id);
-  const orderDocRefInParent = parentRef
-    .collection(appConstants.collection.ORDERS)
-    .doc(centralOrderDocRef.id);
-  batch.set(orderDocRefInCurrentGroup, {
-    createdAt,
-    type: "going"
-  });
   batch.set(orderDocRefInParent, {
     createdAt,
     from: currentGroup.name,
     type: "received"
+  });
+  batch.set(orderDocRefInCurrentGroup, {
+    createdAt,
+    type: "going"
   });
   batch.set(centralOrderDocRef, {
     status,

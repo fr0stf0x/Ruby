@@ -61,11 +61,11 @@ const collection = (
     case types.data.OBSERVE_DATA:
       switch (action.payload.change.type) {
         case "added":
-          // console.log(
-          //   "data added",
-          //   action.payload.id,
-          //   action.payload.change.data
-          // );
+          console.log(
+            "data added",
+            action.payload.id,
+            action.payload.change.data
+          );
           return mergeObj(state, {
             allIds: [...state.allIds, action.payload.id],
             byId: mergeObj(state.byId, {

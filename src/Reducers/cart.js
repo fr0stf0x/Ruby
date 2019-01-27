@@ -65,24 +65,23 @@ const endpoint = (state = {}, action) => {
   }
 };
 
-const cartReducer = (
-  state = {
-    order: {
-      products: {},
-      totalPrice: 0
-    },
-    quotation: {
-      products: {},
-      agencies: [],
-      totalPrice: 0
-    },
-    addProducts: {
-      products: {},
-      agencies: []
-    }
+const cart = {
+  order: {
+    products: {},
+    totalPrice: 0
   },
-  action
-) => {
+  quotation: {
+    products: {},
+    agencies: [],
+    totalPrice: 0
+  },
+  addProducts: {
+    products: {},
+    agencies: []
+  }
+};
+
+const cartReducer = (state = cart, action) => {
   switch (action.type) {
     case types.cart.TOGGLE_ITEM_CART:
     case types.cart.MODIFY_ITEM_IN_CART:
@@ -94,6 +93,8 @@ const cartReducer = (
       return mergeObj(state, {
         [action.meta.endpoint]: endpoint(state[action.meta.endpoint], action)
       });
+    case types.cart.CLEAR_CART:
+      return cart;
     default:
       return state;
   }

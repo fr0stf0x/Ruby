@@ -57,7 +57,6 @@ class CreateOrderScreen extends Component {
   render() {
     const { error } = this.state;
     const { products, appMode, selectedProducts } = this.props;
-    console.log(selectedProducts);
     const totalPrice = Object.entries(selectedProducts)
       .map(([id, value]) => value)
       .filter(value => value.checked)

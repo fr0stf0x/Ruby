@@ -86,7 +86,7 @@ const OrderItem = ({
     const formatedDate = formatDate(detail.createdAt);
     const formatedTime = formatTime(detail.createdAt);
     return (
-      <TouchableOpacity onPress={() => goToDetail(id)}>
+      <TouchableOpacity key={index} onPress={() => goToDetail(id)}>
         <View style={styles(index, !detail.status.verified).listItem}>
           <View style={styles().infoAndActions}>
             <View style={{ flex: 1, flexDirection: "row" }}>
@@ -123,7 +123,11 @@ const OrderItem = ({
       </TouchableOpacity>
     );
   } else {
-    return <Text h1>Đang tải</Text>;
+    return (
+      <Text key={index} h1>
+        Đang tải
+      </Text>
+    );
   }
 };
 

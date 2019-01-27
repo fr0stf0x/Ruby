@@ -125,7 +125,6 @@ export const addProduct = ({
     .doc(companyId)
     .collection(appConstants.collection.PRODUCTS)
     .doc(newProductRef.id);
-
   return db
     .batch()
     .set(newProductRef, productInfo)
@@ -168,16 +167,9 @@ export const acceptNewQuotation = quotationId => (dispatch, getState) => {
   const batch = db.batch();
   const state = getState();
   const currentGroup = selectors.data.getGroupInfo(state);
-  const parentGroup = selectors.data.getParent(state);
   const currentGroupDocRef = db
     .collection(appConstants.collection.GROUPS)
     .doc(currentGroup.id);
-  console.log(parentGroup);
-  // const quotationRefInParent = db
-  //   .collection(appConstants.collection.GROUPS)
-  //   .doc(parentGroup.info.id)
-  //   .collection(appConstants.collection.QUOTATIONS)
-  //   .doc(quotationId);
   const centralRef = db
     .collection(appConstants.collection.ORDERS)
     .doc(quotationId);
@@ -186,11 +178,9 @@ export const acceptNewQuotation = quotationId => (dispatch, getState) => {
     id: quotationId
   });
   batch.update(centralRef, update);
-  // batch.update(quotationRefInParent, update);
   const productCollectionInGroup = currentGroupDocRef.collection(
     appConstants.collection.PRODUCTS
   );
-  console.log("changing price");
   return Promise.all(
     Object.entries(quotationDetail.detail.products).map(([id, value]) => {
       if (value.price) {
@@ -221,60 +211,29 @@ export const acceptNewQuotation = quotationId => (dispatch, getState) => {
 export const rejectNewQuotation = quotationId => (dispatch, getState) => {
   const db = firebase.firestore();
   const batch = db.batch();
-  const currentGroup = selectors.data.getGroupInfo(getState());
-  const parentGroup = selectors.data.getParent(getState());
-  const currentGroupDocRef = db
-    .collection(appConstants.collection.GROUPS)
-    .doc(currentGroup.id);
-  // const quotationRefInParent = db
-  //   .collection(appConstants.collection.GROUPS)
-  //   .doc(parentGroup.info.id)
-  //   .collection(appConstants.collection.QUOTATIONS)
-  //   .doc(quotationId);
   const centralRef = db
     .collection(appConstants.collection.ORDERS)
     .doc(quotationId);
   const update = { status: { verified: "rejected" } };
   batch.update(centralRef, update);
-  // batch.update(quotationRefInParent, update);
   return batch.commit();
 };
 
 export const acceptNewOrder = (fromId, orderId) => (dispatch, getState) => {
   const db = firebase.firestore();
   const batch = db.batch();
-  const currentGroup = selectors.data.getGroupInfo(getState());
-  const currentGroupDocRef = db
-    .collection(appConstants.collection.GROUPS)
-    .doc(currentGroup.id);
-  const orderRefInChild = db
-    .collection(appConstants.collection.GROUPS)
-    .doc(fromId)
-    .collection(appConstants.collection.ORDERS)
-    .doc(orderId);
   const orderRef = db.collection(appConstants.collection.ORDERS).doc(orderId);
   const update = { status: { verified: "accepted" } };
   batch.update(orderRef, update);
-  // batch.update(orderRefInChild, update);
   return batch.commit();
 };
 
 export const rejectNewOrder = (fromId, orderId) => (dispatch, getState) => {
   const db = firebase.firestore();
   const batch = db.batch();
-  const currentGroup = selectors.data.getGroupInfo(getState());
-  const currentGroupDocRef = db
-    .collection(appConstants.collection.GROUPS)
-    .doc(currentGroup.id);
   const orderRef = db.collection(appConstants.collection.ORDERS).doc(orderId);
-  // const orderRefInChild = db
-  //   .collection(appConstants.collection.GROUPS)
-  //   .doc(fromId)
-  //   .collection(appConstants.collection.ORDERS)
-  //   .doc(orderId);
   const update = { status: { verified: "rejected" } };
   batch.update(orderRef, update);
-  // batch.update(orderRefInChild, update);
   return batch.commit();
 };
 
@@ -438,6 +397,9 @@ const getCollectionAndMergeDetails = async (
     .collection(collectionName)
     .onSnapshot((query: QuerySnapshot) => {
       query.docChanges.forEach(async docChange => {
+        if (collectionName === appConstants.collection.ORDERS) {
+          console.log("observing orders");
+        }
         const changeType = docChange.type;
         const docSnapshot = docChange.doc;
         dispatch(
@@ -450,64 +412,53 @@ const getCollectionAndMergeDetails = async (
             }
           })
         );
-        // const { data: detailSnapshot, error } = await promiseWrapper(
         firebase
           .firestore()
           .collection(parentCollectionName)
           .doc(docSnapshot.id)
-          .onSnapshot(
-            async detailSnapshot => {
-              if (detailSnapshot.exists) {
-                const detail = detailSnapshot.data();
-                console.log("detail", detail);
-                const imageDownloaded = await new Promise((resolve, reject) => {
-                  if (
-                    detail.imageUrl ||
-                    (detail.info && detail.info.imageUrl)
-                  ) {
-                    const imageUrl = detail.imageUrl
-                      ? detail.imageUrl
-                      : detail.info.imageUrl;
-                    const localImage = detail.localImage
-                      ? detail.localImage
-                      : detail.info.localImage;
-                    resolve(
-                      RNFetchBlob.fs.exists(localImage).then(exists =>
-                        !exists
-                          ? RNFetchBlob.config({
-                              fileCache: true,
-                              appendExt: "jpg"
-                            }).fetch("GET", imageUrl)
-                          : false
-                      )
-                    );
-                  } else resolve(false);
-                });
-                if (imageDownloaded) {
-                  if (detail.imageUrl)
-                    detail.localImage =
-                      (Platform.OS === "android" ? "file://" : "") +
-                      imageDownloaded.path();
-                  else {
-                    detail.info.localImage =
-                      (Platform.OS === "android" ? "file://" : "") +
-                      imageDownloaded.path();
-                  }
+          .onSnapshot(async detailSnapshot => {
+            if (detailSnapshot.exists) {
+              const detail = detailSnapshot.data();
+              const imageDownloaded = await new Promise((resolve, reject) => {
+                if (detail.imageUrl || (detail.info && detail.info.imageUrl)) {
+                  const imageUrl = detail.imageUrl
+                    ? detail.imageUrl
+                    : detail.info.imageUrl;
+                  const localImage = detail.localImage
+                    ? detail.localImage
+                    : detail.info.localImage;
+                  resolve(
+                    RNFetchBlob.fs.exists(localImage).then(exists =>
+                      !exists
+                        ? RNFetchBlob.config({
+                            fileCache: true,
+                            appendExt: "jpg"
+                          }).fetch("GET", imageUrl)
+                        : false
+                    )
+                  );
+                } else resolve(false);
+              });
+              if (imageDownloaded) {
+                if (detail.imageUrl)
+                  detail.localImage =
+                    (Platform.OS === "android" ? "file://" : "") +
+                    imageDownloaded.path();
+                else {
+                  detail.info.localImage =
+                    (Platform.OS === "android" ? "file://" : "") +
+                    imageDownloaded.path();
                 }
-                dispatch(
-                  observeDetail({
-                    endpoint: collectionName,
-                    id: docSnapshot.id,
-                    detail
-                  })
-                );
               }
+              dispatch(
+                observeDetail({
+                  endpoint: collectionName,
+                  id: docSnapshot.id,
+                  detail
+                })
+              );
             }
-            // })
-            // .get()
-          );
-        // if (!error) {
-        // }
+          });
       });
     });
 };

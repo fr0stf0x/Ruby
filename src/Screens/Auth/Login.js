@@ -41,9 +41,9 @@ class LoginScreen extends Component {
   };
 
   componentDidMount() {
-    const { isUserLoggedIn, navigation, clearAppData } = this.props;
+    const { isUserLoggedIn, navigation, clearAppData, clearCart } = this.props;
     (isUserLoggedIn && navigation.navigate("Welcome")) ||
-      (clearAppData() && this.getAccountAsync());
+      (clearAppData() && clearCart() && this.getAccountAsync());
   }
 
   toggleRevealPassword = () => {
@@ -140,6 +140,7 @@ export default connect(
     logIn: ({ email, password }) =>
       dispatch(actions.auth.makeLogIn({ email, password })),
     toggleLoading: () => dispatch(actions.ui.toggleLoading()),
-    clearAppData: () => dispatch({ type: types.data.CLEAR_DATA })
+    clearAppData: () => dispatch({ type: types.data.CLEAR_DATA }),
+    clearCart: () => dispatch({ type: types.cart.CLEAR_CART })
   })
 )(LoginScreen);
