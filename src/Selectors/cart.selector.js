@@ -12,4 +12,9 @@ export const getProductsInCart = (state, { endpoint }) =>
   state.cart[endpoint].products || {};
 
 export const isCartEmpty = (state, { endpoint }) =>
-  Object.keys(getProductsInCart(state, { endpoint })).length === 0;
+  Object.entries(getProductsInCart(state, { endpoint })).filter(
+    ([id, value]) => value.checked
+  ).length === 0;
+
+export const getTotalPrice = (state, { endpoint }) =>
+  state.cart[endpoint].totalPrice;

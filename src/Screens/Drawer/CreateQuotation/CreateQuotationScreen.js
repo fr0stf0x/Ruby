@@ -18,6 +18,7 @@ import store from "~/configureStore";
 import AccessDenied from "~/Screens/AccessDenied";
 import selectors from "~/Selectors";
 import { globalColorsAndStyles } from "~/Theme";
+import { formatMoney } from "~/Utils/utils";
 class CreateQuotationScreen extends Component {
   state = {
     error: false
@@ -119,8 +120,13 @@ class CreateQuotationScreen extends Component {
 
   render() {
     const { error } = this.state;
-    const { allProducts, appMode } = this.props;
+    const { allProducts, appMode, selectedProducts } = this.props;
     const productIds = allProducts.allIds;
+    const totalPrice = Object.entries(selectedProducts)
+      .filter(([id, value]) => value.checked)
+      .reduce((total, [id, value]) => {
+        return total + value.price;
+      }, 0);
     return (
       (appMode === appConstants.mode.MODE_RETAIL && (
         <AccessDenied navigation={this.props.navigation} mode="bán lẻ" />
@@ -135,6 +141,15 @@ class CreateQuotationScreen extends Component {
             </ProductItemContext.Provider>
           </ScrollView>
           <View style={{ padding: 10 }}>
+            <Text
+              style={{
+                textAlign: "center",
+                fontSize: 16,
+                color: globalColorsAndStyles.color.primaryText
+              }}
+            >
+              Tổng cộng: {formatMoney(totalPrice)}
+            </Text>
             {error && (
               <Text
                 style={{
@@ -196,7 +211,10 @@ export default connect(
     appMode: selectors.ui.getAppMode(state),
     agencies: selectors.data.getAgencies(state),
     selectedAgencyIds: selectors.cart.getSelectedAgenciesInCart(state),
-    allProducts: selectors.data.getProducts(state)
+    allProducts: selectors.data.getProducts(state),
+    selectedProducts: selectors.cart.getProductsInCart(state, {
+      endpoint: appConstants.productItemContext.QUOTATION
+    })
   }),
   dispatch => ({
     doGetProductsOfAgency: id =>

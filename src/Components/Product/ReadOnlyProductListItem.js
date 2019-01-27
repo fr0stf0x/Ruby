@@ -13,7 +13,7 @@ const ReadOnlyProductListItem = ({ id, detail, status, index }) => {
             uri: detail.localImage || detail.imageUrl
           }}
           resizeMode="cover"
-          style={{ width: 100, height: 100 }}
+          style={{ width: 70, height: 70 }}
         />
       </View>
       <View style={styles().infoAndActions}>

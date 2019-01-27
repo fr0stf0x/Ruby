@@ -19,6 +19,7 @@ import {
 } from "./data.selector";
 import { isLoading, getAppMode } from "./ui.selector";
 import {
+  getTotalPrice,
   getProductInCart,
   getProductsInCart,
   isCartEmpty,
@@ -54,6 +55,7 @@ const selectors = {
     getQuotationByIdFromNavigationParam
   },
   cart: {
+    getTotalPrice,
     getProductInCart,
     getProductsInCart,
     isCartEmpty,

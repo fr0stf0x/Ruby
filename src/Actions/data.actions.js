@@ -56,11 +56,11 @@ export const subscribeToTopicIfNeeded = async groupId => {
     const fcmToken = await firebase.messaging().getToken();
     if (fcmToken) {
       console.log("have token");
-    }
-    const enabled = await firebase.messaging().hasPermission();
-    if (enabled) {
-      console.log(`subscribing to /topics/${groupId}`);
-      firebase.messaging().subscribeToTopic(`/topics/${groupId}`);
+      const enabled = await firebase.messaging().hasPermission();
+      if (enabled) {
+        console.log(`subscribing to /topics/${groupId}`);
+        firebase.messaging().subscribeToTopic(`/topics/${groupId}`);
+      }
     }
   }
   return true;
@@ -97,8 +97,10 @@ export const makeCreateOrder = () => (dispatch, getState) => {
   const selectedProducts = selectors.cart.getProductsInCart(state, {
     endpoint: appConstants.productItemContext.ORDER
   });
-  console.log("products", selectedProducts);
-  return createOrder(parentId, selectedProducts);
+  const totalPrice = selectors.cart.getTotalPrice(state, {
+    endpoint: appConstants.productItemContext.ORDER
+  });
+  return createOrder(parentId, selectedProducts, totalPrice);
 };
 
 export const addProduct = ({
@@ -222,7 +224,7 @@ export const rejectNewQuotation = quotationId => (dispatch, getState) => {
   const currentGroupDocRef = db
     .collection(appConstants.collection.GROUPS)
     .doc(currentGroup.id);
-  const quotationRefInParent = db
+  const orderRefInParent = db
     .collection(appConstants.collection.GROUPS)
     .doc(parentGroup.info.id)
     .collection(appConstants.collection.ORDERS)
@@ -232,7 +234,10 @@ export const rejectNewQuotation = quotationId => (dispatch, getState) => {
     .doc(quotationId);
   const update = { status: { verified: "rejected" } };
   batch.update(quotationRef, update);
-  batch.set(quotationRefInParent, { ...update, ...{ from: currentGroup.id } });
+  batch.set(orderRefInParent, {
+    ...update,
+    ...{ from: currentGroup.name }
+  });
   return batch.commit();
 };
 

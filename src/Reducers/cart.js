@@ -10,7 +10,8 @@ const products = (state = {}, action) => {
             ? state[action.payload.id].checked
               ? !state[action.payload.id].checked
               : true
-            : true
+            : true,
+          ...action.payload.data
         })
       });
     case types.cart.MODIFY_ITEM_IN_CART:
@@ -43,6 +44,10 @@ const agencies = (state = [], action) => {
 
 const endpoint = (state = {}, action) => {
   switch (action.type) {
+    case types.cart.CAL_PRICE:
+      return mergeObj(state, {
+        totalPrice: state.totalPrice + action.payload.totalPrice
+      });
     case types.cart.TOGGLE_ITEM_CART:
     case types.cart.MODIFY_ITEM_IN_CART:
       return mergeObj(state, {
@@ -63,11 +68,13 @@ const endpoint = (state = {}, action) => {
 const cartReducer = (
   state = {
     order: {
-      products: {}
+      products: {},
+      totalPrice: 0
     },
     quotation: {
       products: {},
-      agencies: []
+      agencies: [],
+      totalPrice: 0
     },
     addProducts: {
       products: {},
@@ -83,6 +90,7 @@ const cartReducer = (
     case types.cart.ADD_AGENCIES:
     case types.cart.REMOVE_AGENCY:
     case types.cart.REMOVE_ALL_AGENCY:
+    case types.cart.CAL_PRICE:
       return mergeObj(state, {
         [action.meta.endpoint]: endpoint(state[action.meta.endpoint], action)
       });

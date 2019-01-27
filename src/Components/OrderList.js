@@ -14,7 +14,7 @@ import actions from "~/Actions";
 import { promiseWithLoadingAnimation } from "~/Actions/global";
 import selectors from "~/Selectors";
 import { globalColorsAndStyles } from "~/Theme";
-import { formatDate, formatTime } from "~/Utils/utils";
+import { formatDate, formatTime, formatMoney } from "~/Utils/utils";
 import AcceptAndRejectButtons from "./AcceptAndRejectButtons";
 import NewItemBadge from "./NewItemBadge";
 import { mergeObj } from "~/Reducers/utils";
@@ -103,7 +103,8 @@ const OrderItem = ({
               )}
               <View style={{ alignItems: "flex-end" }}>
                 <Text style={styles().listItemSubtitle}>
-                  {formatedTime}, {formatedDate}
+                  <Text>{formatMoney(detail.totalPrice)}</Text> - {formatedTime}
+                  , {formatedDate}
                 </Text>
               </View>
             </View>

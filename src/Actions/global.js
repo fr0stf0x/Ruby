@@ -125,9 +125,11 @@ export const createQuotation = (agencyIds: Array, products) => {
   return batch.commit();
 };
 
-export const createOrder = (parentId, products) => {
-  if (Object.keys(products).length === 0) {
-    return Promise.reject("Chưa chọn sản phẩm để báo giá");
+export const createOrder = (parentId, products, totalPrice) => {
+  if (
+    Object.entries(products).filter(([id, value]) => value.checked).length === 0
+  ) {
+    return Promise.reject("Chưa chọn sản phẩm để đặt hàng");
   }
   const db = firebase.firestore();
   const batch = db.batch();
@@ -146,7 +148,8 @@ export const createOrder = (parentId, products) => {
     products,
     createdAt,
     from: currentGroup.id,
-    to: parentId
+    to: parentId,
+    totalPrice
   });
   batch.set(orderDocRefInParent, {
     status,

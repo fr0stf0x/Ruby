@@ -10,6 +10,7 @@ import {
   View
 } from "react-native";
 import { ParallaxImage } from "react-native-snap-carousel";
+import { formatMoney } from "~/Utils/utils";
 
 export default class SliderEntry extends Component {
   static propTypes = {
@@ -100,7 +101,7 @@ export default class SliderEntry extends Component {
             style={[styles.subtitle, even ? styles.subtitleEven : {}]}
             numberOfLines={2}
           >
-            {price}
+            {formatMoney(price)}
           </Text>
         </View>
       </TouchableOpacity>
@@ -118,9 +119,9 @@ function wp(percentage) {
   return Math.round(value);
 }
 
-const slideHeight = viewportHeight * 0.48;
-const slideWidth = wp(75);
-const itemHorizontalMargin = wp(2);
+const slideHeight = viewportHeight * 0.36;
+const slideWidth = wp(48);
+const itemHorizontalMargin = wp(1);
 
 export const sliderWidth = viewportWidth;
 export const itemWidth = slideWidth + itemHorizontalMargin * 2;
@@ -139,7 +140,7 @@ export const styles = StyleSheet.create({
     width: itemWidth,
     height: slideHeight,
     paddingHorizontal: itemHorizontalMargin,
-    paddingBottom: 18 // needed for shadow
+    paddingBottom: 18
   },
   shadow: {
     position: "absolute",
@@ -155,7 +156,7 @@ export const styles = StyleSheet.create({
   },
   imageContainer: {
     flex: 1,
-    marginBottom: IS_IOS ? 0 : -1, // Prevent a random Android rendering issue
+    marginBottom: IS_IOS ? 0 : -1,
     backgroundColor: "white",
     borderTopLeftRadius: entryBorderRadius,
     borderTopRightRadius: entryBorderRadius
@@ -170,7 +171,6 @@ export const styles = StyleSheet.create({
     borderTopLeftRadius: entryBorderRadius,
     borderTopRightRadius: entryBorderRadius
   },
-  // image's border radius is buggy on iOS; let's hack it!
   radiusMask: {
     position: "absolute",
     bottom: 0,

@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, FlatList, TouchableOpacity, View } from "react-native";
 import { Text } from "react-native-elements";
-import Carousel from "react-native-snap-carousel";
+import Carousel, { Pagination } from "react-native-snap-carousel";
 import { connect } from "react-redux";
 import appConstants from "~/appConstants";
 import { mergeObj } from "~/Reducers/utils";
@@ -61,66 +61,92 @@ const renderItemWithParallax = ({ item, index }, parallaxProps) => {
   );
 };
 
-const ProductList = ({ productIds, productDetailsById }) => {
-  if (productIds && productIds.length > 0) {
+class ProductList extends React.Component {
+  state = {
+    activeIndex: 1
+  };
+
+  render() {
+    const { productIds, productDetailsById } = this.props;
+    if (productIds && productIds.length > 0) {
+      return (
+        <ProductItemContext.Consumer>
+          {context =>
+            context.type === appConstants.productItemContext.SHOW ? (
+              <View>
+                <Carousel
+                  ref={c => {
+                    this._carousel = c;
+                  }}
+                  data={productIds.map(id =>
+                    mergeObj(productDetailsById[id], {
+                      goToDetail: () =>
+                        context.action.navigation.navigate("ProductDetail", {
+                          id
+                        })
+                    })
+                  )}
+                  renderItem={renderItemWithParallax}
+                  sliderWidth={sliderWidth}
+                  itemWidth={itemWidth}
+                  hasParallaxImages={true}
+                  loop={true}
+                  inactiveSlideScale={0.94}
+                  inactiveSlideOpacity={0.7}
+                  loopClonesPerSide={2}
+                  autoplay={true}
+                  autoplayDelay={100}
+                  autoplayInterval={5000}
+                  containerCustomStyle={styles.slider}
+                  onSnapToItem={index => this.setState({ activeIndex: index })}
+                  contentContainerCustomStyle={styles.sliderContentContainer}
+                />
+                <Pagination
+                  dotsLength={productIds.length}
+                  activeDotIndex={this.state.activeIndex}
+                  containerStyle={styles.paginationContainer}
+                  dotColor={"rgba(255, 255, 255, 0.92)"}
+                  dotStyle={styles.paginationDot}
+                  inactiveDotColor={colors.black}
+                  inactiveDotOpacity={0.4}
+                  inactiveDotScale={0.6}
+                  carouselRef={this._carousel}
+                  tappableDots={!!this._carousel}
+                />
+              </View>
+            ) : (
+              <FlatList
+                contentContainerStyle={{ paddingVertical: 10 }}
+                refreshing={true}
+                keyExtractor={(item, index) => index.toString()}
+                data={productIds.map(id =>
+                  mergeObj(productDetailsById[id], { id })
+                )}
+                renderItem={ProductItem}
+              />
+            )
+          }
+        </ProductItemContext.Consumer>
+      );
+    }
     return (
-      <ProductItemContext.Consumer>
-        {context =>
-          context.type === appConstants.productItemContext.SHOW ? (
-            <Carousel
-              ref={c => {
-                this._carousel = c;
-              }}
-              data={productIds.map(id =>
-                mergeObj(productDetailsById[id], {
-                  goToDetail: () =>
-                    context.action.navigation.navigate("ProductDetail", { id })
-                })
-              )}
-              renderItem={renderItemWithParallax}
-              sliderWidth={sliderWidth}
-              itemWidth={itemWidth}
-              hasParallaxImages={true}
-              loop={true}
-              inactiveSlideScale={0.94}
-              inactiveSlideOpacity={0.7}
-              loopClonesPerSide={2}
-              autoplay={true}
-              autoplayDelay={500}
-              autoplayInterval={3000}
-              containerCustomStyle={styles.slider}
-              contentContainerCustomStyle={styles.sliderContentContainer}
-            />
-          ) : (
-            <FlatList
-              contentContainerStyle={{ paddingVertical: 10 }}
-              refreshing={true}
-              keyExtractor={(item, index) => index.toString()}
-              data={productIds.map(id =>
-                mergeObj(productDetailsById[id], { id })
-              )}
-              renderItem={ProductItem}
-            />
-          )
-        }
-      </ProductItemContext.Consumer>
+      <View
+        style={{
+          flex: 1,
+          padding: 20,
+          alignItems: "center",
+          justifyContent: "center"
+        }}
+      >
+        <Text
+          style={{ fontSize: 24, color: globalColorsAndStyles.color.error }}
+        >
+          <Text>Không có sản phẩm nào</Text>
+        </Text>
+      </View>
     );
   }
-  return (
-    <View
-      style={{
-        flex: 1,
-        padding: 20,
-        alignItems: "center",
-        justifyContent: "center"
-      }}
-    >
-      <Text style={{ fontSize: 24, color: globalColorsAndStyles.color.error }}>
-        <Text>Không có sản phẩm nào</Text>
-      </Text>
-    </View>
-  );
-};
+}
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -171,7 +197,7 @@ const styles = StyleSheet.create({
     overflow: "visible" // for custom animations
   },
   sliderContentContainer: {
-    paddingVertical: 10 // for custom animation
+    paddingVertical: 8 // for custom animation
   },
   paginationContainer: {
     paddingVertical: 8

@@ -16,6 +16,8 @@ import ProductList, { ProductItemContext } from "~/Components/ProductList";
 import AccessDenied from "~/Screens/AccessDenied";
 import selectors from "~/Selectors";
 import { globalColorsAndStyles } from "~/Theme";
+import { formatMoney } from "~/Utils/utils";
+import types from "~/Actions/ActionTypes";
 
 class CreateOrderScreen extends Component {
   state = {
@@ -26,7 +28,14 @@ class CreateOrderScreen extends Component {
     this.props.navigation.navigate("OrderList");
   };
 
-  doCreateOrder = () =>
+  doCreateOrder = () => {
+    const totalPrice = Object.entries(this.props.selectedProducts)
+      .map(([id, value]) => value)
+      .filter(value => value.checked)
+      .reduce((total, value) => {
+        return total + value.totalPrice;
+      }, 0);
+    this.props.calculatePrice(totalPrice);
     promiseWithLoadingAnimation(() =>
       this.props
         .createOrder()
@@ -43,10 +52,18 @@ class CreateOrderScreen extends Component {
           this.setState({ error });
         })
     );
+  };
 
   render() {
     const { error } = this.state;
-    const { products, appMode } = this.props;
+    const { products, appMode, selectedProducts } = this.props;
+    console.log(selectedProducts);
+    const totalPrice = Object.entries(selectedProducts)
+      .map(([id, value]) => value)
+      .filter(value => value.checked)
+      .reduce((total, value) => {
+        return total + value.totalPrice;
+      }, 0);
     return (
       (appMode === appConstants.mode.MODE_COMPANY && (
         <AccessDenied
@@ -64,6 +81,15 @@ class CreateOrderScreen extends Component {
             </ProductItemContext.Provider>
           </ScrollView>
           <View style={{ padding: 10 }}>
+            <Text
+              style={{
+                textAlign: "center",
+                fontSize: 16,
+                color: globalColorsAndStyles.color.primaryText
+              }}
+            >
+              Tổng cộng: {formatMoney(totalPrice)}
+            </Text>
             {error && (
               <Text
                 style={{
@@ -132,10 +158,19 @@ CreateOrderScreen.navigationOptions = ({ navigation }) => ({
 export default connect(
   state => ({
     products: selectors.data.getProducts(state),
-    appMode: selectors.ui.getAppMode(state)
+    appMode: selectors.ui.getAppMode(state),
+    selectedProducts: selectors.cart.getProductsInCart(state, {
+      endpoint: appConstants.productItemContext.ORDER
+    })
   }),
   dispatch => ({
     toggleLoading: () => dispatch(actions.ui.toggleLoading()),
+    calculatePrice: totalPrice =>
+      dispatch({
+        type: types.cart.CAL_PRICE,
+        meta: { endpoint: appConstants.productItemContext.ORDER },
+        payload: { totalPrice }
+      }),
     createOrder: () => dispatch(actions.data.makeCreateOrder())
   })
 )(CreateOrderScreen);

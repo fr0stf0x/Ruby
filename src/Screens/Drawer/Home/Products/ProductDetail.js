@@ -10,7 +10,7 @@ import { Text, ThemeProvider, Button } from "react-native-elements";
 import { connect } from "react-redux";
 import selectors from "~/Selectors";
 import { globalColorsAndStyles } from "~/Theme";
-import { formatDate } from "~/Utils/utils";
+import { formatDate, formatMoney } from "~/Utils/utils";
 import NumericInput from "react-native-numeric-input";
 import actions from "~/Actions";
 import { promiseWithLoadingAnimation } from "~/Actions/global";
@@ -61,9 +61,9 @@ class ProductDetail extends Component {
 
   render() {
     const { product } = this.props;
-    const currentPrice = (
+    const currentPrice = formatMoney(
       product.status.price.current || product.status.price.default
-    ).toString();
+    );
     return (
       <ThemeProvider theme={theme}>
         <View

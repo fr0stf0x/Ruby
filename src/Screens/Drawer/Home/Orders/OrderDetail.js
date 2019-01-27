@@ -3,16 +3,16 @@ import { StyleSheet, FlatList, Image, Text, View } from "react-native";
 import { connect } from "react-redux";
 import selectors from "~/Selectors";
 import { globalColorsAndStyles } from "~/Theme";
-import { formatDate, formatTime } from "~/Utils/utils";
+import { formatDate, formatTime, formatMoney } from "~/Utils/utils";
+import { mergeObj } from "~/Reducers/utils";
 
 class OrderDetail extends Component {
   render() {
     const { order, allProducts } = this.props;
-    const { createdAt, products: orderedProducts } = order.detail;
+    const { createdAt, products: orderedProducts, totalPrice } = order.detail;
     const { byId } = allProducts;
     const formatedDate = formatDate(createdAt);
     const formatedTime = formatTime(createdAt);
-
     return (
       <View style={{ flex: 1 }}>
         <View style={{ padding: 10 }}>
@@ -20,11 +20,16 @@ class OrderDetail extends Component {
           <Text style={{ fontSize: 18 }}>
             Đã nhận: {formatedDate}, {formatedTime}
           </Text>
+          <Text style={{ fontSize: 18 }}>
+            Tổng số tiền: {formatMoney(totalPrice)}
+          </Text>
         </View>
         <FlatList
           contentContainerStyle={{ paddingVertical: 10 }}
           keyExtractor={(item, index) => index.toString()}
-          data={Object.keys(orderedProducts).map(id => byId[id])}
+          data={Object.keys(orderedProducts).map(id =>
+            mergeObj(byId[id], { ordered: orderedProducts[id] })
+          )}
           renderItem={ReadOnlyProduct}
         />
       </View>
@@ -32,7 +37,7 @@ class OrderDetail extends Component {
   }
 }
 
-const ReadOnlyProduct = ({ item: { detail }, index }) => {
+const ReadOnlyProduct = ({ item: { detail, ordered }, index }) => {
   return (
     <View style={styles(index).listItem}>
       <View style={styles().imageContainer}>
@@ -45,8 +50,11 @@ const ReadOnlyProduct = ({ item: { detail }, index }) => {
       {detail && (
         <View style={styles().infoAndActions}>
           <View style={styles().info}>
-            <Text style={styles().listItemTitle}>{detail.name}</Text>
-            <Text>{detail.type}</Text>
+            <Text style={styles().listItemTitle}>
+              {detail.name} - <Text>{detail.type}</Text>
+            </Text>
+            <Text>Số lượng: {ordered.count}</Text>
+            <Text>Tổng tiền: {formatMoney(ordered.totalPrice)}</Text>
           </View>
         </View>
       )}

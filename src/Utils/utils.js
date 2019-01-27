@@ -8,27 +8,31 @@ export const promiseWrapper = promise =>
     .then(data => ({ data, error: null }))
     .catch(error => ({ error, data: null }));
 
+export const formatMoney = money =>
+  (money === 0 && "FREE") ||
+  (+money / 1000).toFixed(1).replace(/\d(?=(\d{3})+\.)/g, "$&,") + " K";
+
 export const formatDate = (date: Date): String => {
   var monthNames = [
-    "Tháng 1",
-    "Tháng 2",
-    "Tháng 3",
-    "Tháng 4",
-    "Tháng 5",
-    "Tháng 6",
-    "Tháng 7",
-    "Tháng 8",
-    "Tháng 9",
-    "Tháng 10",
-    "Tháng 11",
-    "Tháng 12"
+    "Th1",
+    "Th2",
+    "Th3",
+    "Th4",
+    "Th5",
+    "Th6",
+    "Th7",
+    "Th8",
+    "Th9",
+    "Th10",
+    "Th11",
+    "Th12"
   ];
 
   var day = date.getDate();
   var monthIndex = date.getMonth();
   var year = date.getFullYear();
 
-  return day + " " + monthNames[monthIndex] + " " + year;
+  return day + " " + monthNames[monthIndex] + ", " + year;
 };
 
 export const formatDateTimeForFileName = (date: Date): String => {
@@ -74,9 +78,9 @@ export const formatTime = (date: Date): String => {
   var second = date.getSeconds();
   return (
     (hour < 10 ? "0" + hour : hour) +
-    " : " +
+    ":" +
     (minutes < 10 ? "0" + minutes : minutes) +
-    " : " +
+    ":" +
     (second < 10 ? "0" + second : second)
   );
 };
